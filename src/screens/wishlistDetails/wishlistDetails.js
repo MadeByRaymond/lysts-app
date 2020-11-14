@@ -199,6 +199,15 @@ export default class wishlistDetails extends Component {
           openRealm();
     }
 
+    componentDidCatch(error, info){
+        if(__DEV__){
+            console.log(error);
+            return;
+        }
+
+        console.log(error, info);
+    }
+
     
     
     navigationButtonPressed({ buttonId }) {
