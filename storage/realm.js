@@ -3,7 +3,7 @@ import {ObjectId} from 'bson';
 
 // Returns the shared instance of the Realm app.
 export function getRealmApp() {
-   const appId = 'mylystsapps-fvist'; // Set Realm app ID here.
+   const appId = 'mylystsapps-fvist'; // Set Realm app ID here. This is for testing purposes
    const appConfig = {
      id: appId,
      timeout: 10000,

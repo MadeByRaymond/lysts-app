@@ -16,6 +16,46 @@ import {app as realmApp} from '../../../storage/realm';
 
 let LottieView = require("lottie-react-native");
 
+// import {ObjectId} from 'bson';
+
+
+// import {setJSExceptionHandler, getJSExceptionHandler, setNativeExceptionHandler} from 'react-native-exception-handler';
+
+// //=================================================
+// // ADVANCED use case:
+// const JSexceptionhandler = (error, isFatal) => {
+//   // your error handler function
+//   console.log(error);
+// };
+// setJSExceptionHandler((JSexceptionhandler), true);
+// // - exceptionhandler is the exception handler function
+// // - allowInDevMode is an optional parameter is a boolean.
+// //   If set to true the handler to be called in place of RED screen
+// //   in development mode also.
+
+// // getJSExceptionHandler gives the currently set JS exception handler
+// const currentHandler = getJSExceptionHandler();
+
+
+// //=================================================
+// // ADVANCED use case:
+// const Nativeexceptionhandler = (exceptionString) => {
+//     // your exception handler code here
+//     console.log(exceptionString);
+//   };
+//   setNativeExceptionHandler(
+//     Nativeexceptionhandler,
+//     false,
+//     false
+//   );
+// // - exceptionhandler is the exception handler function
+// // - forceAppQuit is an optional ANDROID specific parameter that defines
+// //    if the app should be force quit on error.  default value is true.
+// //    To see usecase check the common issues section.
+// // - executeDefaultHandler is an optional boolean (both IOS, ANDROID)
+// //    It executes previous exception handlers if set by some other module.
+// //    It will come handy when you use any other crash analytics module along with this one
+// //    Default value is set to false. Set to true if you are using other analytics modules.
 
 
 export default class wishlistDetails extends Component {
@@ -138,7 +178,7 @@ export default class wishlistDetails extends Component {
     componentDidMount() {
         this.navigationEventListener = Navigation.events().bindComponent(this);
 
-        async function openRealm() {
+        function openRealm() {
             let user = realmApp.currentUser;
             // await user.logOut();
             // alert(user.isLoggedIn);
@@ -152,7 +192,6 @@ export default class wishlistDetails extends Component {
                 schema: [
                   {
                     name: "wishlist",
-                    primaryKey: "_id",
                     properties: {
                         _id: "objectId",
                         _partition: "string",
@@ -178,12 +217,40 @@ export default class wishlistDetails extends Component {
                 sync: {
                   user: user,
                   partitionValue: null,
-                }
+                  error: (s, e) => {console.log(e);}
+                },
+                // deleteRealmIfMigrationNeeded: true
               };
               
-              console.log("step2");
-              realm = await Realm.open(config);
-              console.log("step3");
+              console.log("log step 2");
+            //   realm = await Realm.open(config);
+              Realm.open(config).then((realm) => {
+                // realm.write(() => {
+                //   realm.create('wishlist', {
+                //     _id: new ObjectId(),
+                //     _partition: "public",
+                //     category: "red",
+                //     code: "1112",
+                //     dateCreated: new Date(),
+                //     dateModified: new Date(),
+                //     description: "string",
+                //     listItems: [{item:'food', status: 'active'}],
+                //     name: "Raymond’s New List",
+                //     owner: "5f9e8311c10f3aef0680dc12",
+                //     status: "active"
+                //   });
+                // });
+                let datas = realm.objects("wishlist").filtered("code == '1112'")
+              console.log(datas);
+                console.log("log step 3");
+              }).catch((e) => {
+                console.log(e);
+              }).finally(() => {
+                // if (Realm !== null && !Realm.) {
+                //     // Real.close();
+                //   }
+              });
+            //   console.log("step3");
             //   alert(this.props.wishlistCode);
             //   let datas = realm.objects("wishlist").filtered("code == 'WSH-1234'")
             //   console.log("step4");
@@ -199,7 +266,19 @@ export default class wishlistDetails extends Component {
           openRealm();
     }
 
-    
+    componentDidCatch(error, info){
+        if(__DEV__){
+            console.log(error);
+            return;
+        }
+
+        console.log(error, info);
+    }
+
+    componentWillUnmount() {
+        // Close the realm if there is one open.
+        // Realm.
+    }
     
     navigationButtonPressed({ buttonId }) {
         if (buttonId === 'saveButton') {

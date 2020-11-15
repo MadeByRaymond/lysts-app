@@ -89,6 +89,11 @@ target 'Lysts' do
 
   pod 'RealmJS', :path => '../node_modules/realm'
 
+
+
+
+  pod 'ReactNativeExceptionHandler', :path => '../node_modules/react-native-exception-handler'
+
   target 'LystsTests' do
     inherit! :complete
     # Pods for testing
