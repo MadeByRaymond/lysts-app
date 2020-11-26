@@ -19,7 +19,7 @@ let dWidth = Dimensions.get("window").width;
             useArt 
             style={[styles.cardBoxShadow, {width: cardWidth, height: ((cardWidth*68)/148)+125.5}]}
         >
-            <TouchableOpacity activeOpacity={0.8} onPress={() => action(data.id, data.saved)}>
+            <TouchableOpacity activeOpacity={0.8} onPress={() => action(data.code, data.saved)}>
                 <View style={[styles.cardBox, {width: cardWidth}]}>
                     <View style={styles.top}>
                     <View style={styles.savedIconBox}>

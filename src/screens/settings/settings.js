@@ -4,6 +4,8 @@ import Svg, { Rect, Circle, Path } from "react-native-svg"
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 
+import {app as realmApp} from '../../../storage/realm'
+
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
 
 export default class settings extends Component {
@@ -171,7 +173,7 @@ export default class settings extends Component {
 
                   <View style={styles.divider}></View>
                   
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{realmApp.currentUser.logOut()}}>
                     <View style={styles.settingRow}>
                       <View style={styles.settingTextWrapper}><Text style={[styles.settingText,{color:'#6990C4'}]}>Logout of Lysts</Text></View>
                     </View>

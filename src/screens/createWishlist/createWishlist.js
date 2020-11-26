@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Realm from 'realm';
 import { Text, StyleSheet, View, Dimensions,Platform, TouchableNativeFeedback, TouchableOpacity,BackHandler } from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
@@ -11,12 +12,23 @@ import CreationPreview from '../../components/wishlistCreation/creationPreview';
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import {removeExcessWhiteSpace} from '../../includes/functions';
 
+
+import {app as realmApp} from '../../../storage/realm';
+import {WishlistSchemas} from '../../../storage/schemas';
+import {ObjectId} from 'bson';
+
+
 let dHeight = Dimensions.get("window").height;
 let dWidth = Dimensions.get("window").width;
 
 let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
 
 class createWishlist extends Component {
+    
+    // Class Variables
+    realm;
+    wishlistCode;
+    user = realmApp.currentUser;
 
     constructor(props) {
         super(props)
@@ -230,13 +242,136 @@ class createWishlist extends Component {
 
             this.wizard.current.next();
         } else if(this.state.wizard.currentStep === 2){
-            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, 'WLA235B', 'hhxhdh');
+            this.createNewWishlist();
+            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, 'hhxhdh', ({
+                id: 'temp_id',
+                name: this.state.wishlistInfo.name.value,
+                type: this.state.wishlistInfo.category.value,
+                code: `${this.wishlistCode}`,
+                saved: false,
+            }));
             Navigation.popToRoot(this.props.componentId);
         } else {
             this.wizard.current.next();
         }
         return true;
      }
+    
+     createNewWishlist = () => {
+        try{
+          console.log(`Logged in with the user: ${this.user.id}`);
+          let newWishlist;
+          let listItems = this.state.listItems.map(item => ({
+            item, 
+            status: "active"
+          }))
+
+          this.wishlistCode = "LY" + this.randomString(4);
+          
+          const config = {
+            schema: [
+              WishlistSchemas.wishlistSchema,
+              WishlistSchemas.wishlist_listItemsSchema
+            ],
+            sync: {
+              user: this.user,
+              partitionValue: "public",
+              error: (s, e) => {console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);}
+            },
+          };
+          
+          console.log("log step 2");
+        //   realm = await Realm.open(config);
+          Realm.open(config).then((realm) => {
+            console.log("log step 3/5");
+            this.realm = realm;
+            let keepCheckingCode = true
+            while(keepCheckingCode){
+                let wishlistObject = this.realm.objects("wishlist").filtered(`code == '${this.wishlistCode}'`);
+                if(wishlistObject.length > 0){
+                    this.wishlistCode = "LY" + this.randomString(4)
+                }else{
+                    keepCheckingCode = false
+                }
+            }
+
+            this.realm.write(() => {
+                newWishlist = realm.create("wishlist", { 
+                    _id : new ObjectId(),
+                    _partition : 'public',
+                    name: this.state.wishlistInfo.name.value,
+                    category: this.state.wishlistInfo.category.value,
+                    code: `${this.wishlistCode}`,
+                    dateCreated: new Date(),
+                    dateModified: new Date(),
+                    description: this.state.wishlistInfo.description.value,
+                    owner: this.user.id,
+                    status: 'active',
+                    listItems
+                });
+              });
+
+              console.log({ 
+                _id : new ObjectId(),
+                _partition : 'public',
+                name: this.state.wishlistInfo.name.value,
+                category: this.state.wishlistInfo.category.value,
+                code: `${this.wishlistCode}`,
+                dateCreated: new Date(),
+                dateModified: new Date(),
+                description: this.state.wishlistInfo.description.value,
+                owner: this.user.id,
+                status: 'active',
+                listItems
+            });
+
+            // let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}'`).sorted("dateModified", false);
+            
+            // console.log(wishlistData);
+            // if (wishlistData.length < 1) { 
+            //   this.setState({
+            //     isLoading: false,
+            //     listData
+            //   })
+            // } 
+            // else {
+              
+            //   for (const val of wishlistData) {
+            //     listData.push({
+            //       id: val._id,
+            //       name: val.name,
+            //       type: val.category,
+            //       code: val.code,
+            //       saved: this.user.customData.savedLists.includes(val.code)
+            //     })
+            //   }
+            //   this.setState({
+            //     isLoading: false,
+            //     listData
+            //   })
+            // }
+        //   console.log(datas);
+            console.log("log step 3");
+          }).catch((e) => {
+            console.log(e);
+          }).finally(() => {
+            // if (Realm !== null && !Realm.) {
+            //     // Real.close();
+            //   }
+          });
+        } catch (error) {
+            throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+            
+        }
+      }
+
+      randomString = (length, chars = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') => {
+        length = Math.floor(length);
+        let firstChar = 'ADEJMNUVXY'
+        let result = firstChar[Math.round(Math.random() * (firstChar.length - 1))];
+        for (let i = (length-1); i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
+        return (length < 1) ? '' : result;
+      }
      
     render() {
         let stepsList = [

@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
+import Realm from 'realm';
 import { View, Text, StyleSheet, Dimensions, PixelRatio, Button, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import LottieView from 'lottie-react-native';
 import Svg, { Rect } from "react-native-svg"
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 import * as Animatable from 'react-native-animatable';
+
+import {app as realmApp} from '../../../storage/realm';
+import {WishlistSchemas} from '../../../storage/schemas';
 
 import FabView from '../../UIComponents/Buttons/FabButton/fabButton';
 import ModalButtonView from '../../UIComponents/Buttons/ModalButton/modalButtonView';
@@ -23,7 +27,13 @@ let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
 
 export default class Wishlist extends Component {
 
+  // Class Variables
+  realm;
+  user = realmApp.currentUser;
+
   state = {
+    isLoading: true,
+    silentReload: false,
     newListAdded: false,
     newListInfoModal:{
       // shareLink: 'here\s a code WLA235B',
@@ -179,12 +189,17 @@ export default class Wishlist extends Component {
           },
         },
         passProps: {
-          setNewListAdded: ((boolean, name, code, shareLink) => {this.setState({newListAdded: boolean,
-            newListInfoModal:{
-              wishlistName: name,
-              wishListCode: code,
-              shareLink: shareLink
-            }})})
+          setNewListAdded: ((boolean, name, code, shareLink, newListData) => {
+            this.setState({
+              silentReload: true,
+              newListAdded: boolean,
+              newListInfoModal:{
+                wishlistName: name,
+                wishListCode: code,
+                shareLink: shareLink
+              },
+              listData: [newListData, ...this.state.listData]
+          })})
         }
       }
     });
@@ -213,9 +228,11 @@ export default class Wishlist extends Component {
   renderItemsList = () =>{
     return (
       <ListView 
-        listAction={(id, saveStatus) => goToViewWishlistScreen(this.props.componentId,"WSH-1234",saveStatus)} 
+        listAction={(code, saveStatus) => goToViewWishlistScreen(this.props.componentId,code,saveStatus)} 
         renderType='portrait' 
         renderData={this.state.listData} 
+        onRefresh = {this.getWishlists}
+        refreshing = {this.state.isLoading}
       />
       )
     // let listData = this.state.listData;
@@ -274,6 +291,90 @@ export default class Wishlist extends Component {
     // })
   }
 
+  showLoading = () => (
+    <View style={{
+      flex: 1,
+      justifyContent: "center"
+  }}>
+      <View>
+          <LottieView 
+              style={{width: '100%', height: 250, marginTop: 0, alignSelf: 'center',backgroundColor:'transparent', opacity:0.9}}
+              source={require('../../lotti_animations/37725-loading-50-among-us.json')} 
+              autoPlay 
+              loop={true}
+              autoSize= {true}
+              speed={1}
+          />
+      </View>
+      {this.getWishlists()}
+  </View>
+  )
+
+  getWishlists = (checkIfLoading = true) => {
+    try{
+      console.log(`Logged in with the user: ${this.user.id}`);
+      checkIfLoading ? ((!this.state.isLoading) ? this.setState({isLoading: true}) : null ) : null;
+      
+      let listData = [];
+      const config = {
+        schema: [
+          WishlistSchemas.wishlistSchema,
+          WishlistSchemas.wishlist_listItemsSchema
+        ],
+        sync: {
+          user: this.user,
+          partitionValue: "public",
+          error: (s, e) => {console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);}
+        },
+      };
+      
+      console.log("log step 2");
+    //   realm = await Realm.open(config);
+      Realm.open(config).then((realm) => {
+        console.log("log step 3/5");
+        this.realm = realm;
+        let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'active'`).sorted("dateModified", true);
+        
+        console.log(wishlistData);
+        if (wishlistData.length < 1) { 
+          this.setState({
+            isLoading: false,
+            silentReload: false,
+            listData
+          })
+        } 
+        else {
+          
+          for (const val of wishlistData) {
+            listData.push({
+              id: val._id,
+              name: val.name,
+              type: val.category,
+              code: val.code,
+              saved: this.user.customData.savedLists.includes(val.code)
+            })
+          }
+          this.setState({
+            isLoading: false,
+            silentReload: false,
+            listData
+          })
+        }
+    //   console.log(datas);
+        console.log("log step 3");
+      }).catch((e) => {
+        console.log(e);
+      }).finally(() => {
+        // if (Realm !== null && !Realm.) {
+        //     // Real.close();
+        //   }
+      });
+    } catch (error) {
+        throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+        
+    }
+  }
+
   handelModal = () => {
     // Navigation.updateProps('PROFILE_SCREEN_ID', {
     //   status: 'offline'
@@ -295,20 +396,30 @@ export default class Wishlist extends Component {
     let listData = this.state.listData;
     let hasData = false;
     let whatToRender;
-    if (listData != null && listData.length !== 0){
-      hasData = true;
-      whatToRender = this.renderItemsList();
-    }else{
+    if (this.state.isLoading && (listData.length == 0 || listData == null)){
       hasData = false;
-      whatToRender = this.renderNoItems();
+      whatToRender = this.showLoading();
+    }else if (this.state.isLoading){
+        hasData = true;
+        whatToRender = this.renderItemsList(true);
+    } else {
+      if (listData != null && listData.length !== 0){
+        hasData = true;
+        whatToRender = this.renderItemsList();
+      }else{
+        hasData = false;
+        whatToRender = this.renderNoItems();
+      }
     }
+
+    this.state.silentReload ? this.getWishlists(false) : null;
 
     return (
       <View style={styles.container}>
         {this.state.newListAdded ? this.handelModal() : null}
         <View style={[styles.container, hasData ? styles.grayBG : styles.whiteBg]}>
           <View style={styles.top}>
-            <Text style={styles.topText}>Wishlist</Text>
+            <Text style={styles.topText}>Wishlists</Text>
           </View>
           <View style={styles.bottom}>
             {whatToRender}

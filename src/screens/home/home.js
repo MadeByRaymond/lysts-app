@@ -64,7 +64,7 @@ export class Home extends Component {
                               })
                           }}
                           onSubmitEditing = {(e) => {
-                            goToViewWishlistScreen(this.props.componentId, "WSH-1234")
+                            goToViewWishlistScreen(this.props.componentId, e.nativeEvent.text)
                           }}
                           style={styles.searchInput} 
                           placeholder="🎁  Enter wishlist code" 

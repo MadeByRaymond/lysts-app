@@ -5,11 +5,16 @@ import { Shadow } from 'react-native-neomorph-shadows';
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 
+import {app as realmApp} from '../../../storage/realm';
+
 import {dHeight, dWidth} from '../../includes/variables';
 import {onShare} from '../../includes/functions';
 import ContactsModal from '../../UIComponents/Modals/DefaultModal';
 
 export default class profile extends Component {
+    // Class Variables 
+    user = realmApp.currentUser;
+    userData = realmApp.currentUser.customData;
     state = {
         actionsWrapperHeight: 410,
         contactModal: false,
@@ -53,7 +58,13 @@ export default class profile extends Component {
                 />
                 <View style={styles.top}>
                     <View><Image style={styles.avatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
-                    <View><Text style={styles.name}>Daisy Oh</Text></View>
+                    <View><Text style={styles.name}>{
+                        (
+                                (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
+                                ? `${this.userData.firstName.trim().trimStart()} ${this.userData.lastName.trim().trimStart()}`.trim() 
+                                : this.userData.displayName.trim().trimStart()
+                        )
+                    }</Text></View>
                     <View>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo')}}>
                             <View style={styles.button}><Text style={styles.buttonText}>Edit Profile</Text></View>

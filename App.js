@@ -57,6 +57,10 @@ Navigation.registerComponentWithRedux('com.lysts.screen.securitySettings', () =>
 Navigation.registerComponent('com.lysts.component.SavedButton', () => SavedButton);
 
 
+// REQUIRED APP RESOURCES
+require("./src/assets/images/home_bg.png");
+
+
 
 export const loginRoot = {
   root: {
