@@ -8,11 +8,22 @@ import ListView from '../../components/wishlistList/wishlistList';
 import * as Fade from '../../UIComponents/GradientFade/gradientFade';
 import { Touchable } from '../../includes/variables';
 
+import {app as realmApp} from '../../../storage/realm';
+import {WishlistSchemas, UserSchemas} from '../../../storage/schemas';
+
+// import PushNotificationIOS from "@react-native-community/push-notification-ios";
+// import PushNotification from "react-native-push-notification";
+
 export default class save_archive extends Component {
+    // Class Variables
+    realm;
+    user = realmApp.currentUser;
+
     state ={
       isArchive : this.props.show == 'archive' ? true : false,
       isSaved : this.props.show == 'saved' ? true : false,
-        listData: [
+      isLoading : true,
+      listData: [
             // {
             //   id: '1233',
             //   name: 'Raymond’s Ultimate House Warming List',
@@ -94,6 +105,8 @@ export default class save_archive extends Component {
             listAction={(id, saveStatus) => goToViewWishlistScreen(this.props.componentId,id,saveStatus)} 
             renderType= {this.state.isArchive ? 'portrait' : this.state.isSaved ? 'horizontal' : 'portrait'}
             renderData={this.state.listData} 
+            onRefresh = {this.getWishlists}
+            refreshing = {this.state.isLoading}
 
           />
         )
@@ -124,16 +137,152 @@ export default class save_archive extends Component {
       )
     }
 
+    loadingItems = () => {
+      return(
+        <View><Text>Loading ....</Text>{this.getWishlists()}</View>
+      )
+    }
+
+    getWishlistsFromRealm = () => {
+      
+      let wishlistData = [];
+      let ownerData = [];
+      
+
+      // for (const value of temp) {
+      //   filter = filter + `code == '${value}'`
+      // }
+
+      let listData = [];
+      if (this.state.isArchive){
+        wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'inactive'`).sorted("dateModified", true);
+      }else if(this.state.isSaved){
+        let savedWishlists = this.user.customData.savedLists
+        let filter = "status == 'inactive'";
+        let ownersFilter = "";
+
+        savedWishlists.forEach((val, i) =>{
+          if (i == 0){
+            filter = `code == '${val}'`
+          }else{
+            filter = filter + ` || code == '${val}'`
+          }
+        })
+        wishlistData = this.realm.objects("wishlist").filtered(`${filter}`).sorted("dateCreated", true);
+        // console.log(wishlistData.length);
+        if(wishlistData.length > 0){
+          wishlistData.forEach((val,i) => {
+            if (i == 0){
+              ownersFilter = `userID == '${val.owner}'`
+            }else{
+              ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
+            }
+          })
+          // console.log(ownersFilter);
+          ownerData = this.realm.objects("user").filtered(ownersFilter);
+        }
+        // ownerData = this.realm.objects("user").filtered(`userID == '${wishlistData[0].owner}'`);
+      }  else{
+        wishlistData = [];
+      }    
+          
+      console.log(wishlistData);
+      if (wishlistData.length < 1) { 
+        listData = [];
+      } 
+      else {
+        
+        for (const val of wishlistData) {
+          let ownerName = '';
+          console.log(ownerData);
+          ownerData.forEach(user => {
+            if (user.userID == val.owner){
+              ownerName = (
+                (user.displayName == undefined || user.displayName == null || user.displayName.trim() == "") 
+                ? user.fullName.trim().trimStart() : user.displayName.trim().trimStart());
+              // break;
+            }
+          })
+
+          listData.push({
+            id: val._id,
+            name: val.name,
+            type: val.category,
+            code: val.code,
+            owner: this.state.isSaved ? ownerName : this.user.id,
+            saved: this.user.customData.savedLists.includes(val.code)
+          })
+        }
+        
+      }
+  
+      this.setState({
+        isLoading: false,
+        silentReload: false,
+        listData
+      })
+    }
+
+    getWishlists = (checkIfLoading = true) => {
+      try{
+        console.log(`Logged in with the user: ${this.user.id}`);        
+        
+        const config = {
+          schema: [
+            WishlistSchemas.wishlistSchema,
+            WishlistSchemas.wishlist_listItemsSchema,
+            UserSchemas.userSchema,
+            UserSchemas.user_settingsSchema,
+            UserSchemas.user_settings_notificationSchema
+          ],
+          sync: {
+            user: this.user,
+            partitionValue: "public",
+            error: (s, e) => {console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);}
+          },
+        };
+        
+        console.log("log step 2");
+      //   realm = await Realm.open(config);
+      if(this.realm != null && !this.realm.isClosed){
+        this.getWishlistsFromRealm();
+      }else{
+        Realm.open(config).then((realm) => {
+          console.log("log step 3/5");
+          this.realm = realm;
+          this.getWishlistsFromRealm();
+          
+      //   console.log(datas);
+          console.log("log step 3");
+        }).catch((e) => {
+          console.log(e);
+        }).finally(() => {
+          // if (Realm !== null && !Realm.) {
+          //     // Real.close();
+          //   }
+        });
+      }
+        
+      } catch (error) {
+          throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+          
+      }
+    }
 
     render() {
-        let whatToRender = this.state.listData.length == 0 ? this.renderNoItems() : this.renderItemsList();
+        let whatToRender = (this.state.isLoading  
+          ? (this.loadingItems()) 
+          : (this.state.listData.length == 0 ? this.renderNoItems() : this.renderItemsList()));
+        
         
         return (
             <View style={styles.container}>
                 <View style={styles.headerWrapper}>
+                    <TouchableOpacity onPress={this.testNotification}>
                     <View style={styles.headerSVGWrapper}>
                       {this.renderHeaderSVG()}
                     </View>
+                    </TouchableOpacity>
                     <TouchableOpacity activeOpacity={0.7} onPress={() => {Navigation.popToRoot(this.props.componentId);}}>
                       <View style={styles.profileWrapper}>
                         <View style={styles.profileAvatarWrapper}><Image style={styles.profileAvatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>

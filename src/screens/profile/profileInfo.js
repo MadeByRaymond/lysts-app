@@ -7,26 +7,31 @@ import InfoForm from '../../components/Forms/profileForms/profileInfoForm';
 
 import {removeExcessWhiteSpace} from '../../includes/functions';
 
+import {app as realmApp} from '../../../storage/realm';
+
 export default class profileInfo extends Component {
+    user = realmApp.currentUser;
+    userData = realmApp.currentUser.customData;
 
     state={
        buttonDisabledStatus: true,
+       savingData: false,
        closeButtonText: 'Close',
        profileInfo:{
           name: {
-            value: 'Daisy Obianala',
+            value: this.userData.fullName,
             focused: false
           },
           displayName: {
-            value: 'Daisy Oh',
+            value: this.userData.displayName,
             focused: false
           },
           email: {
-            value: 'daisyobia23@gmail.com',
+            value: this.userData.contactEmail,
             focused: false
           },
           phone:{
-            value: '+1 555 012 7643',
+            value: this.userData.contactPhone,
             focused: false
           }
         },
@@ -35,6 +40,63 @@ export default class profileInfo extends Component {
     validateEmail = (email) =>{
         let valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,6})+$/.test(email);
         return valid;
+    }
+
+    saveData = async () => {
+        try {
+            const mongo = this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists");
+            const collection = mongo.db("lysts").collection("users");
+
+            const filter = {
+                userID: this.user.id, // Query for the user object of the logged in user
+            };
+
+            const updateDoc = {
+                $set: {
+                    fullName:this.state.profileInfo.name.value,
+                    displayName:this.state.profileInfo.displayName.value,
+                    contactEmail : this.state.profileInfo.email.value,
+                    contactPhone: this.state.profileInfo.phone.value,
+                    lastModified: new Date()
+                },
+            };
+            const result = await collection.updateMany(filter, updateDoc);
+            console.log(result);
+
+            const customUserData = await this.user.refreshCustomData();
+            console.log(customUserData);
+            
+            this.props.refreshInfo(customUserData);
+
+            this.setState({
+                buttonDisabledStatus: true,
+                savingData: false,
+                profileInfo:{
+                    name: {
+                        value: customUserData.fullName,
+                        focused: false
+                    },
+                    displayName: {
+                        value: customUserData.displayName,
+                        focused: false
+                    },
+                    email: {
+                        value: customUserData.contactEmail,
+                        focused: false
+                    },
+                    phone:{
+                        value: customUserData.contactPhone,
+                        focused: false
+                    }
+                }
+            }, alert("Saved Successfully!!"))
+        } catch (error) {
+            
+            this.setState({
+                buttonDisabledStatus: false,
+                savingData: false
+            }, alert("Error saving your information"))
+        }
     }
 
     
@@ -100,6 +162,7 @@ export default class profileInfo extends Component {
     }
 
     render() {
+        this.state.savingData ? this.saveData() : null
         return (
             <View style={styles.container}>
                 <View style={styles.topBar}>
@@ -120,11 +183,14 @@ export default class profileInfo extends Component {
                     </View>
                 </ScrollView>
                 
-                {this.state.buttonDisabledStatus ? null : (<Button onPress={()=>{
+                {this.state.buttonDisabledStatus ? null : (<Button 
+                  disabled = {this.state.savingData}
+                  onPress={()=>{
                     Keyboard.dismiss();
                     this.setState(prevState => ({
-                        buttonDisabledStatus: true,
+                        buttonDisabledStatus: false,
                         closeButtonText : 'Close',
+                        savingData: true,
                         profileInfo: {
                             ...prevState.profileInfo,
                             name: {

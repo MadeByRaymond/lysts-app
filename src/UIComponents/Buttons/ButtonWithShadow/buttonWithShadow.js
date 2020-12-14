@@ -17,7 +17,7 @@ const buttonWithShadow = (props) => {
             useArt
             style={styles.buttonShadow}
             >
-            <Touchable useForeground={true} activeOpacity={0.9} {...props}>    
+            <Touchable disabled={props.disabled} useForeground={true} activeOpacity={0.9} {...props}>    
                 <View style={[styles.button, props.disabled ? {backgroundColor:'#CFA280'} : null]}>
                     <Text style={styles.text}>{props.children}</Text>
                 </View>

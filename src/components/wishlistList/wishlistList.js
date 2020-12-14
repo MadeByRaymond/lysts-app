@@ -36,6 +36,8 @@ const wishlistList = (props) => {
 
             showsVerticalScrollIndicator = {false}
             decelerationRate = 'normal'
+            onRefresh = {() => props.onRefresh()}
+            refreshing = {props.refreshing}
         />
     )
 

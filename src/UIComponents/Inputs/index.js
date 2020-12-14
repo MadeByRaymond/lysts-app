@@ -15,6 +15,12 @@ export function InputText(props) {
             placeholderTextColor = 'rgba(153, 153, 153, 0.6)'
             underlineColorAndroid="transparent"
             autoFocus={props.autoFocus}
+            onKeyPress={({nativeEvent}) => {
+                if(props.backspaceEvent){
+                    nativeEvent.key == 'Backspace' ? props.backspaceEvent() : null
+                }
+                
+            }}
             keyboardType = {props.keyboardType ? props.keyboardType : 'default'}
         />
     )

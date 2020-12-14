@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
 import { Shadow } from 'react-native-neomorph-shadows';
 import debounce from 'lodash.debounce';
@@ -18,9 +18,13 @@ export default class profile extends Component {
     state = {
         actionsWrapperHeight: 410,
         contactModal: false,
+        displayName: (
+            (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
+            ? `${this.userData.fullName.trim().trimStart()}` : this.userData.displayName.trim().trimStart()
+        ),
         contactInfo: {
-            email: 'paulreads@gmali.com',
-            phone: '+1 555 8654 43563'
+            email: this.userData.contactEmail,
+            phone: this.userData.contactPhone
         }
     }
 
@@ -42,6 +46,28 @@ export default class profile extends Component {
         });
       }, 1000, {leading: true,trailing: false})
 
+    refreshInfo = (newUserData) => {
+        // let newUserData = await this.user.refreshCustomData();
+        this.userData = newUserData;
+        this.setState({
+            displayName: (
+                (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
+                ? `${this.userData.fullName.trim().trimStart()}` : this.userData.displayName.trim().trimStart()
+            ),
+            contactInfo: {
+                email: this.userData.contactEmail,
+                phone: this.userData.contactPhone
+            }
+        })
+
+        // this.setState({
+        //     displayName,
+        //     contactInfo: {
+        //         email: contactEmail,
+        //         phone: contactPhone
+        //     }
+        // })
+    }
 
     render() {
         return (
@@ -50,23 +76,23 @@ export default class profile extends Component {
                     isVisible={this.state.contactModal}
                     closeFunction = {() => {this.setState({contactModal: false})}}
                     type='contactDetails'
-                    goToScreen = {() => {this.setState({contactModal: false},() => {this.goToScreen('com.lysts.screen.profileInfo')})}}
+                    goToScreen = {() => {this.setState({contactModal: false},() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})})}}
 
                     contactInfo={this.state.contactInfo}
                     modalTitle='Contact Details'
                     modalSubtitle='Your contact information will not be shared with other users'
                 />
+              <ScrollView 
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                bounces={false}
+                overScrollMode = 'auto'
+              >
                 <View style={styles.top}>
                     <View><Image style={styles.avatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
-                    <View><Text style={styles.name}>{
-                        (
-                                (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
-                                ? `${this.userData.firstName.trim().trimStart()} ${this.userData.lastName.trim().trimStart()}`.trim() 
-                                : this.userData.displayName.trim().trimStart()
-                        )
-                    }</Text></View>
+                    <View><Text style={styles.name}>{this.state.displayName}</Text></View>
                     <View>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo')}}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})}}>
                             <View style={styles.button}><Text style={styles.buttonText}>Edit Profile</Text></View>
                         </TouchableOpacity>
                     </View>
@@ -165,7 +191,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo')}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -361,6 +387,8 @@ Get it now on android free.
                         </View> 
                     </Shadow>
                 </View>
+              </ScrollView>
+                
             </View>
         )
     }

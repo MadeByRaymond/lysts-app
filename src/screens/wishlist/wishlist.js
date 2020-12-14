@@ -45,42 +45,42 @@ export default class Wishlist extends Component {
       wishListCode: ''
     },
     listData: [
-      {
-        id: '1233',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'Graduation',
-        saved: true,
-      },
-      {
-        id: '1234',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'Birthday',
-        saved: true,
-      },
-      {
-        id: '1235',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'job_promotion',
-        saved: false,
-      },
-      {
-        id: '1236',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'christmas',
-        saved: true,
-      },
-      {
-        id: '1237',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'father0s_day',
-        saved: false,
-      },
-      {
-        id: '1238',
-        name: 'Raymond’s Ultimate House Warming List',
-        type: 'house_warming',
-        saved: false,
-      },
+      // {
+      //   id: '1233',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'Graduation',
+      //   saved: true,
+      // },
+      // {
+      //   id: '1234',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'Birthday',
+      //   saved: true,
+      // },
+      // {
+      //   id: '1235',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'job_promotion',
+      //   saved: false,
+      // },
+      // {
+      //   id: '1236',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'christmas',
+      //   saved: true,
+      // },
+      // {
+      //   id: '1237',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'father0s_day',
+      //   saved: false,
+      // },
+      // {
+      //   id: '1238',
+      //   name: 'Raymond’s Ultimate House Warming List',
+      //   type: 'house_warming',
+      //   saved: false,
+      // },
       // {
       //   name: 'Raymond’s Ultimate House Warming List',
       //   type: 'job_promotion',
@@ -310,12 +310,44 @@ export default class Wishlist extends Component {
   </View>
   )
 
+
+  getWishlistsFromRealm = () => {
+    let listData = [];
+    let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'active'`).sorted("dateModified", true);
+        
+    console.log(wishlistData);
+    if (wishlistData.length < 1) { 
+      listData = [];
+    } 
+    else {
+      
+      for (const val of wishlistData) {
+        listData.push({
+          id: val._id,
+          name: val.name,
+          type: val.category,
+          code: val.code,
+          saved: this.user.customData.savedLists.includes(val.code)
+        })
+      }
+      
+    }
+
+    this.setState({
+      isLoading: false,
+      silentReload: false,
+      listData
+    })
+  }
+
+
   getWishlists = (checkIfLoading = true) => {
     try{
       console.log(`Logged in with the user: ${this.user.id}`);
-      checkIfLoading ? ((!this.state.isLoading) ? this.setState({isLoading: true}) : null ) : null;
+      // If should show loading screen when loading
+      // checkIfLoading ? ((!this.state.isLoading) ? this.setState({isLoading: true}) : null ) : null;
       
-      let listData = [];
+      
       const config = {
         schema: [
           WishlistSchemas.wishlistSchema,
@@ -330,36 +362,14 @@ export default class Wishlist extends Component {
       
       console.log("log step 2");
     //   realm = await Realm.open(config);
+    if(this.realm != null && !this.realm.isClosed){
+      this.getWishlistsFromRealm();
+    }else{
       Realm.open(config).then((realm) => {
         console.log("log step 3/5");
         this.realm = realm;
-        let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'active'`).sorted("dateModified", true);
+        this.getWishlistsFromRealm();
         
-        console.log(wishlistData);
-        if (wishlistData.length < 1) { 
-          this.setState({
-            isLoading: false,
-            silentReload: false,
-            listData
-          })
-        } 
-        else {
-          
-          for (const val of wishlistData) {
-            listData.push({
-              id: val._id,
-              name: val.name,
-              type: val.category,
-              code: val.code,
-              saved: this.user.customData.savedLists.includes(val.code)
-            })
-          }
-          this.setState({
-            isLoading: false,
-            silentReload: false,
-            listData
-          })
-        }
     //   console.log(datas);
         console.log("log step 3");
       }).catch((e) => {
@@ -369,6 +379,8 @@ export default class Wishlist extends Component {
         //     // Real.close();
         //   }
       });
+    }
+      
     } catch (error) {
         throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
         
@@ -412,7 +424,7 @@ export default class Wishlist extends Component {
       }
     }
 
-    this.state.silentReload ? this.getWishlists(false) : null;
+    this.state.silentReload ? this.getWishlists() : null;
 
     return (
       <View style={styles.container}>

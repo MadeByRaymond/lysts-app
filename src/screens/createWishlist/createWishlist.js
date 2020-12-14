@@ -41,6 +41,7 @@ class createWishlist extends Component {
                 infoButtonDisabledStatus: true,
                 itemButtonDisabledStatus: true,
             },
+            showError: false,
             wishlistInfo:{
               name: {
                 value: '',
@@ -376,7 +377,7 @@ class createWishlist extends Component {
     render() {
         let stepsList = [
             {
-                content: <InfoForm selectedCategory={this.props.selectedCategory} infoState = {this.state.wishlistInfo} setInfoState={this.setInfoState} />
+                content: <InfoForm selectedCategory={this.props.selectedCategory} infoState = {this.state.wishlistInfo} setInfoState={this.setInfoState} showError={this.state.showError} backspaceEvent={() => {this.state.showError ? null : this.setState({showError : true})}} />
             },
             {
                 content: (

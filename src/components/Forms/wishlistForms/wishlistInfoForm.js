@@ -22,6 +22,7 @@ const Form = (props) => {
             <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}} >
                 <View style={styles.container}>
                     <View style={styles.inputWrapper}><Input.InputText targetKey ='name' {...props} placeholder='Wishlist Name' maxLength = {35} autoFocus={true} /></View>
+                    {(props.showError && (props.infoState.name.value.length < 3)) ? (<View style={styles.errorMessageWrapper}><Text style={styles.errorMessage}>Must be longer than 3 characters</Text></View>) : null}
                     <View style={styles.inputWrapper}><Input.SelectInput targetKey ='category' {...props} placeholder='Category' itemsList={categoryList} selectedItem ={props.selectedCategory}/></View>
                     <View style={styles.inputWrapper}><Input.TextAreaInput targetKey ='description' {...props} placeholder='Description (optional)' maxLength = {1000} /></View>
                 </View>
@@ -42,5 +43,12 @@ const styles = StyleSheet.create({
     },
     inputWrapper: {
         marginBottom: 16,
+    },
+    errorMessageWrapper:{
+        marginTop: -6,
+        marginBottom: 6
+    },
+    errorMessage:{
+        color: '#ff4d40'
     }
 })

@@ -58,7 +58,7 @@ export class Home extends Component {
                         <TextInput 
                           value={this.state.wishlistCode}
                           onChangeText = {(val) => {
-                              let codeValue = val.toUpperCase();
+                              let codeValue = val.trimStart().trim().toUpperCase();
                               this.setState({
                                   wishlistCode: codeValue 
                               })
@@ -71,7 +71,7 @@ export class Home extends Component {
                           placeholderTextColor="rgba(68, 87, 124, 0.4)"  
                           textAlign= 'center'
                           autoCapitalize='characters'
-                          maxLength= {9}
+                          maxLength= {6}
                           returnKeyType = 'search'
                         />
                     </View>

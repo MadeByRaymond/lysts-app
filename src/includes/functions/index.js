@@ -66,34 +66,25 @@ const goToViewWishlistScreen = debounce((componentId, code="WSH-1234", saveStatu
 
             
             rightButtons: [
-              {
-                id: 'actionsButton',
-                icon: require('../../assets/images/nav-icons/ellipse.png'),
-                text: 'actions'
-              },
               // {
-              //   id:'com.lysts.component.SavedButton',
-              //   component: 'com.lysts.component.SavedButton',
-              //   passProps: {
-              //     saved: saveStatus,
-              //     height: 22,
-              //     width: 22,
-              //     color: '#515D70'
+              //   id: 'actionsButton',
+              //   icon: require('../../assets/images/nav-icons/ellipse.png'),
+              //   text: 'actions'
+              // },
+              // {
+              //   id: 'saveButton',
+              //   text: 'save',
+              //   component: {
+              //     id:'com.lysts.component.SavedButton',
+              //     name: 'com.lysts.component.SavedButton',
+              //     passProps: {
+              //       saved: saveStatus,
+              //       height: 22,
+              //       width: 22,
+              //       color: '#515D70'
+              //     }
               //   }
-              {
-                id: 'saveButton',
-                text: 'save',
-                component: {
-                  id:'com.lysts.component.SavedButton',
-                  name: 'com.lysts.component.SavedButton',
-                  passProps: {
-                    saved: saveStatus,
-                    height: 22,
-                    width: 22,
-                    color: '#515D70'
-                  }
-                }
-              }
+              // }
             ]
           }
         },
