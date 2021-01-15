@@ -1,8 +1,10 @@
 import * as React from "react"
-import Svg, { Circle, Mask, G, Path, Ellipse, Rect } from "react-native-svg"
+import Svg, { Circle, Mask, G, Path, Ellipse, Rect } from "react-native-svg";
 
-let loadColor = (avatarFeatures, feature, defaultColor) => (avatarFeatures ? avatarFeatures[feature] ? avatarFeatures[feature] : defaultColor : 'none') 
-let loadDefaultColor = (avatarFeatures, feature, defaultColor, noColor = false) => (avatarFeatures ? (avatarFeatures[feature] && avatarFeatures[feature] !== 'none') ? defaultColor : noColor ? 'none' : defaultColor : 'none') 
+import {loadColor, loadDefaultColor} from './globalVariables';
+
+// let loadColor = (avatarFeatures, feature, defaultColor) => (avatarFeatures ? avatarFeatures[feature] ? avatarFeatures[feature] : defaultColor : 'none') 
+// let loadDefaultColor = (avatarFeatures, feature, defaultColor, noColor = false) => (avatarFeatures ? (avatarFeatures[feature] && avatarFeatures[feature] !== 'none') ? defaultColor : noColor ? 'none' : defaultColor : 'none') 
 // fill={props.avatarFeatures ? props.avatarFeatures.bgColor "#FFEDEF" : }
 export function M001(props) {
   return (

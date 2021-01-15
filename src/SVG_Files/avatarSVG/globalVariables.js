@@ -1,0 +1,2 @@
+export const loadColor = (avatarFeatures, feature, defaultColor) => (avatarFeatures ? avatarFeatures[feature] ? avatarFeatures[feature] : defaultColor : 'none') 
+export const loadDefaultColor = (avatarFeatures, feature, defaultColor, noColor = false) => (avatarFeatures ? (avatarFeatures[feature] && avatarFeatures[feature] !== 'none') ? defaultColor : noColor ? 'none' : defaultColor : 'none') 
