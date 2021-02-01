@@ -608,8 +608,8 @@ export default class wishlistDetails extends Component {
             <View style={styles.container}>
                 {this.actionModal()}
                 <FadeBottom />
-                <View style={styles.ImageWrapper}>
-                    <CategoryImage width={(dWidth-60)} height={(dHeight/2.8)} />
+                <View style={[styles.ImageWrapper, CategoryImage.color ? CategoryImage.color : null]}>
+                    <CategoryImage.svg width={(dWidth-60)} height={(dHeight/2.8)} />
                 </View>
                 <ScrollView 
                     showsVerticalScrollIndicator={false} 
