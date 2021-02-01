@@ -2,7 +2,9 @@ import * as React from "react"
 import Svg, { Path } from "react-native-svg"
 
 function SvgComponent(props) {
-  return (
+  return ({
+    color: '#ffffff',
+    svg: (
     <Svg
       width={1094}
       height={760}
@@ -135,7 +137,8 @@ function SvgComponent(props) {
         fill="#000"
       />
     </Svg>
-  )
+    )
+  })
 }
 
 export default SvgComponent

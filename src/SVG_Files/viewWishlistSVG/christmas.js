@@ -2,7 +2,8 @@ import * as React from "react"
 import Svg, { Path, G } from "react-native-svg"
 
 function SvgComponent(props) {
-  return (
+  return ({
+    svg:(
     <Svg width={889} height={705} viewBox="0 0 889 705" fill="none" {...props}>
       <Path
         d="M379.657 6.251C235.564 32.4 114.31 161.818 135.604 225.59c14.233 42.698 84.955 33.871 99.85 83.851 13.681 46.119-40.492 73.922-51.304 147.624-8.606 59.027 13.791 125.998 48.877 159.98 119.047 115.296 493.842-42.036 506.199-190.101 1.986-23.942-3.2-74.694-35.968-111.765-34.865-39.499-68.405-26.811-92.788-58.697-42.368-55.165 30.23-129.308-1.876-191.976C575.605.073 455.013-7.43 379.657 6.251z"
@@ -830,7 +831,8 @@ function SvgComponent(props) {
         strokeLinejoin="round"
       />
     </Svg>
-  )
+    )
+  })
 }
 
 export default SvgComponent
