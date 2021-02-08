@@ -3,15 +3,11 @@ import { StyleSheet, Text, View, Dimensions, Platform, TouchableNativeFeedback, 
 
 import { Shadow } from 'react-native-neomorph-shadows';
 
-
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {Touchable} from '../../../includes/variables'
 
 const buttonWithShadow = (props) => {
 
-    // alert(PixelRatio.getPixelSizeForLayoutSize(105));
-
-    let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
+    // alert(PixelRatio.getPixelSizeForLayoutSize(45));
     return (
         <Shadow
             useArt
@@ -19,7 +15,7 @@ const buttonWithShadow = (props) => {
             >
             <Touchable disabled={props.disabled} useForeground={true} activeOpacity={0.9} {...props}>    
                 <View style={[styles.button, props.disabled ? {backgroundColor:'#CFA280'} : null]}>
-                    <Text style={styles.text}>{props.children}</Text>
+                    <Text style={styles.text}>{props.buttonText ? props.buttonText : props.children}</Text>
                 </View>
             </Touchable>
         </Shadow>
