@@ -7,6 +7,8 @@ import Svg, { Rect } from "react-native-svg"
 
 import ModalView from './ModalView';
 import ModalButtonView from '../Buttons/ModalButton/modalButtonView';
+import EditModalContent from '../../components/EditWishlistDetails/editWishlist';
+import ReportModalContent from '../../components/EditWishlistDetails/reportWishlist';
 
 import {dWidth} from '../../includes/variables';
 import {onShare} from '../../includes/functions';
@@ -15,7 +17,7 @@ let svgWidth = dWidth > 500 ? 400 : (dWidth-100);
 
 const DefaultModal = (props) => {
 
-    const animatableView = useRef(null)
+    const animatableView = useRef(null);
 
     let modalContent;
 
@@ -57,7 +59,7 @@ const DefaultModal = (props) => {
                 <View>
                     <ModalButtonView 
                         buttonText = 'share'
-                        onPress={() => {onShare('Share your Wishlink', `See my new Wishlist on with ${props.newListInfoModal.shareLink}`, props.newListInfoModal.wishlistName)}}
+                        onPress={() => {onShare('Share your Wishlink', `See my new Wishlist on Lysts App with ${props.newListInfoModal.shareLink}`, props.newListInfoModal.wishlistName)}}
                     />
                 </View>
               </View>
@@ -84,17 +86,49 @@ const DefaultModal = (props) => {
             )
             break;
 
+        case 'editWishlist' :
+            modalContent = (
+              <EditModalContent 
+                onClose={props.closeFunction} 
+                wishlistInfo={props.wishlistInfo} 
+                realmInfo = {props.realmInfo} 
+                userInfo = {props.userInfo} 
+                wishlistCode={props.wishlistCode} 
+                updateUI={props.updateUI} 
+                closeFunction = {props.closeFunction} 
+              />
+            )
+            break;
+
+        case 'reportWishlist' :
+            modalContent = (
+              <ReportModalContent 
+                reportFunction = {props.reportFunction}
+                userLoggedIn = {props.userLoggedIn}
+              />
+            )
+            break;
+
         default:
             break;
     }
 
     return(
       <ModalView
+
         isVisible={props.isVisible} 
         closeFunction = {props.closeFunction}
+        containerViewStyle = {props.type == 'editWishlist' ? {paddingHorizontal:30} : null}
       >
-        <View><Text style={styles.modalHeader}>{props.modalTitle}</Text></View>
-        <View><Text style={styles.modalSubheader}>{props.modalSubtitle}</Text></View>
+        {
+          props.type == 'editWishlist' ? null :(
+            <View>
+              <View><Text style={styles.modalHeader}>{props.modalTitle}</Text></View>
+              {props.type == 'reportWishlist' ? null :(<View><Text style={styles.modalSubheader}>{props.modalSubtitle}</Text></View>)}
+            </View>
+          )
+        }
+        
             {modalContent}
         
       </ModalView>

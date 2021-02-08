@@ -29,7 +29,7 @@ const ModalView = (props) => {
         }
       >
           <View style={styles.modalContainerWrapper}>
-            <View style={styles.modalContainer}>
+            <View style={[styles.modalContainer, props.containerViewStyle ? props.containerViewStyle : null]}>
               <View style={styles.modalSwipeIndicator}></View>
               {props.children}
             </View>
