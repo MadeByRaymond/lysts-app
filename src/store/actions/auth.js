@@ -3,6 +3,8 @@ import Reactotron from 'reactotron-react-native';
 import {Navigation} from 'react-native-navigation';
 
 import {getRealmApp, app as realmApp} from '../../../storage/realm';
+import {getGoogleAuthCode} from '../../services/GoogleAuthService';
+import {getFacebookAccessToken} from '../../services/FacebookAuthService';
 
 
 
@@ -72,17 +74,27 @@ const sendToLogin = () =>{
 //     }
 // }
 
-export const signInAuth = (authData) =>{
+export const signInAuth = (type) =>{
     // Navigation.setRoot(mainRoot);
     // return {
     //     type: SIGN_IN_AUTH
     // }
-    return dispatch => {
+    return async dispatch => {
 
         dispatch(uiStartLoading());
         // let app = getRealmApp();
         // Login User
-        const credentials = Realm.Credentials.emailPassword("demo@mymail.com", "password");
+        let credentials;
+        if(type == 'google'){
+            credentials = Realm.Credentials.google(await getGoogleAuthCode())
+        }else if(type == 'facebook'){
+            await getFacebookAccessToken();
+            // credentials = Realm.Credentials.google(await getGoogleAuthCode())
+        }else{
+            credentials = Realm.Credentials.emailPassword("demo@mymail.com", "password");
+        }
+
+        console.log("here");
         
         // fetch("https://stitch.mongodb.com/api/client/v2.0/app/mylystsapps-fvist/auth/providers/local-userpass/login", {
         //     method: 'POST',
@@ -117,6 +129,7 @@ export const signInAuth = (authData) =>{
             // }
 
             if(parsedRes.error){
+                dispatch(uiStopLoading()); 
             //   let message = parsedRes.error.message;
             //   if(message == 'EMAIL_NOT_FOUND'){
             //     alert("This email address is not recognized on our system.");
