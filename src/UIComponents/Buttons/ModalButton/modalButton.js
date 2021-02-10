@@ -1,12 +1,13 @@
 import React from 'react'
 import { StyleSheet, Text, View, Platform, TouchableNativeFeedback, TouchableOpacity} from 'react-native'
 
+import {Touchable} from '../../../includes/variables'
+
 const modalButton = (props) => {
-    let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
     return (
         <View style={styles.buttonWrapper}>
             <Touchable useForeground={true} activeOpacity={0.9} {...props}>
-                <View style={styles.button}>
+                <View style={[styles.button, props.disabled ? styles.buttonDisabled : null]}>
                     <Text style={styles.buttonText}>{props.buttonText}</Text>
                 </View>
             </Touchable>
@@ -28,6 +29,9 @@ const styles = StyleSheet.create({
         width: 220,
         justifyContent:'center',
         alignItems:'center'
+    },
+    buttonDisabled:{
+        opacity: 0.6
     },
     buttonText:{
         // letterSpacing: 0.6,

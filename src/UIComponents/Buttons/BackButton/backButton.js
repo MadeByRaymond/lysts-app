@@ -3,8 +3,9 @@ import { StyleSheet, Text, View, Platform, TouchableNativeFeedback, TouchableOpa
 
 import Svg, { Path } from "react-native-svg"
 
+import {Touchable} from '../../../includes/variables'
+
 const backButton = (props) => {
-    let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
     return (
         <View style={styles.buttonWrapper}>
             <Touchable useForeground={true} activeOpacity={0.9} {...props}>

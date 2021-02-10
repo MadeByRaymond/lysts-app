@@ -4,12 +4,9 @@ import { StyleSheet, View, Dimensions, Platform, TouchableNativeFeedback, Toucha
 import { Shadow } from 'react-native-neomorph-shadows';
 import Svg, { Path } from "react-native-svg"
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {Touchable} from '../../../includes/variables'
 
 const fabButton = (props) => {
-
-    let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
     return (
         <View style={styles.floatingView}>
             <Shadow
