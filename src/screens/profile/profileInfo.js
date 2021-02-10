@@ -4,14 +4,19 @@ import { Navigation } from "react-native-navigation";
 
 import Button from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import InfoForm from '../../components/Forms/profileForms/profileInfoForm';
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
-import {removeExcessWhiteSpace} from '../../includes/functions';
+import {removeExcessWhiteSpace, validateEmail, goToScreen} from '../../includes/functions';
+import {Touchable} from '../../includes/variables';
 
 import {app as realmApp} from '../../../storage/realm';
+
+import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
 export default class profileInfo extends Component {
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
+    timeoutAlert;
 
     state={
        buttonDisabledStatus: true,
@@ -35,12 +40,20 @@ export default class profileInfo extends Component {
             focused: false
           }
         },
+        avatarFeatures: this.userData.avatarFeatures,
+        alertMessage:{
+            show: false,
+            type: '',
+            title: '',
+            subtitle: '',
+        }
     }
 
-    validateEmail = (email) =>{
-        let valid = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,6})+$/.test(email);
-        return valid;
+    componentWillUnmount(){
+        this.props.onCloseFunc ? this.props.onCloseFunc() : null;
+        clearTimeout(this.timeoutAlert);
     }
+    
 
     saveData = async () => {
         try {
@@ -88,18 +101,29 @@ export default class profileInfo extends Component {
                         value: customUserData.contactPhone,
                         focused: false
                     }
+                },
+                alertMessage:{
+                    show: true,
+                    type: 'success',
+                    title: 'Saved Successfully!',
+                    subtitle: '',
                 }
-            }, alert("Saved Successfully!!"))
+            })
         } catch (error) {
             
             this.setState({
                 buttonDisabledStatus: false,
-                savingData: false
-            }, alert("Error saving your information"))
+                savingData: false,
+                alertMessage:{
+                    show: true,
+                    type: 'error',
+                    title: 'Error saving your information',
+                    subtitle: '',
+                }
+            })
         }
     }
 
-    
 
     setInfoState = (parentKey, childKey, childValue) =>{
         let buttonDisabledStatus = this.state.buttonDisabledStatus;
@@ -118,7 +142,7 @@ export default class profileInfo extends Component {
                 
             }else {
                 if(this.state.profileInfo.name.value.trim() == ''
-                || !this.validateEmail(this.state.profileInfo.email.value.trim())
+                || !validateEmail(this.state.profileInfo.email.value.trim())
                 ){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
             }
         }else{
@@ -127,15 +151,15 @@ export default class profileInfo extends Component {
             } else {
                 if (parentKey == 'name'){
                     if(childValue.toString().trim() == '' 
-                      || !this.validateEmail(this.state.profileInfo.email.value.trim())
+                      || !validateEmail(this.state.profileInfo.email.value.trim())
                     ){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
                 }else if (parentKey == 'email'){
                     if(this.state.profileInfo.name.value.trim() == ''
-                      || !this.validateEmail(childValue.toString().trim())
+                      || !validateEmail(childValue.toString().trim())
                     ){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
                 }else {
                     if(this.state.profileInfo.name.value.trim() == ''
-                      || !this.validateEmail(this.state.profileInfo.email.value.trim())
+                      || !validateEmail(this.state.profileInfo.email.value.trim())
                     ){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
                 }
             }
@@ -161,10 +185,34 @@ export default class profileInfo extends Component {
         })
     }
 
+    onAvatarRefresh = (newUserData) => {
+        this.setState({
+            avatarFeatures: newUserData.avatarFeatures
+        })
+
+        this.props.refreshInfo(newUserData)
+    }
+
+    resetAlert = () => {
+        
+        this.timeoutAlert = setTimeout(()=>{
+            this.setState({alertMessage: {show: false}})
+            clearTimeout(this.timeoutAlert);
+        }, 4500)
+    }
+
     render() {
-        this.state.savingData ? this.saveData() : null
+        this.state.savingData ? this.saveData() : null;
+        this.state.alertMessage.show ? this.resetAlert() : null;
+        let AvatarSVGView = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
         return (
             <View style={styles.container}>
+                {this.state.alertMessage.show ? (<ErrorSuccessAlert 
+                    type = {this.state.alertMessage.type}
+                    title = {this.state.alertMessage.title}
+                    subtitle = {this.state.alertMessage.subtitle}
+                /> )
+                : null}
                 <View style={styles.topBar}>
                     <TouchableOpacity onPress={() => { Navigation.popToRoot(this.props.componentId)}}>
                         <Text style={styles.cancelText}>{this.state.closeButtonText}</Text>
@@ -172,8 +220,27 @@ export default class profileInfo extends Component {
                 </View>
                 <ScrollView showsVerticalScrollIndicator = {false}>
                     <View style={styles.profileAvatarWrapper}>
-                        <View style={styles.avatarWrapper}><Image style={styles.avatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
-                        <View><Text style={styles.changeAvatarText}>Change Profile Photo</Text></View>
+                        <TouchableOpacity useForeground={true} activeOpacity={0.8} onPress={()=>{
+                            goToScreen(this.props.componentId,'com.lysts.screen.customizeAvatar',{refreshInfo: this.onAvatarRefresh},{
+                                topBar: {
+                                    title: {
+                                        text: 'Customize Avatar'
+                                    },
+                                    visible: true,
+                                    drawBehind: false,
+                                    animate: true,
+                                }
+                            })
+                        }}>
+                            <View>
+                                <View style={styles.avatarWrapper}>
+                                    <View style={styles.avatar}>
+                                        <AvatarSVGView width={150} height={150} avatarFeatures={this.state.avatarFeatures} />
+                                    </View>
+                                </View>
+                                <View><Text style={styles.changeAvatarText}>Customize avatar</Text></View>
+                            </View>
+                        </TouchableOpacity>
                     </View>
                     <View>
                         <InfoForm 
@@ -211,7 +278,7 @@ export default class profileInfo extends Component {
                             }
                         }
                     }))
-                }}>Save</Button>)}
+                }}>{this.state.savingData ? 'Saving...' : 'Save'}</Button>)}
             </View>
         )
     }

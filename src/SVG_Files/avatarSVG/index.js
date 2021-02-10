@@ -1,8 +1,8 @@
-import * as MaleAvatars from './maleAvatars';
-import * as FemaleAvatars from './maleAvatars';
+import * as Male from './maleAvatars';
+import * as Female from './femaleAvatars';
 
 
 export {
-    MaleAvatars,
-    FemaleAvatars
+    Male,
+    Female
 }

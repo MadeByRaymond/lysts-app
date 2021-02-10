@@ -4,28 +4,41 @@ import Svg, { Circle, Path } from "react-native-svg";
 import { Shadow } from 'react-native-neomorph-shadows';
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
+import ViewShot, {captureRef} from "react-native-view-shot";
 
 import {app as realmApp} from '../../../storage/realm';
 
-import {dHeight, dWidth} from '../../includes/variables';
-import {onShare} from '../../includes/functions';
+import {dHeight, dWidth, Touchable} from '../../includes/variables';
+import {onShare, goToScreen} from '../../includes/functions';
 import ContactsModal from '../../UIComponents/Modals/DefaultModal';
+
+import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
 export default class profile extends Component {
     // Class Variables 
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
+    viewShot = React.createRef();
     state = {
         actionsWrapperHeight: 410,
         contactModal: false,
         displayName: (
-            (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
+            (typeof this.userData.displayName == 'undefined' || this.userData.displayName == null || this.userData.displayName.trim() == "") 
             ? `${this.userData.fullName.trim().trimStart()}` : this.userData.displayName.trim().trimStart()
         ),
         contactInfo: {
             email: this.userData.contactEmail,
             phone: this.userData.contactPhone
-        }
+        },
+        avatarFeatures: this.userData.avatarFeatures,
+        avatarTempImage: ''
+    }
+
+    componentDidMount () {
+        this.viewShot.current.capture().then(uri => {
+          console.log("avatarTempImage: ", uri);
+          this.setState({avatarTempImage: uri})
+        });
     }
 
 
@@ -49,15 +62,17 @@ export default class profile extends Component {
     refreshInfo = (newUserData) => {
         // let newUserData = await this.user.refreshCustomData();
         this.userData = newUserData;
+        
         this.setState({
             displayName: (
-                (this.userData.displayName == undefined || this.userData.displayName == null || this.userData.displayName.trim() == "") 
+                (typeof this.userData.displayName == 'undefined' || this.userData.displayName == null || this.userData.displayName.trim() == "") 
                 ? `${this.userData.fullName.trim().trimStart()}` : this.userData.displayName.trim().trimStart()
             ),
             contactInfo: {
                 email: this.userData.contactEmail,
                 phone: this.userData.contactPhone
-            }
+            },
+            avatarFeatures : this.userData.avatarFeatures
         })
 
         // this.setState({
@@ -69,7 +84,17 @@ export default class profile extends Component {
         // })
     }
 
+    updateAvatarTemp = async() =>{
+        let uri = await captureRef(this.viewShot.current, {format: 'png'})
+        console.log("another one: ",uri);
+
+        this.setState({
+            avatarTempImage: uri
+        })
+    }
+
     render() {
+        let AvatarSVGView = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
         return (
             <View style={styles.container}>
                 <ContactsModal 
@@ -89,10 +114,27 @@ export default class profile extends Component {
                 overScrollMode = 'auto'
               >
                 <View style={styles.top}>
-                    <View><Image style={styles.avatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
+                    <View>
+                        <TouchableOpacity useForeground={true} activeOpacity={0.8} onPress={()=>{goToScreen(this.props.componentId,'com.lysts.screen.customizeAvatar',{refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp},{
+                            topBar: {
+                                title: {
+                                    text: 'Customize Avatar'
+                                },
+                                visible: true,
+                                drawBehind: false,
+                                animate: true,
+                            }
+                        })}}>
+                            <ViewShot ref={this.viewShot} options={{ format: "png" }}>
+                                <View style={styles.avatar}>
+                                    <AvatarSVGView width={100} height={100} avatarFeatures={this.state.avatarFeatures} />
+                                </View>
+                            </ViewShot>
+                        </TouchableOpacity>
+                    </View>
                     <View><Text style={styles.name}>{this.state.displayName}</Text></View>
                     <View>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})}}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp})}}>
                             <View style={styles.button}><Text style={styles.buttonText}>Edit Profile</Text></View>
                         </TouchableOpacity>
                     </View>
@@ -105,7 +147,7 @@ export default class profile extends Component {
                         <View style={styles.actionsWrapper} onLayout={(e) => {
                             this.setState({actionsWrapperHeight: e.nativeEvent.layout.height})
                         }}>
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'saved'})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'saved',avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -144,7 +186,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'archive'})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'archive',avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -301,7 +343,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.settings')}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.settings',{avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -407,8 +449,8 @@ const styles = StyleSheet.create({
     },
     avatar:{
         borderRadius: 1000,
-        height: 88,
-        width: 88,
+        height: 100,
+        width: 100,
         resizeMode: 'cover'
     },
     name:{
