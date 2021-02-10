@@ -2,11 +2,19 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import Svg, { Rect, Circle } from "react-native-svg"
 import {Navigation} from 'react-native-navigation';
+import LottieView from 'lottie-react-native';
+import NetInfo from "@react-native-community/netinfo";
+
+import {noSaved, noArchive, noInternet} from '../../SVG_Files/UI_SVG/errors';
+import ErrorView from '../../components/Errors/errorView';
+import NavHeader from '../../components/Headers/profileNavHeader';
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
 import {goToViewWishlistScreen} from '../../includes/functions';
 import ListView from '../../components/wishlistList/wishlistList';
 import * as Fade from '../../UIComponents/GradientFade/gradientFade';
-import { Touchable } from '../../includes/variables';
+import Loader from '../../components/Loader/loader'
+import { dHeight, Touchable } from '../../includes/variables';
 
 import {app as realmApp} from '../../../storage/realm';
 import {WishlistSchemas, UserSchemas} from '../../../storage/schemas';
@@ -18,11 +26,15 @@ export default class save_archive extends Component {
     // Class Variables
     realm;
     user = realmApp.currentUser;
+    timeoutAlert;
+    unsubscribeNetworkUpdate;
 
     state ={
       isArchive : this.props.show == 'archive' ? true : false,
       isSaved : this.props.show == 'saved' ? true : false,
+      hasNetworkConnection: null,
       isLoading : true,
+      silentReload: false,
       listData: [
             // {
             //   id: '1233',
@@ -30,71 +42,28 @@ export default class save_archive extends Component {
             //   type: 'Graduation',
             //   owner: 'Dora Patsone',
             //   saved: true,
-            // },
-            // {
-            //   id: '1234',
-            //   name: 'Cute and Cuddly',
-            //   type: 'Birthday',
-            //   owner: 'Daisy Oh',
-            //   saved: true,
-            // },
-            // {
-            //   id: '1235',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'job_promotion',
-            //   owner: 'Nicky Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '1236',
-            //   name: 'Christ Birthday',
-            //   type: 'christmas',
-            //   owner: 'Paul Micca',
-            //   saved: true,
-            // },
-            // {
-            //   id: '1237',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'father0s_day',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '1238',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'house_warming',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '1239',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'house_warming',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '1240',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'house_warming',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '12389',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'house_warming',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
-            // },
-            // {
-            //   id: '12388',
-            //   name: 'Raymond’s Ultimate House Warming List',
-            //   type: 'house_warming',
-            //   owner: 'Dora Patsone',
-            //   saved: false,
             // }
-          ]
+      ], 
+      alertMessage:{
+        show:false, 
+        type:'',
+        title:'',
+        subtitle: ''
+      }
+    }
+
+    componentDidMount(){
+      this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected);
+        this.setState({hasNetworkConnection: state.isConnected});
+        
+      });
+    }
+
+    componentWillUnmount(){
+      this.unsubscribeNetworkUpdate();
+      clearTimeout(this.timeoutAlert);
     }
 
     
@@ -102,48 +71,83 @@ export default class save_archive extends Component {
     renderItemsList = () =>{
         return (
           <ListView 
-            listAction={(id, saveStatus) => goToViewWishlistScreen(this.props.componentId,id,saveStatus)} 
-            renderType= {this.state.isArchive ? 'portrait' : this.state.isSaved ? 'horizontal' : 'portrait'}
+            listAction={(id, saveStatus) => goToViewWishlistScreen(this.props.componentId,id,saveStatus,(showAlertInfo={showAlert:false,type:'', message:''}) => { 
+                this.setState({
+                  silentReload: true, 
+                  alertMessage:{
+                    show:showAlertInfo.showAlert, 
+                    type:showAlertInfo.type,
+                    title:showAlertInfo.message,
+                    subtitle: ''
+                  }
+                })
+              }
+            )} 
+            renderType= {this.state.isSaved ? 'horizontal' : 'portrait'}
             renderData={this.state.listData} 
             onRefresh = {this.getWishlists}
             refreshing = {this.state.isLoading}
-
+            savingInProgress = {(code)=>{
+              this.setState((prevState) => {
+                return ({
+                  listData: prevState.listData.map((item) => {
+                    if (item.code == code){
+                      return {
+                        ...item,
+                        saved : null
+                      }
+                    }else{
+                      return item
+                    }
+                  })
+                }) 
+              })
+            }}
+            updateUIFunction = {
+              this.state.isSaved 
+              ? (code, value) => {
+                this.setState((prevState) => {
+                  return ({
+                    listData: prevState.listData.map((item, i) => {
+                      if (item.code == code){
+                        return {
+                          ...item,
+                          saved : value
+                        }
+                      }else{
+                        return item
+                      }
+                    })
+                  }) 
+                })
+              }
+              : () => {this.setState({silentReload: true})} 
+            }
           />
         )
     }
 
     renderNoItems = () => {
-      let isArchiveSVG = (<Text>is Archive</Text>);
-      let isSavedSVG = (<Text>is Saved</Text>);
+      let isArchiveSVG = (<ErrorView message={"Your archive is empty"} svg={noArchive} contentWrapperStyle={{justifyContent: 'flex-start', marginTop: (dHeight/10)}} />);
+      let isSavedSVG = (<ErrorView message={"You haven't saved any\nwishlists yet"} svg={noSaved} contentWrapperStyle={{justifyContent: 'flex-start', marginTop: (dHeight/10)}} />);
       return this.state.isArchive ? isArchiveSVG : this.state.isSaved ? isSavedSVG : null
     }
 
-    renderHeaderSVG = () => {
-      // alert(this.state.isArchive)
-      return (
-        <Svg width={((159*60)/115)} height={60} viewBox="0 0 159 115" fill="none">
-          <Rect
-            opacity={0.4}
-            x={0.666}
-            y={20.862}
-            width={95.04}
-            height={95.04}
-            rx={14.4}
-            transform="rotate(-12.375 .666 20.862)"
-            fill= {this.state.isArchive ? '#E76666' : this.state.isSaved ? "#28A664" : "#E76666"}
-          />
-          <Circle opacity={0.44} cx={111.16} cy={66.76} r={47.52} fill={this.state.isArchive ? '#28A664' : this.state.isSaved ? "#214BC0" : "#28A664"} />
-        </Svg>
-      )
-    }
-
     loadingItems = () => {
+      this.getWishlists()
       return(
-        <View><Text>Loading ....</Text>{this.getWishlists()}</View>
+        <View style={{
+          flex: 1,
+          justifyContent: "center",
+          marginTop: -90
+      }}>
+          <Loader lottieViewStyle={{opacity:0.9}} />
+          {/* {this.getWishlists()} */}
+      </View>
       )
     }
 
-    getWishlistsFromRealm = () => {
+    getWishlistsFromRealm = async () => {
       
       let wishlistData = [];
       let ownerData = [];
@@ -158,8 +162,8 @@ export default class save_archive extends Component {
         wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'inactive'`).sorted("dateModified", true);
       }else if(this.state.isSaved){
         let savedWishlists = this.user.customData.savedLists
-        let filter = "status == 'inactive'";
-        let ownersFilter = "";
+        let filter = "";
+        let ownersFilter = [];
 
         savedWishlists.forEach((val, i) =>{
           if (i == 0){
@@ -168,18 +172,26 @@ export default class save_archive extends Component {
             filter = filter + ` || code == '${val}'`
           }
         })
-        wishlistData = this.realm.objects("wishlist").filtered(`${filter}`).sorted("dateCreated", true);
+        wishlistData = this.realm.objects("wishlist").filtered(`${filter} && status == 'active'`).sorted("dateCreated", true);
         // console.log(wishlistData.length);
         if(wishlistData.length > 0){
           wishlistData.forEach((val,i) => {
-            if (i == 0){
-              ownersFilter = `userID == '${val.owner}'`
-            }else{
-              ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
-            }
+            ownersFilter.push({userID : val.owner})
+            // if (i == 0){
+            //   ownersFilter.push({userID : val.owner})
+            //   ownersFilter = `userID == '${val.owner}'`
+            // }else{
+            //   ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
+            // }
           })
           // console.log(ownersFilter);
-          ownerData = this.realm.objects("user").filtered(ownersFilter);
+          console.log('aaaaa');
+          let ownerDataTemp = await this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists").db("lysts").collection("users").find({
+            $or: ownersFilter
+          })
+          // ownerData = this.realm.objects('user').filtered(ownersFilter);
+          ownerData = JSON.parse(JSON.stringify(ownerDataTemp));
+          console.log('bbbbb ==> ', ownerData);
         }
         // ownerData = this.realm.objects("user").filtered(`userID == '${wishlistData[0].owner}'`);
       }  else{
@@ -194,12 +206,16 @@ export default class save_archive extends Component {
         
         for (const val of wishlistData) {
           let ownerName = '';
-          console.log(ownerData);
+          // console.log("ownerData");
           ownerData.forEach(user => {
+            console.log('userID ==>',user.userID);
+            console.log('owner ==>',val.owner);
             if (user.userID == val.owner){
               ownerName = (
-                (user.displayName == undefined || user.displayName == null || user.displayName.trim() == "") 
+                (typeof user.displayName == 'undefined' || user.displayName == null || user.displayName.trim() == "") 
                 ? user.fullName.trim().trimStart() : user.displayName.trim().trimStart());
+
+                // console.log('ownerName ==>',ownerName);
               // break;
             }
           })
@@ -212,6 +228,8 @@ export default class save_archive extends Component {
             owner: this.state.isSaved ? ownerName : this.user.id,
             saved: this.user.customData.savedLists.includes(val.code)
           })
+
+          console.log('List Data ==> ', listData);
         }
         
       }
@@ -223,80 +241,122 @@ export default class save_archive extends Component {
       })
     }
 
-    getWishlists = (checkIfLoading = true) => {
+    getWishlists = async() => {
+      // console.log("uuuu");
+      // return null;
       try{
-        console.log(`Logged in with the user: ${this.user.id}`);        
-        
+        console.log(`Logged in with the user: ${this.user.id}`);  
+        let schemaList = (
+        // this.state.isSaved 
+        // ? [
+        //   WishlistSchemas.wishlistSchema,
+        //   WishlistSchemas.wishlist_listItemsSchema,
+        //   UserSchemas.userSchema,
+        //   UserSchemas.user_avatarFeaturesSchema,
+        //   UserSchemas.user_settingsSchema,
+        //   UserSchemas.user_settings_notificationSchema,
+        // ] 
+        // : 
+        [
+          WishlistSchemas.wishlistSchema,
+          WishlistSchemas.wishlist_listItemsSchema
+        ]  )    
+        // console.log(schemaList);
         const config = {
-          schema: [
-            WishlistSchemas.wishlistSchema,
-            WishlistSchemas.wishlist_listItemsSchema,
-            UserSchemas.userSchema,
-            UserSchemas.user_settingsSchema,
-            UserSchemas.user_settings_notificationSchema
-          ],
+          schema: schemaList,
           sync: {
             user: this.user,
             partitionValue: "public",
-            error: (s, e) => {console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);}
+            error: (s, e) => {
+              this.setState({
+                isLoading: false,
+                silentReload: false
+              }, () => { console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);})
+            }
           },
         };
         
         console.log("log step 2");
-      //   realm = await Realm.open(config);
+        // realm = await Realm.open(config);
       if(this.realm != null && !this.realm.isClosed){
-        this.getWishlistsFromRealm();
+        console.log('hhhh:', this.realm.schema);
+        await this.getWishlistsFromRealm();
       }else{
-        Realm.open(config).then((realm) => {
-          console.log("log step 3/5");
-          this.realm = realm;
-          this.getWishlistsFromRealm();
+        console.log("log step 2/5");
+        this.realm = await Realm.open(config)
+        console.log("log step 3/5");
+        console.log('hhhh:', this.realm.schema);
+        await this.getWishlistsFromRealm();
+        console.log("log step 3");
+      //   Realm.open(config).then((realm) => {
+      //     console.log("log step 3/5");
+      //     console.log('hhhh:', realm.schema);
+      //     this.realm = realm;
+      //     // return this.getWishlistsFromRealm();
           
-      //   console.log(datas);
-          console.log("log step 3");
-        }).catch((e) => {
-          console.log(e);
-        }).finally(() => {
-          // if (Realm !== null && !Realm.) {
-          //     // Real.close();
-          //   }
-        });
+      // //   console.log(datas);
+      //     // console.log("log step 3");
+      //   }).then(() => {
+      //     console.log("log step 3");
+      //   }).catch((e) => {
+      //     this.setState({
+      //       isLoading: false,
+      //       silentReload: false
+      //     }, () => {console.log(e);})
+      //   }).finally(() => {
+      //     // if (Realm !== null && !Realm.) {
+      //     //     // Real.close();
+      //     //   }
+      //   });
       }
         
       } catch (error) {
-          throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+        this.setState({
+          isLoading: false,
+          silentReload: false
+        }, () => { throw `Error opening realm: ${JSON.stringify(error,null,2)}`;})
+         
           
       }
     }
 
+    resetAlert = () => {
+      this.timeoutAlert = setTimeout(()=>{
+          this.setState({alertMessage: {show: false}})
+          clearTimeout(this.timeoutAlert);
+      }, 4500)
+    }
+
     render() {
-        let whatToRender = (this.state.isLoading  
+        let whatToRender = ((!this.state.hasNetworkConnection && this.state.listData.length == 0)
+          ? <ErrorView message="No Internet Connection" svg={noInternet} contentWrapperStyle={{justifyContent: 'flex-start', marginTop: (dHeight/10)}} />
+          : this.state.isLoading  
           ? (this.loadingItems()) 
           : (this.state.listData.length == 0 ? this.renderNoItems() : this.renderItemsList()));
         
-        
+        this.state.silentReload ? this.getWishlists() : null;
+
+        this.state.alertMessage.show ? this.resetAlert() : null;
+
         return (
             <View style={styles.container}>
-                <View style={styles.headerWrapper}>
-                    <TouchableOpacity onPress={this.testNotification}>
-                    <View style={styles.headerSVGWrapper}>
-                      {this.renderHeaderSVG()}
-                    </View>
-                    </TouchableOpacity>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => {Navigation.popToRoot(this.props.componentId);}}>
-                      <View style={styles.profileWrapper}>
-                        <View style={styles.profileAvatarWrapper}><Image style={styles.profileAvatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
-                        <View style={styles.profileTextWrapper}><Text style={styles.profileText}>Profile</Text></View>
-                      </View>
-                    </TouchableOpacity>
-                    
-                </View>
+                <NavHeader 
+                  onPressFunc={()=>{Navigation.popToRoot(this.props.componentId)}}
+                  avatarImage = {this.props.avatarImage}
+                  theme = {this.state.isArchive ? 'Theme1' : 'Theme2'}
+                />
                 <View style={styles.titleWrapper}><Text style={styles.title}>{this.state.isArchive ? 'Archived Lists' : this.state.isSaved ? 'My saved wishlists' : null} {this.state.listData.length == 0 ? null : `(${this.state.listData.length})`}</Text></View>
                 <View style={styles.listWrapper}>
                   <Fade.Top color='#FCFCFC' style={{height: 40}} />
                   <Fade.Bottom color='#FCFCFC' />
                     {whatToRender}
                 </View>
+                {this.state.alertMessage.show ? (<ErrorSuccessAlert 
+                    type = {this.state.alertMessage.type}
+                    title = {this.state.alertMessage.title}
+                    subtitle = {this.state.alertMessage.subtitle}
+                /> )
+                : null}
             </View>
         )
     }
@@ -308,32 +368,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#1A2C34',
         backgroundColor: '#FCFCFC'
     },
-    headerWrapper:{
-      paddingHorizontal: 25,
-      paddingTop: 20,
-      flexDirection: 'row',
-      justifyContent:'space-between',
-    },
-    headerSVGWrapper:{},
-    profileWrapper:{
-      alignItems: 'center'
-    },
-    profileAvatarWrapper:{
-      
-    },
-    profileAvatar:{
-      resizeMode: 'cover',
-      height: 60,
-      width: 60,
-      borderRadius: 1000
-    },
-    profileTextWrapper:{},
-    profileText:{
-      color:'#515D70',
-      fontSize: 13,
-      fontFamily: 'Poppins-Medium',
-      marginTop: 3
-    },
+    
     titleWrapper:{},
     title:{
       paddingHorizontal: 25,
