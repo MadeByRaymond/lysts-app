@@ -17,3 +17,8 @@ export const categories = [
     'other'
     
 ];
+
+export const reportReasons = [
+    'Other',
+    'Other 2'
+];
