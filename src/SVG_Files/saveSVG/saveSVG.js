@@ -1,5 +1,6 @@
 import * as React from "react"
 import Svg, { Path } from "react-native-svg"
+import {View as AnimatableView} from 'react-native-animatable';
 
 function Unsaved(props) {
   return (
@@ -33,4 +34,18 @@ function Saved(props) {
     )
   }
 
-export {Unsaved, Saved}
+function Loading(props) {
+    return (
+      <AnimatableView animation="rotate" easing='linear' duration={2000} iterationDelay={0} iterationCount='infinite' useNativeDriver={true}>
+        <Svg width={763} height={762} viewBox="0 0 281 283" fill="none" xmlns="http://www.w3.org/2000/svg" {...props} >
+          <Path
+            d="M.73 157.132h31.484a109.409 109.409 0 00108.266 93.649 109.407 109.407 0 00108.266-93.649h31.5a140.642 140.642 0 01-279.532 0H.73zm0-31.25a140.641 140.641 0 01279.531 0h-31.484a109.41 109.41 0 00-108.266-93.65 109.406 109.406 0 00-108.265 93.65H.73z"
+            fill={props.color || "#E76666"}
+            opacity={0.8}
+          />
+        </Svg>
+      </AnimatableView>
+    )
+  }
+
+export {Unsaved, Saved, Loading}
