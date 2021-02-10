@@ -10,11 +10,7 @@ import * as Fade from '../../UIComponents/GradientFade/gradientFade';
 import * as iconSVG from '../../SVG_Files/wishlistIconsSVG';
 import {categories} from '../../includes/datasets';
 import {getCategoryDisplay} from '../../includes/functions'
-
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
-
-let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
+import {Touchable, dWidth, dHeight} from '../../includes/variables';
 
 class selectCategory extends Component {
 

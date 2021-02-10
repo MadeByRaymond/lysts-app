@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Realm from 'realm';
-import { Text, StyleSheet, View, Dimensions,Platform, TouchableNativeFeedback, TouchableOpacity,BackHandler } from 'react-native'
+import { Text, StyleSheet, View, BackHandler } from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
 
@@ -11,17 +11,12 @@ import CreationPreview from '../../components/wishlistCreation/creationPreview';
 
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import {removeExcessWhiteSpace} from '../../includes/functions';
+import {Touchable, dWidth, dHeight} from '../../includes/variables';
 
 
 import {app as realmApp} from '../../../storage/realm';
 import {WishlistSchemas} from '../../../storage/schemas';
 import {ObjectId} from 'bson';
-
-
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
-
-let Touchable = Platform.OS === "android" ? TouchableNativeFeedback : TouchableOpacity ;
 
 class createWishlist extends Component {
     
@@ -126,6 +121,8 @@ class createWishlist extends Component {
             "hardwareBackPress",
             this.backAction
         );
+
+        (this.realm !== null && typeof this.realm !== 'undefined' && this.realm !== "") ? (this.realm.isClose ? null : realm.close()) : null
     }
 
     onAddItem = () => {
@@ -244,13 +241,13 @@ class createWishlist extends Component {
             this.wizard.current.next();
         } else if(this.state.wizard.currentStep === 2){
             this.createNewWishlist();
-            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, 'hhxhdh', ({
+            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
                 id: 'temp_id',
                 name: this.state.wishlistInfo.name.value,
                 type: this.state.wishlistInfo.category.value,
                 code: `${this.wishlistCode}`,
                 saved: false,
-            }));
+            });
             Navigation.popToRoot(this.props.componentId);
         } else {
             this.wizard.current.next();
