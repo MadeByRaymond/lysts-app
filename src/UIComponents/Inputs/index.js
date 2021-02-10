@@ -7,9 +7,9 @@ export function InputText(props) {
         <TextInput 
             style={[styles.generalStyle, props.infoState[props.targetKey].focused ? styles.focusedStyle : null, props.style]} 
             value={props.infoState[props.targetKey].value} 
-            onChangeText={(val) => props.setInfoState(props.targetKey, 'value', val)} 
-            onFocus = {(e) => props.setInfoState(props.targetKey, 'focused', true)}
-            onBlur = {(e) => props.setInfoState(props.targetKey, 'focused', false)}
+            onChangeText={(val) => {props.setInfoState(props.targetKey, 'value', val)}} 
+            onFocus = {(e) => {props.setInfoState(props.targetKey, 'focused', true)}}
+            onBlur = {(e) => {props.setInfoState(props.targetKey, 'focused', false)}}
             maxLength = {props.maxLength}
             placeholder= {props.placeholder}
             placeholderTextColor = 'rgba(153, 153, 153, 0.6)'
@@ -27,6 +27,7 @@ export function InputText(props) {
 }
 
 export function SelectInput(props) {
+    // console.log('items:' , JSON.stringify(props.itemsList));
     return (
         // <TextInput 
         //     style={[styles.generalStyle, props.infoState[props.targetKey].focused ? styles.focusedStyle : null]} 
@@ -41,11 +42,12 @@ export function SelectInput(props) {
             value = {props.infoState[props.targetKey].value}
             onValueChange={(val) => {
                 props.setInfoState(props.targetKey, 'value', val)
+                props.selectValueChangeEvent ? props.selectValueChangeEvent() : null;
                 Keyboard.dismiss()
             }}
             onOpen={() => {Keyboard.dismiss()}}
             items={props.itemsList}
-            placeholder={{}}
+            placeholder={props.placeholder ? props.placeholder : {}}
             useNativeAndroidPickerStyle = {false}
             style={{
                 inputAndroid:{
@@ -72,9 +74,9 @@ export function TextAreaInput(props) {
         <TextInput 
             style={[styles.generalStyle, styles.textAreaStyle, props.infoState[props.targetKey].focused ? styles.focusedStyle : null, props.style]} 
             value={props.infoState[props.targetKey].value} 
-            onChangeText={(val) => props.setInfoState(props.targetKey, 'value', val)} 
-            onFocus = {(e) => props.setInfoState(props.targetKey, 'focused', true)}
-            onBlur = {(e) => props.setInfoState(props.targetKey, 'focused', false)}
+            onChangeText={(val) => {props.setInfoState(props.targetKey, 'value', val)}} 
+            onFocus = {(e) => {props.setInfoState(props.targetKey, 'focused', true)}}
+            onBlur = {(e) => {props.setInfoState(props.targetKey, 'focused', false)}}
             placeholder= {props.placeholder}
             placeholderTextColor = 'rgba(153, 153, 153, 0.6)'
             underlineColorAndroid="transparent"
