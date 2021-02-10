@@ -3,6 +3,7 @@ import Svg, { Path, G } from "react-native-svg"
 
 function SvgComponent(props) {
   return ({
+    color: '#FFF8EF',
     svg:(
     <Svg width={889} height={705} viewBox="0 0 889 705" fill="none" {...props}>
       <Path
@@ -831,6 +832,7 @@ function SvgComponent(props) {
         strokeLinejoin="round"
       />
     </Svg>
+    
     )
   })
 }
