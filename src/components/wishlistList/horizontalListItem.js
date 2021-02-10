@@ -2,7 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet, Dimensions, PixelRatio, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Shadow } from 'react-native-neomorph-shadows';
 
-import {getCategoryDisplay} from '../../includes/functions';
+import {getCategoryDisplay, onBookmark} from '../../includes/functions';
 
 import * as iconSVG from '../../SVG_Files/wishlistIconsSVG/';
 import SaveButton from '../saveWishlistButton/saveButton';
@@ -10,7 +10,7 @@ import SaveButton from '../saveWishlistButton/saveButton';
 let dHeight = Dimensions.get("window").height;
 let dWidth = Dimensions.get("window").width;
 
-  export default function portraitListItem({data, cardsPerRow, action}) {
+  export default function portraitListItem({data, cardsPerRow, action, updateUIFunction}) {
     let Icon = iconSVG[data.type.toLowerCase()];
     // let cardsPerRow = dWidth > 575 ? 3 : 2
     let cardWidth = ((dWidth /cardsPerRow ) - 30);
@@ -30,7 +30,7 @@ let dWidth = Dimensions.get("window").width;
                         
                         <View style={styles.savedIconBox}>
                             <TouchableOpacity activeOpacity={0.9} hitSlop={{top:16, bottom: 16, left: 3444}}>
-                                <SaveButton width={20} height={20} saved={data.saved} />
+                                <SaveButton saveFunc={() => onBookmark(!data.saved, data.code, ()=>{updateUIFunction ? updateUIFunction(data.code, !data.saved) : null} )} width={20} height={20} savedStatus={data.saved ? 'saved' : 'unsaved'} />
                             </TouchableOpacity>
                         </View>
                         <View>

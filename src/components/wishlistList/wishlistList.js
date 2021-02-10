@@ -16,7 +16,7 @@ const wishlistList = (props) => {
             contentContainerStyle = {styles.listWrapper} 
             data={props.renderData}
             numColumns= {cardsPerRow_Portrait}
-            renderItem={({ item }) => <PortraitListItem action={props.listAction} data={item} cardsPerRow = {cardsPerRow_Portrait} />}
+            renderItem={({ item }) => <PortraitListItem action={props.listAction} data={item} cardsPerRow = {cardsPerRow_Portrait} savingInProgress={props.savingInProgress ? props.savingInProgress : null} updateUIFunction={props.updateUIFunction ? props.updateUIFunction : null} />}
             keyExtractor={item => {return item.id}}
 
             showsVerticalScrollIndicator = {false}
@@ -31,7 +31,7 @@ const wishlistList = (props) => {
             contentContainerStyle = {styles.listWrapper} 
             data={props.renderData}
             numColumns= {cardsPerRow_Horizontal}
-            renderItem={({ item }) => <HorizontalListItem action={props.listAction} data={item} cardsPerRow = {cardsPerRow_Horizontal} />}
+            renderItem={({ item }) => <HorizontalListItem action={props.listAction} data={item} cardsPerRow = {cardsPerRow_Horizontal} updateUIFunction={props.updateUIFunction ? props.updateUIFunction : null} />}
             keyExtractor={item => {return item.id}}
 
             showsVerticalScrollIndicator = {false}
