@@ -47,16 +47,33 @@ class UserSchemas {
     properties: {
       _id: 'objectId?',
       _partition: 'string?',
-      avatarID: 'string?',
+      avatarFeatures: 'user_avatarFeatures',
       contactEmail: 'string?',
       contactPhone: 'string?',
+      dateCreated: 'date?',
       displayName: 'string?',
       fullName: 'string?',
+      lastModified: 'date?',
       savedLists: 'string[]',
       settings: 'user_settings',
       userID: 'string?',
     },
     primaryKey: '_id',
+  };
+
+  static user_avatarFeaturesSchema = {
+    name: 'user_avatarFeatures',
+    embedded: true,
+    properties: {
+      avatarId: 'string',
+      bgColor: 'string?',
+      eyeGlass: 'string?',
+      hairColor: 'string?',
+      jewelry: 'string?',
+      shirtCollarColor: 'string?',
+      shirtColor: 'string?',
+      skinTone: 'string?',
+    },
   };
 
   static user_settingsSchema = {
