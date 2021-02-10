@@ -5,35 +5,65 @@ import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 
 import {app as realmApp} from '../../../storage/realm'
+import {loginRoot} from '../../../App';
 
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
+import NavHeader from '../../components/Headers/profileNavHeader';
+
+import {goToScreen} from '../../includes/functions'
 
 export default class settings extends Component {
 
-    goToScreen = debounce((screenName, title='', screenProps = null, screenOptions = null) =>{
-        // alert('ddd')
-        Navigation.push(this.props.componentId, {
-          component: {
-            name: screenName, // Push the screen registered with the 'Settings' key
-            options: { // Optional options object to configure the screen
-              bottomTabs: {
-                animate: false,
-                visible: false
-              },
-              topBar: {
-                title: {
-                    text: title
-                },
-                visible: true,
-                drawBehind: false,
-                animate: true,
-              },
-              ...screenOptions
-            },
-            passProps: screenProps
-          }
-        });
-      }, 1000, {leading: true,trailing: false})
+  state={
+    loggingOut: false
+  }
+
+    goToScreenHandler = (screenName, title='', screenProps = {}, screenOptions = {}) => {
+      let screenOptionsObject = {
+        topBar: {
+          title: {
+              text: title
+          },
+          visible: true,
+          drawBehind: false,
+          animate: true,
+        },
+        ...screenOptions
+      }
+      goToScreen(this.props.componentId,screenName, screenProps, screenOptionsObject)
+    }
+    // goToScreenHandler = debounce((screenName, title='', screenProps = null, screenOptions = null) =>{
+    //     // alert('ddd')
+    //     Navigation.push(this.props.componentId, {
+    //       component: {
+    //         name: screenName, // Push the screen registered with the 'Settings' key
+    //         options: { // Optional options object to configure the screen
+    //           bottomTabs: {
+    //             animate: false,
+    //             visible: false
+    //           },
+    //           topBar: {
+    //             title: {
+    //                 text: title
+    //             },
+    //             visible: true,
+    //             drawBehind: false,
+    //             animate: true,
+    //           },
+    //           ...screenOptions
+    //         },
+    //         passProps: screenProps
+    //       }
+    //     });
+    //   }, 1000, {leading: true,trailing: false})
+
+    logoutHandler = () => {
+      realmApp.currentUser.logOut().then(()=>{
+        Navigation.setRoot(loginRoot);
+      }).catch(() => {
+        this.setState({loggingOut: false}, () => {alert('Error with login you out')})
+      })
+    }
 
     render() {
         return (
@@ -41,30 +71,11 @@ export default class settings extends Component {
                 <View style={styles.credits}>
                     <CreditSVG width={111} height={48} />
                 </View>
-                <View style={styles.headerWrapper}>
-                    <View style={styles.headerSVGWrapper}>
-                      <Svg width={((159*60)/115)} height={60} viewBox="0 0 159 115" fill="none">
-                        <Rect
-                            opacity={0.4}
-                            x={0.666}
-                            y={20.862}
-                            width={95.04}
-                            height={95.04}
-                            rx={14.4}
-                            transform="rotate(-12.375 .666 20.862)"
-                            fill= "#28A664"
-                        />
-                        <Circle opacity={0.44} cx={111.16} cy={66.76} r={47.52} fill="#214BC0" />
-                      </Svg>
-                    </View>
-                    <TouchableOpacity activeOpacity={0.7} onPress={() => {Navigation.popToRoot(this.props.componentId);}}>
-                      <View style={styles.profileWrapper}>
-                        <View style={styles.profileAvatarWrapper}><Image style={styles.profileAvatar} source={require('../../assets/images/avatars/avatar1.png')} /></View>
-                        <View style={styles.profileTextWrapper}><Text style={styles.profileText}>Profile</Text></View>
-                      </View>
-                    </TouchableOpacity>
-                    
-                </View>
+                <NavHeader 
+                  onPressFunc={()=>{Navigation.popToRoot(this.props.componentId)}}
+                  avatarImage = {this.props.avatarImage}
+                  theme = 'Theme2'
+                />
                 <View style={styles.titleWrapper}><Text style={styles.title}>App Settings</Text></View>
                 <ScrollView 
                   contentContainerStyle={styles.settingsScroll}
@@ -74,7 +85,7 @@ export default class settings extends Component {
                   overScrollMode = 'auto'
                 >
                   <View style={styles.settingsWrapper}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreen("com.lysts.screen.securitySettings", "Security")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.securitySettings", "Security")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 60 44" fill="none">
@@ -96,7 +107,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreen("com.lysts.screen.notificationSettings", "Notifications")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.notificationSettings", "Notifications")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 59 53" fill="none">
@@ -152,7 +163,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreen("com.lysts.screen.aboutSettings", "About")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.aboutSettings", "About")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 44 52" fill="none">
@@ -180,9 +191,13 @@ export default class settings extends Component {
 
                     <View style={styles.divider}></View>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{realmApp.currentUser.logOut()}}>
+                    <TouchableOpacity disabled={this.state.loggingOut} activeOpacity={0.8} onPress={()=>{
+                      this.setState({
+                        loggingOut: true
+                      })
+                    }}>
                       <View style={styles.settingRow}>
-                        <View style={styles.settingTextWrapper}><Text style={[styles.settingText,{color:'#6990C4'}]}>Logout of Lysts</Text></View>
+                        <View style={styles.settingTextWrapper}><Text style={[styles.settingText,{color:'#6990C4'}]}>{this.state.loggingOut ? 'Logging out, Please wait...' : 'Logout of Lysts'}</Text></View>
                       </View>
                     </TouchableOpacity>
                     
@@ -193,6 +208,7 @@ export default class settings extends Component {
                     </TouchableOpacity>
                   </View>
                 </ScrollView>
+                {this.state.loggingOut ? this.logoutHandler() : null}
             </View>
         )
     }
@@ -202,34 +218,10 @@ const styles = StyleSheet.create({
     container:{
         flex: 1,
         backgroundColor: '#1A2C34',
+        //Darkmode Background backgroundColor: '#263238',
         backgroundColor: '#FCFCFC'
     },
-    headerWrapper:{
-      paddingHorizontal: 25,
-      paddingTop: 20,
-      flexDirection: 'row',
-      justifyContent:'space-between',
-    },
-    headerSVGWrapper:{},
-    profileWrapper:{
-      alignItems: 'center'
-    },
-    profileAvatarWrapper:{
-      
-    },
-    profileAvatar:{
-      resizeMode: 'cover',
-      height: 60,
-      width: 60,
-      borderRadius: 1000
-    },
-    profileTextWrapper:{},
-    profileText:{
-      color:'#515D70',
-      fontSize: 13,
-      fontFamily: 'Poppins-Medium',
-      marginTop: 3
-    },
+    
     titleWrapper:{},
     title:{
       paddingHorizontal: 25,
