@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity, Linking  } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, Linking, NativeModules, Platform  } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
+import SelectPicker from 'react-native-picker-select';
+import Sound from 'react-native-sound'
+// import AsyncStorage from '@react-native-community/async-storage';
+import debounce from 'lodash.debounce';
+
+import {message} from '../../services/FCMService';
 
 import {dWidth} from '../../includes/variables';
 
@@ -9,16 +15,57 @@ import {app as realmApp} from '../../../storage/realm';
 import {LocalNotification} from '../../services/LocalPushController';
 
 export default class settings extends Component {
-    user = realmApp.currentUser;
-    userData = realmApp.currentUser.customData;
+  constructor(props) {
+    super(props);
 
-    state = {
+    this.user = realmApp.currentUser;
+    this.userData = realmApp.currentUser.customData;
+
+    this.notificationSounds = [
+      {
+        id: 'SID-0',
+        sound: 'default_notification_sound_long_expected_548.mp3',
+        title: 'Default'
+      },
+      {
+        id: 'SID-324',
+        sound: 'arrogant_324.mp3',
+        title: 'Arrogant'
+      },
+      {
+        id: 'SID-469',
+        sound: 'awareness_469.mp3',
+        title: 'Awareness'
+      }
+    ]
+
+    this.state = {
       savingData: false,
       notifications:{
         appUpdates: this.userData.settings.notification.appUpdates,
         systemNotifications: this.userData.settings.notification.systemNotifications
+      },
+
+      // getStoredData:true,
+
+      notificationModal: false,
+      notificationSound: {
+        id: 'SID-0',
+        sound: 'default_notification_sound_long_expected_548.mp3',
+        title: 'Default'
       }
     }
+  }  
+  
+  componentDidMount(){
+    // createChannel(this.state.notificationSound.sound);
+
+    
+  }
+
+  componentWillUnmount(){
+    //  /*stopSampleSound();*/
+  }
 
     testNotification = () => {
       LocalNotification();
@@ -90,6 +137,9 @@ export default class settings extends Component {
           const customUserData = await this.user.refreshCustomData();
           console.log(customUserData);
 
+          customUserData.settings.notification.appUpdates ? await message.subscribeToTopic('app_updates') : await message.unsubscribeFromTopic('app_updates')
+          customUserData.settings.notification.systemNotifications ? await message.subscribeToTopic('general') : await message.unsubscribeFromTopic('general')
+
           this.setState({
             savingData: false,
             notifications:{
@@ -103,14 +153,43 @@ export default class settings extends Component {
           }, alert("Error saving your information"))
       }
     }
+
+    // notificationSoundChangeHandler = (value) => {
+    //   //  /*stopSampleSound();*/
+    //   AsyncStorage.setItem('lystsApp:settings:notificationSound', JSON.stringify(value)).then(() => {
+    //     console.log('Saved value is: ' + JSON.stringify(value));
+    //     // this.setState({notificationSound:value});
+    //   }).catch((e) => {
+    //     alert('error while saving');
+    //   });
+    // }
     
     render() {
         this.state.savingData ? this.saveData() : null;
+
+        // if(this.state.getStoredData){
+        //   AsyncStorage.getItem('lystsApp:settings:notificationSound').then((value) => {
+        //     console.log('gotten value is: ' + value);
+        //     this.setState({notificationSound:(value != null ? JSON.parse(value): this.notificationSounds[0]),getStoredData:false});
+        //   }).catch((e)=>{
+        //     alert('error while getting');
+        //   })
+        // }
+
         return (
             <View style={styles.container}>
+                {/* <SoundsModal 
+                  modalState = {this.state.notificationModal}
+                  closeModal = {() => {this.setState({notificationModal: false}, ()=>{this.notificationSoundChangeHandler(this.state.notificationSound); recreateChannel(this.state.notificationSound.sound)})}}
+                  soundsList = {this.notificationSounds}
+                  notificationSound = {this.state.notificationSound}
+                  setNotificationSound = {(notificationSound) => {
+                    this.setState({notificationSound})
+                  }}
+                /> */}
                 <View style={styles.titleWrapper}><Text style={styles.title}>Get notification about</Text></View>
                 <View style={styles.settingsWrapper}>
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.setState((prevState) => {
+                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
                     return ({savingData: true, notifications: {...prevState.notifications, appUpdates: !prevState.notifications.appUpdates} });
                   })}}>
                     <View style={styles.settingRow}>
@@ -147,7 +226,7 @@ export default class settings extends Component {
                       </View>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.setState((prevState) => {
+                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
                     return ({savingData: true, notifications: {...prevState.notifications, systemNotifications: !prevState.notifications.systemNotifications} });
                   })}}>
                     <View style={styles.settingRow}>
@@ -185,10 +264,16 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                 </View>
-                  
+                
                 <View style={[styles.titleWrapper, {marginTop: -10}]}><Text style={styles.title}>Other settings</Text></View>
                 <View style={styles.settingsWrapper}>  
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openSettings()}}>
+                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{ 
+                    NativeModules.OpenSettings.openNotificationSettings(data => {
+                      console.log('call back data', data);
+                    });
+                  // this.setState({notificationModal:true})
+                  // Linking.canOpenURL('app-settings:').then(support =>{ return Linking.openURL('app-settings://notification')}).catch(err=> {console.log(err)})
+                  }}>
                     <View style={styles.settingRow}>
                       <View style={styles.settingSVGWrapper}>
                         <Svg width={35} height={30} viewBox="0 0 50 52" fill="none">
@@ -225,8 +310,57 @@ export default class settings extends Component {
                       <View style={styles.settingTextWrapper}><Text style={styles.settingText}>Notification sound</Text></View>
                     </View>
                   </TouchableOpacity>
+                  {/* <View style={{marginLeft:20}}>
+                    <TouchableOpacity activeOpacity={0.8} hitSlop={{top:20, left:20, bottom:20, right:20,}} onPress={debounce(()=>{
+                      let notiSound = new Sound(this.state.notificationSound.sound, Sound.MAIN_BUNDLE, (error) => {
+                          if (error) {
+                              console.log('failed to load the sound', error);
+                              return;
+                          }
+                          // loaded successfully
+                          console.log('duration in seconds: ' + notiSound.getDuration() + 'number of channels: ' + notiSound.getNumberOfChannels());
+                          
+                          
+                          // Stop the sound and rewind to the beginning
+                          notiSound.stop(() => {
+                              // Note: If you want to play a sound after stopping and rewinding it,
+                              // it is important to call play() in a callback.
+                              
+                              // Play the sound with an onEnd callback
+                              notiSound.play((success) => {
+                                  if (success) {
+                                      console.log('successfully finished playing');
+                                  } else {
+                                      console.log('playback failed due to audio decoding errors');
+                                  }
+                                  notiSound.release();
+                              });
+
+                              
+                          });
+                      })
+                    }, 1000, {leading: true,trailing: false})}>
+                      <View style={styles.notificationSoundPlayWrapper}>
+                        <View><Text style={styles.notificationSoundPlayText}>{this.state.notificationSound.title}</Text></View>
+                        <View style={styles.notificationSoundPlayIcon}>
+                          <Svg
+                            width={16}
+                            height={16}
+                            viewBox="0 0 31 31"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <Path
+                              d="M15.5 0C6.953 0 0 6.953 0 15.5S6.953 31 15.5 31 31 24.047 31 15.5 24.047 0 15.5 0zm6.162 16.043l-9.042 5.813a.643.643 0 01-.658.023.645.645 0 01-.337-.567V9.688a.645.645 0 01.995-.543l9.042 5.813a.647.647 0 010 1.086z"
+                              fill="#63AAAD"
+                            />
+                          </Svg>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View> */}
                   
-                  <TouchableOpacity activeOpacity={0.8} onPress={this.testNotification}>
+                  <TouchableOpacity activeOpacity={0.8} onPress={() => { /*stopSampleSound();*/ this.testNotification()}}>
                     <View style={styles.settingRow}>
                       <View style={styles.settingSVGWrapper}>
                         <Svg width={35} height={30} viewBox="0 0 45 51" fill="none">
@@ -317,6 +451,21 @@ const styles = StyleSheet.create({
         marginTop: 12,
         marginBottom: 30
     },
+
+    notificationSoundPlayWrapper:{
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: -18,
+      paddingLeft: 25,
+      paddingBottom:20
+    },
+    notificationSoundPlayText:{
+      color: '#63AAAD',
+      fontSize: 14.5,
+      fontFamily: 'Poppins-Regular',
+      paddingTop: 3
+    },
+    notificationSoundPlayIcon:{ marginLeft:5},
 
     credits:{
         alignItems:'center',

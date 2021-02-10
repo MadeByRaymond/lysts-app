@@ -8,7 +8,7 @@
 
 // AppRegistry.registerComponent(appName, () => App);
 
-import './src/services/LocalPushController'
+// import './src/services/LocalPushController'
 
 // import PushNotificationIOS from "@react-native-community/push-notification-ios";
 // import PushNotification from "react-native-push-notification";
@@ -63,6 +63,10 @@ import './src/services/LocalPushController'
 //        */
 //       requestPermissions: true,
 //     });
+
+let PushNotification = require('./src/services/LocalPushController')
+PushNotification.configurePushNotification();
+PushNotification.createChannel();
 
 require('./App');
 
