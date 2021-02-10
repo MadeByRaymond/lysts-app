@@ -24,13 +24,15 @@ export default createWishlistHeader
 
 const styles = StyleSheet.create({ 
     top:{
-        paddingHorizontal: 25
+        paddingHorizontal: 25,
+        width: '100%'
     },
     topBar:{
         marginTop: 40,
         flexDirection: 'row',
         justifyContent:'space-between',
-        alignItems:'flex-start'
+        alignItems:'flex-start',
+        width: '100%'
     },
     subTextWrapper:{
         width: (dWidth * 835)/1080,
