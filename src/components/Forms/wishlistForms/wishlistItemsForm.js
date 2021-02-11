@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { StyleSheet, Text, View, Keyboard, ScrollView, TouchableWithoutFeedback, TouchableOpacity, Dimensions  } from 'react-native'
 import Svg, { Path, Circle, Defs, LinearGradient, Stop } from "react-native-svg"
 
@@ -38,6 +38,28 @@ function CircleSVG(props) {
 }
 
 const wishlistItemsForm = (props) => {
+
+    const [keyboardShown, setKeyboardShown] = useState(true);
+    let KeyboardDidShowListener, KeyboardDidHideListener;
+
+    useEffect(() => {
+        KeyboardDidShowListener = Keyboard.addListener('keyboardDidShow', _keyboardDidShow);
+        KeyboardDidHideListener = Keyboard.addListener('keyboardDidHide', _keyboardDidHide);
+
+        return () => {
+            KeyboardDidShowListener.remove();
+            KeyboardDidHideListener.remove();
+        }
+    });
+
+    let _keyboardDidShow = () => {
+        setKeyboardShown(true)
+    }
+
+    let _keyboardDidHide = () => {
+        setKeyboardShown(false)
+    }
+    
     let items = props.items.map((item, i) => {
         return (
             <View style={styles.contentWrapper} key={i}>
@@ -50,7 +72,7 @@ const wishlistItemsForm = (props) => {
                         placeholder='Item Name' 
                         maxLength = {40} 
                         onChangeText={(val) => {props.onUpdateItem(val, i)}}
-                        onBlur={(e) => props.onRemoveAllEmptyItems()}
+                        onBlur={(e) => {props.onRemoveAllEmptyItems()}}
                         autoFocus={true}
                     />
                 </View>
@@ -70,23 +92,24 @@ const wishlistItemsForm = (props) => {
     })
     return (
         <View style={{flex:1}}>
-            <View style={styles.actionTextWrapper}>
+            {props.hideActions ? null : (<View style={styles.actionTextWrapper}>
                 <View><TouchableOpacity onPress={() => {props.onClearItems()}}><Text style={styles.actionText}>Clear all ({props.items.length})</Text></TouchableOpacity></View>
                 <View><TouchableOpacity onPress={() => {props.onAddItem()}}><Text style={styles.actionText}>+ Item</Text></TouchableOpacity></View>
-            </View>
+            </View>)}
             <ScrollView showsVerticalScrollIndicator = {false}>
                 <TouchableWithoutFeedback onPress={() => {
                     Keyboard.dismiss();
                     props.onRemoveAllEmptyItems();
                 }} >
-                    <View style={styles.container}>
+                    <View style={[styles.container, props.customFormWrapperStyle ? props.customFormWrapperStyle : null]}>
                         {items}
                         {/* <View style={styles.inputWrapper}><Input.InputText targetKey ='name' {...props} placeholder='Wishlist Name' maxLength = {35} /></View> */}
                     </View>
                 </TouchableWithoutFeedback>
             </ScrollView>  
-            <Fade.Top style={{top: 45}} />
-            <Fade.Bottom  />  
+            <Fade.Top style={{top: props.hideActions ? 0 : 45}} />
+              
+            {keyboardShown ? null : (<Fade.Bottom />)}
         </View>
         
     )
