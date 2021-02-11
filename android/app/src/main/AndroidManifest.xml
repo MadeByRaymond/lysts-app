@@ -25,12 +25,53 @@
         </intent-filter>
       </activity>
 
+      <!-- Enabling Deep Linking  -->
+      <!-- Intent filters for incoming links -->
+      <activity android:name=".LinkingActivity">
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+
+            <!-- Accepts URIs that begin with "http://www.lystsapp.com/wishlink” -->
+            <data android:scheme="http"
+                android:host="www.lystsapp.com"
+                android:pathPrefix="/wishlink" />
+            <!-- note that the leading "/" is required for pathPrefix-->
+
+            <!-- Accepts URIs that begin with "https://www.lystsapp.com/wishlink” -->
+            <data android:scheme="https"
+                android:host="www.lystsapp.com"
+                android:pathPrefix="/wishlink" />
+            <!-- note that the leading "/" is required for pathPrefix-->
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!-- Accepts URIs that begin with "lystsapp:// -->
+            <data android:scheme="lystsapp" />
+        </intent-filter>
+        <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!-- Accepts URIs that begin with "fb199695245174373:// -->
+            <data android:scheme="@string/fb_login_protocol_scheme" />
+        </intent-filter>
+      </activity>
+
+      <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+
       <!-- Change the value to true to enable pop-up for in foreground on receiving remote notifications (for prevent duplicating while showing local notifications set this to false) -->
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_foreground"
                   android:value="false"/>
       <!-- Change the resource name to your App's accent color - or any other color you want -->
       <meta-data  android:name="com.dieam.reactnativepushnotification.notification_color"
                   android:resource="@color/notificationColor"/> <!-- or @android:color/{name} to use a standard color -->
+      <meta-data
+          android:name="com.dieam.reactnativepushnotification.default_notification_channel_id"
+          android:value="@string/default_notification_channel_id" />
 
       <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationActions" />
       <receiver android:name="com.dieam.reactnativepushnotification.modules.RNPushNotificationPublisher" />
@@ -49,6 +90,8 @@
               <action android:name="com.google.firebase.MESSAGING_EVENT" />
           </intent-filter>
       </service>
+
+      <!-- <service android:name="com.lysts.TaskService" /> -->
 
       <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
     </application>
