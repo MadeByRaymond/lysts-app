@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Realm from 'realm';
-import { Text, StyleSheet, View, BackHandler } from 'react-native'
+import { Text, StyleSheet, View, BackHandler, Vibration } from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
 
@@ -367,7 +367,7 @@ class createWishlist extends Component {
                 saved: false,
             });
             Navigation.popToRoot(this.props.componentId);
-            console.log("log step 3");
+            Vibration.vibrate(300);
           }).catch((e) => {
             console.log(e);
             this.setState({

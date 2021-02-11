@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View, Vibration } from 'react-native'
 import Svg, { Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
 import { Shadow } from 'react-native-neomorph-shadows';
@@ -15,6 +15,7 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
     }, 4000);
 
     useEffect(() => {
+      Vibration.vibrate(300);
         return () => {
             clearTimeout(exitAlertTimeout);
         }
