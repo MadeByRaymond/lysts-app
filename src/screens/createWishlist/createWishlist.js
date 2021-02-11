@@ -8,6 +8,7 @@ import Header from '../../components/Headers/createWishlistHeader';
 import InfoForm from '../../components/Forms/wishlistForms/wishlistInfoForm';
 import ItemsForm from '../../components/Forms/wishlistForms/wishlistItemsForm';
 import CreationPreview from '../../components/wishlistCreation/creationPreview';
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import {removeExcessWhiteSpace} from '../../includes/functions';
@@ -24,6 +25,7 @@ class createWishlist extends Component {
     realm;
     wishlistCode;
     user = realmApp.currentUser;
+    timeoutAlert;
 
     constructor(props) {
         super(props)
@@ -58,6 +60,12 @@ class createWishlist extends Component {
                 svgHeight: 0,
                 expandIndex: null
             },
+            alertMessage:{
+                show: false,
+                type: '',
+                title: '',
+                subtitle: '',
+            }
 
 
 
@@ -121,6 +129,7 @@ class createWishlist extends Component {
             "hardwareBackPress",
             this.backAction
         );
+        clearTimeout(this.timeoutAlert);
 
         (this.realm !== null && typeof this.realm !== 'undefined' && this.realm !== "") ? (this.realm.isClose ? null : realm.close()) : null
     }
@@ -241,14 +250,14 @@ class createWishlist extends Component {
             this.wizard.current.next();
         } else if(this.state.wizard.currentStep === 2){
             this.createNewWishlist();
-            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
-                id: 'temp_id',
-                name: this.state.wishlistInfo.name.value,
-                type: this.state.wishlistInfo.category.value,
-                code: `${this.wishlistCode}`,
-                saved: false,
-            });
-            Navigation.popToRoot(this.props.componentId);
+            // this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
+            //     id: 'temp_id',
+            //     name: this.state.wishlistInfo.name.value,
+            //     type: this.state.wishlistInfo.category.value,
+            //     code: `${this.wishlistCode}`,
+            //     saved: false,
+            // });
+            // Navigation.popToRoot(this.props.componentId);
         } else {
             this.wizard.current.next();
         }
@@ -349,16 +358,37 @@ class createWishlist extends Component {
             //   })
             // }
         //   console.log(datas);
+
+            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
+                id: 'temp_id',
+                name: this.state.wishlistInfo.name.value,
+                type: this.state.wishlistInfo.category.value,
+                code: `${this.wishlistCode}`,
+                saved: false,
+            });
+            Navigation.popToRoot(this.props.componentId);
             console.log("log step 3");
           }).catch((e) => {
             console.log(e);
-          }).finally(() => {
-            // if (Realm !== null && !Realm.) {
-            //     // Real.close();
-            //   }
-          });
+            this.setState({
+                alertMessage:{
+                    show: true,
+                    type: 'error',
+                    title: 'Wishlist Creation Failed',
+                    subtitle: 'Please check your network connection...',
+                }
+            })
+          })
         } catch (error) {
-            throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+            this.setState({
+                alertMessage:{
+                    show: true,
+                    type: 'error',
+                    title: 'Error Connection To Server',
+                    subtitle: 'Please check your network connection...',
+                }
+            })
+            // throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
             
         }
       }
@@ -370,6 +400,15 @@ class createWishlist extends Component {
         for (let i = (length-1); i > 0; --i) result += chars[Math.round(Math.random() * (chars.length - 1))];
         return (length < 1) ? '' : result;
       }
+
+    
+    resetAlert = () => {
+        
+        this.timeoutAlert = setTimeout(()=>{
+            this.setState({alertMessage: {show: false}})
+            clearTimeout(this.timeoutAlert);
+        }, 4500)
+    }
      
     render() {
         let stepsList = [
@@ -415,6 +454,10 @@ class createWishlist extends Component {
         } else {
             buttonDisabledStatus = false;
         }
+
+        
+        this.state.alertMessage.show ? this.resetAlert() : null;
+
         return (
             <View style={styles.container}>
 
@@ -483,6 +526,13 @@ class createWishlist extends Component {
                         currentStepValue == 0 ? 'Next' : currentStepValue == 1 ? 'Preview' : currentStepValue == 2 ? 'Finish' : 'Next'
                     }</ButtonView>
                )}
+
+               {this.state.alertMessage.show ? (<ErrorSuccessAlert 
+                    type = {this.state.alertMessage.type}
+                    title = {this.state.alertMessage.title}
+                    subtitle = {this.state.alertMessage.subtitle}
+                /> )
+                : null}
                 
             </View>
         )
