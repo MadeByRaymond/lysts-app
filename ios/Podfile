@@ -94,6 +94,19 @@ target 'Lysts' do
 
   pod 'ReactNativeExceptionHandler', :path => '../node_modules/react-native-exception-handler'
 
+  pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+
+  pod 'react-native-notification-sounds', :path => '../node_modules/react-native-notification-sounds'
+
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+
+  pod 'react-native-view-shot', :path => '../node_modules/react-native-view-shot'
+
+
+  pod 'RNBootSplash', :path => '../node_modules/react-native-bootsplash'
+
+  pod 'react-native-fbsdk', :path => '../node_modules/react-native-fbsdk'
+
   target 'LystsTests' do
     inherit! :complete
     # Pods for testing
