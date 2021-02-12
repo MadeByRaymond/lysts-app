@@ -9,7 +9,8 @@ import { connect } from 'react-redux';
 import {getRealmApp} from '../../../storage/realm';
 
 import {dWidth, dHeight} from '../../includes/variables'
-import {goToScreen} from '../../includes/functions'
+import {goToScreen} from '../../includes/functions';
+import {signInAuth} from '../../services/AuthServiceProvider'
 
 // REDUX ACTIONS 
 import {signInAuth} from '../../store/actions';
@@ -24,7 +25,7 @@ export class Auth extends Component {
     // }
 
     state = {
-        data : {},
+        isLoading:false,
         loginWith: ''
     }
 
@@ -101,9 +102,13 @@ export class Auth extends Component {
                     </View>
                     <View style={styles.buttonsWrapper}>
                         <View style={[styles.buttonContainer]}>
-                            <TouchableOpacity disabled={this.props.isLoading} activeOpacity={0.8} onPress={() => this.setState({loginWith: 'google'}, () => {this.props.onSignInAuth("googles")}) } >
+                            <TouchableOpacity disabled={this.state.isLoading} activeOpacity={0.8} onPress={
+                                () => this.setState({
+                                    isLoading:true,
+                                    loginWith: 'google'
+                                }, () => {signInAuth("demo", ()=>{this.setState({isLoading:false,loginWith: ''})})}) } >
                                 <View style={[styles.button, styles.whiteButton]}>
-                                    <View><Text style={[styles.buttonText, styles.whiteButtonText]}>{ (this.props.isLoading && this.state.loginWith.trim() == 'google') ? 'Please wait...' : 'Continue with Google'}</Text></View>
+                                    <View><Text style={[styles.buttonText, styles.whiteButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'google') ? 'Please wait...' : 'Continue with Google'}</Text></View>
                                     <View style={styles.svgWrapper}>
                                         <Svg
                                             width={30}
@@ -135,9 +140,13 @@ export class Auth extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.buttonContainer]}>
-                            <TouchableOpacity disabled={this.props.isLoading} activeOpacity={0.8} onPress={() => this.setState({loginWith: 'facebook'}, () => {this.props.onSignInAuth("facebook")})} >
+                            <TouchableOpacity disabled={this.state.isLoading} activeOpacity={0.8} onPress={
+                                () => this.setState({
+                                    isLoading:true,
+                                    loginWith: 'facebook'
+                                }, () => {signInAuth("facebook", ()=>{this.setState({isLoading:false,loginWith: ''})})})} >
                                 <View style={[styles.button, styles.blueButton]}>
-                                    <View><Text style={[styles.buttonText, styles.blueButtonText]}>{ (this.props.isLoading && this.state.loginWith.trim() == 'facebook') ? 'Please wait...' : 'Continue with Facebook'}</Text></View>
+                                    <View><Text style={[styles.buttonText, styles.blueButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'facebook') ? 'Please wait...' : 'Continue with Facebook'}</Text></View>
                                     <View style={styles.svgWrapper}>
                                         <Svg
                                             width={30}
@@ -157,7 +166,7 @@ export class Auth extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.buttonContainer, {marginTop: -8}]}>
-                            <TouchableOpacity disabled={this.props.isLoading} activeOpacity={0.8} onPress={() => {
+                            <TouchableOpacity disabled={this.state.isLoading} activeOpacity={0.8} onPress={() => {
                                 goToScreen(this.props.componentId, 'com.lysts.screen.home', {}, {
                                     topBar: {
                                         // title: {
@@ -190,19 +199,19 @@ export class Auth extends Component {
 }
 
 
-const mapStateToProps = (state) =>{
-    return{
-      isLoading: state.ui.isLoading
-    }
-  }
+// const mapStateToProps = (state) =>{
+//     return{
+//       isLoading: state.ui.isLoading
+//     }
+//   }
   
-  const mapDispatchToProps = dispatch => {
-      return {
-          onSignInAuth: (data) => dispatch(signInAuth(data))
-      };
-  };
+//   const mapDispatchToProps = dispatch => {
+//       return {
+//           onSignInAuth: (data) => dispatch(signInAuth(data))
+//       };
+//   };
   
-  export default connect(mapStateToProps, mapDispatchToProps)(Auth);
+  export default Auth;
 
 
   const styles = StyleSheet.create({

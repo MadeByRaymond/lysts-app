@@ -6,6 +6,7 @@ import { Navigation } from "react-native-navigation";
 
 import {app as realmApp} from '../../../storage/realm'
 import {loginRoot} from '../../../App';
+import {signOutAuth} from '../../services/AuthServiceProvider';
 
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
 import NavHeader from '../../components/Headers/profileNavHeader';
@@ -58,11 +59,24 @@ export default class settings extends Component {
     //   }, 1000, {leading: true,trailing: false})
 
     logoutHandler = () => {
-      realmApp.currentUser.logOut().then(()=>{
-        Navigation.setRoot(loginRoot);
-      }).catch(() => {
-        this.setState({loggingOut: false}, () => {alert('Error with login you out')})
-      })
+      signOutAuth(
+        () => {
+          this.setState({
+            loggingOut: false,
+            alertMessage:{
+              show: false,
+              type: 'error',
+              title: 'Oh Wow! We\'re Sorry',
+              subtitle: 'Seems like an error occurred. Try again.',
+            }
+          })
+        }
+      )
+      // realmApp.currentUser.logOut().then(()=>{
+      //   Navigation.setRoot(loginRoot);
+      // }).catch(() => {
+      //   this.setState({loggingOut: false}, () => {alert('Error with login you out')})
+      // })
     }
 
     render() {
