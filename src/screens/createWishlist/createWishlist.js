@@ -3,12 +3,14 @@ import Realm from 'realm';
 import { Text, StyleSheet, View, BackHandler, Vibration } from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
+import NetInfo from "@react-native-community/netinfo";
 
 import Header from '../../components/Headers/createWishlistHeader';
 import InfoForm from '../../components/Forms/wishlistForms/wishlistInfoForm';
 import ItemsForm from '../../components/Forms/wishlistForms/wishlistItemsForm';
 import CreationPreview from '../../components/wishlistCreation/creationPreview';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import {removeExcessWhiteSpace} from '../../includes/functions';
@@ -26,6 +28,7 @@ class createWishlist extends Component {
     wishlistCode;
     user = realmApp.currentUser;
     timeoutAlert;
+    unsubscribeNetworkUpdate;
 
     constructor(props) {
         super(props)
@@ -60,12 +63,14 @@ class createWishlist extends Component {
                 svgHeight: 0,
                 expandIndex: null
             },
+            hasNetworkConnection: null,
             alertMessage:{
                 show: false,
                 type: '',
                 title: '',
                 subtitle: '',
-            }
+            },
+            savingInfo: false,
 
 
 
@@ -122,6 +127,13 @@ class createWishlist extends Component {
             "hardwareBackPress",
             this.backAction
         );
+
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            this.setState({hasNetworkConnection: state.isConnected});
+            
+        });
     }
     
     componentWillUnmount() {
@@ -130,8 +142,9 @@ class createWishlist extends Component {
             this.backAction
         );
         clearTimeout(this.timeoutAlert);
+        this.unsubscribeNetworkUpdate();
 
-        (this.realm !== null && typeof this.realm !== 'undefined' && this.realm !== "") ? (this.realm.isClose ? null : realm.close()) : null
+        (typeof this.realm !== 'undefined' && this.realm !== null && this.realm !== "") ? (this.realm.isClose ? null : this.realm.close()) : null
     }
 
     onAddItem = () => {
@@ -249,7 +262,8 @@ class createWishlist extends Component {
 
             this.wizard.current.next();
         } else if(this.state.wizard.currentStep === 2){
-            this.createNewWishlist();
+            // this.createNewWishlist();
+            this.startSaving();
             // this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
             //     id: 'temp_id',
             //     name: this.state.wishlistInfo.name.value,
@@ -283,7 +297,22 @@ class createWishlist extends Component {
             sync: {
               user: this.user,
               partitionValue: "public",
-              error: (s, e) => {console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);}
+              error: (s, e) => {
+                  console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);
+                  this.setState((prevState) => ({
+                    wizard:{
+                        ...prevState.wizard,
+                        infoButtonDisabledStatus: true
+                    },
+                    savingInfo: false,
+                    alertMessage:{
+                        show: true,
+                        type: 'error',
+                        title: 'Error Syncing With Server...',
+                        subtitle: 'Kindly check your network connection',
+                    }
+                  }))
+                }
             },
           };
           
@@ -367,10 +396,11 @@ class createWishlist extends Component {
                 saved: false,
             });
             Navigation.popToRoot(this.props.componentId);
-            Vibration.vibrate(300);
+            Vibration.vibrate(350);
           }).catch((e) => {
             console.log(e);
             this.setState({
+                savingInfo: false,
                 alertMessage:{
                     show: true,
                     type: 'error',
@@ -381,6 +411,7 @@ class createWishlist extends Component {
           })
         } catch (error) {
             this.setState({
+                savingInfo: false,
                 alertMessage:{
                     show: true,
                     type: 'error',
@@ -392,6 +423,8 @@ class createWishlist extends Component {
             
         }
       }
+
+      startSaving = () => {this.setState({savingInfo: true})}
 
       randomString = (length, chars = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') => {
         length = Math.floor(length);
@@ -458,6 +491,8 @@ class createWishlist extends Component {
         
         this.state.alertMessage.show ? this.resetAlert() : null;
 
+        this.state.savingInfo ? this.createNewWishlist() : null;
+
         return (
             <View style={styles.container}>
 
@@ -521,11 +556,11 @@ class createWishlist extends Component {
                     />
                 </View>
 
-               {buttonDisabledStatus ? null : (
-                    <ButtonView onPress={() => {this.nextAction()}}>{
-                        currentStepValue == 0 ? 'Next' : currentStepValue == 1 ? 'Preview' : currentStepValue == 2 ? 'Finish' : 'Next'
+               {this.state.hasNetworkConnection ? buttonDisabledStatus ? null : (
+                    <ButtonView disabled={this.state.savingInfo} onPress={() => {this.nextAction()}}>{
+                        this.state.savingInfo ? 'Please wait...' : currentStepValue == 1 ? 'Preview' : currentStepValue == 2 ? 'Finish' : 'Next'
                     }</ButtonView>
-               )}
+               ) : <NoConnectionAlert wrapperContainerStyle={{top: dHeight - 20 - 55 }} />}
 
                {this.state.alertMessage.show ? (<ErrorSuccessAlert 
                     type = {this.state.alertMessage.type}
