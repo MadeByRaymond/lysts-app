@@ -27,7 +27,7 @@ import WishlistEmptySVG from '../../SVG_Files/UI_SVG/noWishlist/noWishlist';
 import * as iconSVG from '../../SVG_Files/wishlistIconsSVG/';
 import * as SaveSVG from '../../SVG_Files/saveSVG/saveSVG';
 
-let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
+// let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
 
 export default class Wishlist extends Component {
 
@@ -41,7 +41,7 @@ export default class Wishlist extends Component {
 
   state = {
     isLoading: true,
-    hasNetworkConnection: null,
+    hasNetworkConnection: true,
     silentReload: false,
     newListAdded: false,
     newListInfoModal:{      
@@ -284,36 +284,30 @@ export default class Wishlist extends Component {
 
   render() {
     let listData = this.state.listData;
-    let hasData = false;
+    let hasData = (listData.length == 0 || listData == null) ? false : true;
     let whatToRender;
     if(!this.state.hasNetworkConnection){
-      if(listData.length == 0 || listData == null){
-        hasData = false;
-        whatToRender = (<ErrorView message="No Internet Connection" svg={noInternet} />)
-      }else{
-        hasData = true;
+      if(hasData){
         whatToRender = this.renderItemsList();
+      }else{
+        whatToRender = (<ErrorView message="No Internet Connection" svg={noInternet} />)
       }
-    }else if (this.state.isLoading && (listData.length == 0 || listData == null)){
-      hasData = false;
+    }else if (this.state.isLoading && !hasData){
       whatToRender = this.showLoading();
     }else if (this.state.isLoading){
-        hasData = true;
         whatToRender = this.renderItemsList();
         this.getWishlists();
     } else {
-      if (listData != null && listData.length != 0){
-        hasData = true;
+      if (hasData){
         whatToRender = this.renderItemsList();
       }else{
-        hasData = false;
         whatToRender = this.renderNoItems();
       }
     }
 
     this.state.silentReload ? this.getWishlists() : null;
 
-    this.state.alertMessage.show ? this.resetAlert() : null
+    this.state.alertMessage.show ? this.resetAlert() : null;
 
     return (
       <View style={styles.container}>
@@ -360,7 +354,7 @@ const styles = StyleSheet.create({
   },
   topText:{
     color:'#515D70',
-    fontSize: pexels(10.5),
+    // fontSize: pexels(10.5),
     fontSize: 28,
     fontFamily: 'Poppins-SemiBold'
   },
@@ -385,7 +379,7 @@ const styles = StyleSheet.create({
   noContentText:{
     textAlign:'center',
     color:'rgba(68, 87, 124, 0.9)',
-    fontSize: pexels(9.5),
+    // fontSize: pexels(9.5),
     fontSize: 25,
     fontFamily: 'Poppins-Medium'
   },
