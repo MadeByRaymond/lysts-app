@@ -40,7 +40,7 @@ export default function loader({lottieViewStyle = null}) {
                 // clearTimeout(attentionSeekerTimeout)
                 break;
             case 1:
-                setAttentionSeeker(<AnimatableTextTemplate text={'We\'re almost done 😁'} animation='pulse' iterationCount="infinite" />)
+                setAttentionSeeker(<AnimatableTextTemplate text={'We\'re almost done 😁'} animation='pulse' />)
                 setSetTimeoutTracker(2)
                 // clearTimeout(attentionSeekerTimeout)
                 break;
