@@ -58,19 +58,19 @@ Navigation.registerComponent('com.lysts.screen.onboarding', () => OnBoarding);
 Navigation.registerComponentWithRedux('com.lysts.screen.auth', () => Auth, Provider, store);
 
 // APP SCREEN COMPONENTS REGISTER
-Navigation.registerComponentWithRedux('com.lysts.screen.wishlist', () => Wishlist, Provider, store);
+Navigation.registerComponent('com.lysts.screen.wishlist', () => Wishlist);
 Navigation.registerComponent('com.lysts.screen.home', () => Home);
 Navigation.registerComponent('com.lysts.screen.selectCategory', () => SelectCategory);
-Navigation.registerComponentWithRedux('com.lysts.screen.createWishlist', () => CreateWishlist, Provider, store);
+Navigation.registerComponent('com.lysts.screen.createWishlist', () => CreateWishlist);
 Navigation.registerComponent('com.lysts.screen.wishlistDetails', () => WishlistDetails);
 Navigation.registerComponent('com.lysts.screen.profile', () => Profile);
 Navigation.registerComponent('com.lysts.screen.profileInfo', () => ProfileInfo);
 Navigation.registerComponent('com.lysts.screen.customizeAvatar', () => CustomizeAvatar);
-Navigation.registerComponentWithRedux('com.lysts.screen.save_archive', () => Save_Archive, Provider, store);
-Navigation.registerComponentWithRedux('com.lysts.screen.settings', () => Settings, Provider, store);
+Navigation.registerComponent('com.lysts.screen.save_archive', () => Save_Archive);
+Navigation.registerComponent('com.lysts.screen.settings', () => Settings);
 Navigation.registerComponent('com.lysts.screen.aboutSettings', () => AboutSettings);
-Navigation.registerComponentWithRedux('com.lysts.screen.notificationSettings', () => NotificationSettings, Provider, store);
-Navigation.registerComponentWithRedux('com.lysts.screen.securitySettings', () => SecuritySettings, Provider, store);
+Navigation.registerComponent('com.lysts.screen.notificationSettings', () => NotificationSettings);
+Navigation.registerComponent('com.lysts.screen.securitySettings', () => SecuritySettings);
 // NON SCREEN COMPONENTS REGISTER
 Navigation.registerComponent('com.lysts.component.SavedButton', () => SavedButton);
 
