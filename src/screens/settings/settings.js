@@ -10,14 +10,30 @@ import {signOutAuth} from '../../services/AuthServiceProvider';
 
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
 import NavHeader from '../../components/Headers/profileNavHeader';
+import DefaultModal from '../../UIComponents/Modals/DefaultModal';
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
 import {goToScreen} from '../../includes/functions'
 
 export default class settings extends Component {
 
-  state={
-    loggingOut: false
-  }
+    user = realmApp.currentUser;
+    timeoutAlert;
+
+    state={
+      loggingOut: false,
+      reportModal: false,
+      alertMessage:{
+        show: false,
+        type: '',
+        title: '',
+        subtitle: '',
+      }
+    }
+
+    componentWillUnmount(){
+      clearTimeout(this.timeoutAlert);
+    }
 
     goToScreenHandler = (screenName, title='', screenProps = {}, screenOptions = {}) => {
       let screenOptionsObject = {
@@ -146,9 +162,20 @@ export default class settings extends Component {
       // })
     }
 
+    resetAlert = () => {
+      this.timeoutAlert = setTimeout(()=>{
+          
+        this.setState({alertMessage: {show: false}})
+          clearTimeout(this.timeoutAlert);
+      }, 4500)
+    }
+    
     render() {
+      this.state.loggingOut ? this.logoutHandler() : null;
+
         return (
             <View style={styles.container}>
+              {this.state.reportModal ? this.reportModal() : null}
                 <View style={styles.credits}>
                     <CreditSVG width={111} height={48} />
                 </View>
@@ -214,7 +241,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.setState}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={32} viewBox="0 0 49 53" fill="none">
@@ -289,7 +316,11 @@ export default class settings extends Component {
                     </TouchableOpacity>
                   </View>
                 </ScrollView>
-                {this.state.loggingOut ? this.logoutHandler() : null}
+                {this.state.alertMessage.show ? <ErrorSuccessAlert 
+                  type = {this.state.alertMessage.type}
+                  title = {this.state.alertMessage.title}
+                  subtitle = {this.state.alertMessage.subtitle}
+                /> : null}
             </View>
         )
     }
