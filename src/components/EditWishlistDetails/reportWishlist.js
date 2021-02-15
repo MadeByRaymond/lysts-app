@@ -121,6 +121,7 @@ export default class reportWishlist extends Component {
                     customFormWrapperStyle = {{paddingHorizontal: 0, paddingTop: 10}}
 
                     userLoggedIn = {this.props.userLoggedIn}
+                    reportType = {this.props.type}
                   />
                 </View>
                 {this.state.hasNetworkConnection ? <View style={styles.ModalButtonWrapper}>

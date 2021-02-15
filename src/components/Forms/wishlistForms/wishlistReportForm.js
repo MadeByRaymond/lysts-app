@@ -4,10 +4,11 @@ import { StyleSheet, Text, View, TouchableWithoutFeedback, Keyboard, ScrollView 
 import * as Input from '../../../UIComponents/Inputs/index';
 import {getCategoryDisplay,validateEmail} from '../../../includes/functions';
 
-import {reportReasons} from '../../../includes/datasets';
+import {wishlistReportReasons, issueReportReasons} from '../../../includes/datasets';
 
 const Form = (props) => {
     let reportReasonList = [];
+    let reportReasons = (props.reportType == 'reportWishlist') ? wishlistReportReasons : issueReportReasons;
     reportReasons.map((item,key) => {
         return reportReasonList.push({
             label: getCategoryDisplay(item),

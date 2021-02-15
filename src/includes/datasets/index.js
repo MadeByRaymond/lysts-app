@@ -18,7 +18,12 @@ export const categories = [
     
 ];
 
-export const reportReasons = [
+export const wishlistReportReasons = [
+    'Other',
+    'Other 2'
+];
+
+export const issueReportReasons = [
     'Other',
     'Other 2'
 ];

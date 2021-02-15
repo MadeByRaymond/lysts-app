@@ -101,13 +101,24 @@ const DefaultModal = (props) => {
             break;
 
         case 'reportWishlist' :
-            modalContent = (
-              <ReportModalContent 
-                reportFunction = {props.reportFunction}
-                userLoggedIn = {props.userLoggedIn}
-              />
-            )
-            break;
+          modalContent = (
+            <ReportModalContent 
+              reportFunction = {props.reportFunction}
+              userLoggedIn = {props.userLoggedIn}
+              type = {props.type}
+            />
+          )
+          break;
+
+        case 'reportIssue' :
+          modalContent = (
+            <ReportModalContent 
+              reportFunction = {props.reportFunction}
+              userLoggedIn = {props.userLoggedIn}
+              type = {props.type}
+            />
+          )
+          break;
 
         default:
             break;

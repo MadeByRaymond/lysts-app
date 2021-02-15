@@ -58,13 +58,80 @@ export default class settings extends Component {
     //     });
     //   }, 1000, {leading: true,trailing: false})
 
+
+    reportHandler = (type, message, email='', callbackFunc = ()=>{}, errorCallbackFunc = ()=>{}) => {
+     
+      let data = {
+          service_id: 'service_mmevngd',
+          template_id: 'template_u7na939',
+          user_id: 'user_BQqm4mon2VH841IwUesJQ',
+          template_params: {
+              reply_to: this.user.customData.contactEmail,
+              from_name: this.user.customData.fullName,
+              // wishlist_owner_name: this.state.wishlistInfo.owner,
+              // wishlist_name: this.state.wishlistInfo.name,
+              // wishlist_description: this.state.wishlistInfo.description,
+              // wishlist_code: this.props.wishlistCode,
+              // wishlist_owner_id: this.state.wishlistInfo.ownerId,
+              // wishlist_items: wishlist_items.trim(),
+              report_type: type,
+              message: message
+          }
+      };
+
+      fetch('https://api.emailjs.com/api/v1.0/email/send', {
+          method: 'POST', // or 'PUT'
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data),
+      })
+      .then(response => {
+          if (response.ok) {
+              callbackFunc();
+              this.setState({reportModal: false,
+                  alertMessage: {
+                      show: true,
+                      type: 'success',
+                      title: 'Report Sent!',
+                      subtitle: ''
+                  }});
+              
+          } else {
+              return response.text()
+                .then(text => Promise.reject(text));
+          }
+      })
+      // .then(data => {
+      //     console.log('Success:', data);
+      // })
+      .catch((error) => {
+          errorCallbackFunc();
+          console.log('Error:', error);
+      });
+    }
+
+    reportModal = () => (
+      <DefaultModal 
+          isVisible={this.state.reportModal}
+          closeFunction = {() => {this.setState({reportModal: false})}}
+          type= 'reportIssue'
+          modalTitle='Report An Issue'
+
+          reportFunction = {this.reportHandler}
+          userLoggedIn = {true}
+          // userInfo = {this.user}
+          // wishlistCode = {this.props.wishlistCode}
+      />
+    )
+
     logoutHandler = () => {
       signOutAuth(
         () => {
           this.setState({
             loggingOut: false,
             alertMessage:{
-              show: false,
+              show: true,
               type: 'error',
               title: 'Oh Wow! We\'re Sorry',
               subtitle: 'Seems like an error occurred. Try again.',
