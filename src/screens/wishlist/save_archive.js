@@ -9,6 +9,7 @@ import {noSaved, noArchive, noInternet} from '../../SVG_Files/UI_SVG/errors';
 import ErrorView from '../../components/Errors/errorView';
 import NavHeader from '../../components/Headers/profileNavHeader';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {goToViewWishlistScreen} from '../../includes/functions';
 import ListView from '../../components/wishlistList/wishlistList';
@@ -32,7 +33,7 @@ export default class save_archive extends Component {
     state ={
       isArchive : this.props.show == 'archive' ? true : false,
       isSaved : this.props.show == 'saved' ? true : false,
-      hasNetworkConnection: null,
+      hasNetworkConnection: true,
       isLoading : true,
       silentReload: false,
       listData: [
@@ -65,8 +66,6 @@ export default class save_archive extends Component {
       this.unsubscribeNetworkUpdate();
       clearTimeout(this.timeoutAlert);
     }
-
-    
 
     renderItemsList = () =>{
         return (
@@ -158,146 +157,141 @@ export default class save_archive extends Component {
     }
 
     getWishlistsFromRealm = async () => {
-      
-      let wishlistData = [];
-      let ownerData = [];
-      
+      try {
+        let wishlistData = [];
+        let ownerData = [];
 
-      // for (const value of temp) {
-      //   filter = filter + `code == '${value}'`
-      // }
+        let listData = [];
+        if (this.state.isArchive){
+          wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'inactive'`).sorted("dateModified", true);
+        }else if(this.state.isSaved){
+          let savedWishlists = this.user.customData.savedLists
+          let filter = "";
+          let ownersFilter = [];
 
-      let listData = [];
-      if (this.state.isArchive){
-        wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'inactive'`).sorted("dateModified", true);
-      }else if(this.state.isSaved){
-        let savedWishlists = this.user.customData.savedLists
-        let filter = "";
-        let ownersFilter = [];
-
-        savedWishlists.forEach((val, i) =>{
-          if (i == 0){
-            filter = `code == '${val}'`
-          }else{
-            filter = filter + ` || code == '${val}'`
-          }
-        })
-        wishlistData = this.realm.objects("wishlist").filtered(`${filter} && status == 'active'`).sorted("dateCreated", true);
-        // console.log(wishlistData.length);
-        if(wishlistData.length > 0){
-          wishlistData.forEach((val,i) => {
-            ownersFilter.push({userID : val.owner})
-            // if (i == 0){
-            //   ownersFilter.push({userID : val.owner})
-            //   ownersFilter = `userID == '${val.owner}'`
-            // }else{
-            //   ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
-            // }
-          })
-          // console.log(ownersFilter);
-          console.log('aaaaa');
-          let ownerDataTemp = await this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists").db("lysts").collection("users").find({
-            $or: ownersFilter
-          })
-          // ownerData = this.realm.objects('user').filtered(ownersFilter);
-          ownerData = JSON.parse(JSON.stringify(ownerDataTemp));
-          console.log('bbbbb ==> ', ownerData);
-        }
-        // ownerData = this.realm.objects("user").filtered(`userID == '${wishlistData[0].owner}'`);
-      }  else{
-        wishlistData = [];
-      }    
-          
-      console.log(wishlistData);
-      if (wishlistData.length < 1) { 
-        listData = [];
-      } 
-      else {
-        
-        for (const val of wishlistData) {
-          let ownerName = '';
-          // console.log("ownerData");
-          ownerData.forEach(user => {
-            console.log('userID ==>',user.userID);
-            console.log('owner ==>',val.owner);
-            if (user.userID == val.owner){
-              ownerName = (
-                (typeof user.displayName == 'undefined' || user.displayName == null || user.displayName.trim() == "") 
-                ? user.fullName.trim().trimStart() : user.displayName.trim().trimStart());
-
-                // console.log('ownerName ==>',ownerName);
-              // break;
+          savedWishlists.forEach((val, i) =>{
+            if (i == 0){
+              filter = `code == '${val}'`
+            }else{
+              filter = filter + ` || code == '${val}'`
             }
           })
 
-          listData.push({
-            id: val._id,
-            name: val.name,
-            type: val.category,
-            code: val.code,
-            owner: this.state.isSaved ? ownerName : this.user.id,
-            saved: this.user.customData.savedLists.includes(val.code)
-          })
+          wishlistData = this.realm.objects("wishlist").filtered(`status == 'active' && (${filter})`).sorted("dateCreated", true);
+          // console.log(wishlistData.length);
+          if(wishlistData.length > 0){
+            wishlistData.forEach((val,i) => {
+              ownersFilter.push({userID : val.owner})
+              // if (i == 0){
+              //   ownersFilter.push({userID : val.owner})
+              //   ownersFilter = `userID == '${val.owner}'`
+              // }else{
+              //   ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
+              // }
+            });
 
-          console.log('List Data ==> ', listData);
+            let ownerDataTemp = await this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists").db("lysts").collection("users").find({
+              $or: ownersFilter
+            })
+
+            // ownerData = this.realm.objects('user').filtered(ownersFilter);
+            ownerData = JSON.parse(JSON.stringify(ownerDataTemp));
+            // console.log('bbbbb ==> ', ownerData);
+          }
+          // ownerData = this.realm.objects("user").filtered(`userID == '${wishlistData[0].owner}'`);
+        }  else{
+          wishlistData = [];
+        }    
+            
+        // console.log(wishlistData);
+        if (wishlistData.length < 1) { 
+          listData = [];
+        } else {
+          
+          for (const val of wishlistData) {
+            let ownerName = '';
+            // console.log("ownerData");
+            ownerData.forEach(user => {
+              // console.log('userID ==>',user.userID);
+              // console.log('owner ==>',val.owner);
+              if (user.userID == val.owner){
+                ownerName = (
+                  (typeof user.displayName == 'undefined' || user.displayName == null || user.displayName.trim() == "") 
+                  ? user.fullName.trim().trimStart() : user.displayName.trim().trimStart());
+
+                  // console.log('ownerName ==>',ownerName);
+                // break;
+              }
+            })
+
+            listData.push({
+              id: val._id,
+              name: val.name,
+              type: val.category,
+              code: val.code,
+              owner: this.state.isSaved ? ownerName : this.user.id,
+              saved: this.user.customData.savedLists.includes(val.code)
+            })
+
+            // console.log('List Data ==> ', listData);
+          }
+          
         }
+    
+        this.setState({
+          isLoading: false,
+          silentReload: false,
+          listData
+        })
         
+      } catch (error) {
+          throw error;
       }
-  
-      this.setState({
-        isLoading: false,
-        silentReload: false,
-        listData
-      })
     }
 
     getWishlists = async() => {
-      // console.log("uuuu");
-      // return null;
       try{
-        console.log(`Logged in with the user: ${this.user.id}`);  
-        let schemaList = (
-        // this.state.isSaved 
-        // ? [
-        //   WishlistSchemas.wishlistSchema,
-        //   WishlistSchemas.wishlist_listItemsSchema,
-        //   UserSchemas.userSchema,
-        //   UserSchemas.user_avatarFeaturesSchema,
-        //   UserSchemas.user_settingsSchema,
-        //   UserSchemas.user_settings_notificationSchema,
-        // ] 
-        // : 
-        [
-          WishlistSchemas.wishlistSchema,
-          WishlistSchemas.wishlist_listItemsSchema
-        ]  )    
-        // console.log(schemaList);
+        // console.log(`Logged in with the user: ${this.user.id}`);  
+        
         const config = {
-          schema: schemaList,
+          schema: [
+            WishlistSchemas.wishlistSchema,
+            WishlistSchemas.wishlist_listItemsSchema
+          ],
           sync: {
             user: this.user,
             partitionValue: "public",
             error: (s, e) => {
               this.setState({
-                isLoading: false,
-                silentReload: false
-              }, () => { console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);})
+                isLoading: false, 
+                silentReload: false,
+                alertMessage: {
+                    show: true,
+                    type: 'error',
+                    title: 'Oops! Error Syncing With Server...',
+                    subtitle: 'Kindly check your network connection'
+                }
+              })
+              // this.setState({
+              //   isLoading: false,
+              //   silentReload: false
+              // }, () => { console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);})
             }
           },
         };
         
-        console.log("log step 2");
+        // console.log("log step 2");
         // realm = await Realm.open(config);
       if(this.realm != null && !this.realm.isClosed){
-        console.log('hhhh:', this.realm.schema);
+        // console.log('hhhh:', this.realm.schema);
         await this.getWishlistsFromRealm();
       }else{
-        console.log("log step 2/5");
+        // console.log("log step 2/5");
         this.realm = await Realm.open(config)
-        console.log("log step 3/5");
-        console.log('hhhh:', this.realm.schema);
+        // console.log("log step 3/5");
+        // console.log('hhhh:', this.realm.schema);
         await this.getWishlistsFromRealm();
-        console.log("log step 3");
+        // console.log("log step 3");
       //   Realm.open(config).then((realm) => {
       //     console.log("log step 3/5");
       //     console.log('hhhh:', realm.schema);
@@ -322,9 +316,19 @@ export default class save_archive extends Component {
         
       } catch (error) {
         this.setState({
-          isLoading: false,
-          silentReload: false
-        }, () => { throw `Error opening realm: ${JSON.stringify(error,null,2)}`;})
+          isLoading: false, 
+          silentReload: false,
+          alertMessage: {
+              show: true,
+              type: 'error',
+              title: 'Oops! Error Syncing With Server...',
+              subtitle: 'Kindly check your network connection'
+          }
+        })
+        // this.setState({
+        //   isLoading: false,
+        //   silentReload: false
+        // }, () => { throw `Error opening realm: ${JSON.stringify(error,null,2)}`;})
          
           
       }
@@ -361,6 +365,7 @@ export default class save_archive extends Component {
                   <Fade.Bottom color='#FCFCFC' />
                     {whatToRender}
                 </View>
+                {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
                 {this.state.alertMessage.show ? (<ErrorSuccessAlert 
                     type = {this.state.alertMessage.type}
                     title = {this.state.alertMessage.title}
