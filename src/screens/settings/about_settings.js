@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
+import { Text, StyleSheet, View, Image, TouchableOpacity, Linking } from 'react-native';
 import Svg, { Rect, Circle, Path } from "react-native-svg"
 import {Navigation} from 'react-native-navigation';
 
@@ -97,7 +97,7 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                   
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("mailto:contact.lystsapp@gmail.com?subject=&body=")}}>
                     <View style={styles.settingRow}>
                       <View style={styles.settingSVGWrapper}>
                         <Svg width={35} height={30} viewBox="0 0 58 56" fill="none">
