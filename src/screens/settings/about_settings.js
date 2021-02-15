@@ -9,6 +9,8 @@ import * as Fade from '../../UIComponents/GradientFade/gradientFade';
 import { Touchable } from '../../includes/variables';
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
 
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+
 export default class settings extends Component {
     render() {
         return (
@@ -123,6 +125,7 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                 </View>
+                {this.props.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>
         )
     }

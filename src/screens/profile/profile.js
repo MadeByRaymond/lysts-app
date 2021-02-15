@@ -5,12 +5,14 @@ import { Shadow } from 'react-native-neomorph-shadows';
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 import ViewShot, {captureRef} from "react-native-view-shot";
+import NetInfo from "@react-native-community/netinfo";
 
 import {app as realmApp} from '../../../storage/realm';
 
 import {dHeight, dWidth, Touchable} from '../../includes/variables';
 import {onShare, goToScreen} from '../../includes/functions';
 import ContactsModal from '../../UIComponents/Modals/DefaultModal';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
@@ -18,6 +20,7 @@ export default class profile extends Component {
     // Class Variables 
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
+    unsubscribeNetworkUpdate;
     viewShot = React.createRef();
     state = {
         actionsWrapperHeight: 410,
@@ -31,13 +34,20 @@ export default class profile extends Component {
             phone: this.userData.contactPhone
         },
         avatarFeatures: this.userData.avatarFeatures,
-        avatarTempImage: ''
+        avatarTempImage: '',
+        hasNetworkConnection: true,
     }
 
     componentDidMount () {
         this.viewShot.current.capture().then(uri => {
           console.log("avatarTempImage: ", uri);
           this.setState({avatarTempImage: uri})
+        });
+
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            this.setState({hasNetworkConnection: state.isConnected});
         });
     }
 
@@ -343,7 +353,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.settings',{avatarImage: this.state.avatarTempImage})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.settings',{avatarImage: this.state.avatarTempImage, hasNetworkConnection: this.state.hasNetworkConnection})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -431,6 +441,7 @@ Get it now on android free.
                 </View>
               </ScrollView>
                 
+                {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>
         )
     }

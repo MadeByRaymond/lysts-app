@@ -2,10 +2,12 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Switch, Image } from 'react-native'
 // import Svg, { Circle, Path } from "react-native-svg"
 import Svg, { Circle, Mask, G, Path, Ellipse } from "react-native-svg"
+import NetInfo from "@react-native-community/netinfo";
 
 import { dWidth, dHeight, sWidth, sHeight, Touchable } from '../../includes/variables';
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
@@ -14,6 +16,7 @@ import {app as realmApp} from '../../../storage/realm';
 export default class customizeAvatar extends Component {
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
+    unsubscribeNetworkUpdate;
 
     skinTone = ['#FFE5BA','#F9C9B6','#ECA08A','#AC6651','#77311D'];
     hairColor = ['#000000','#263238','#535461','#A57939','#C1453E','#EA5A47','#FAD08C','#F8E99F','#8DC6CC','#D2EFF3','#FC909F','#FFFDF3'];
@@ -86,7 +89,17 @@ export default class customizeAvatar extends Component {
             type: '',
             title: '',
             subtitle: '',
-        }
+        },
+        
+        hasNetworkConnection: true,
+    }
+
+    componentDidMount(){
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            this.setState({hasNetworkConnection: state.isConnected});
+        });
     }
 
     componentWillUnmount(){
@@ -256,14 +269,14 @@ export default class customizeAvatar extends Component {
         this.state.alertMessage.show ? this.resetAlert() : null;
         return (
             <View style={styles.container}>
-              {this.state.showSaveButton 
+              {this.state.hasNetworkConnection ? this.state.showSaveButton 
               ? (<ButtonView 
                     disabled={this.state.savingData} 
                     onPress={this.startSaving} 
                     floatingViewStyle={{top: dWidth > 575 ? (dHeight - (56 + 56) - 77) : (dHeight - (56 + 56) - 37)}} 
                     buttonText={this.state.savingData ? "Saving..." : "Save" }
                 />)
-              : null}
+              : null : <NoConnectionAlert />}
               
               {this.state.alertMessage.show ? (<ErrorSuccessAlert 
                     type = {this.state.alertMessage.type}

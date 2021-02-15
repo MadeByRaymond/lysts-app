@@ -99,7 +99,7 @@ export default class settings extends Component {
                   overScrollMode = 'auto'
                 >
                   <View style={styles.settingsWrapper}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.securitySettings", "Security")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.securitySettings", "Security", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 60 44" fill="none">
@@ -121,7 +121,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.notificationSettings", "Notifications")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.notificationSettings", "Notifications", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 59 53" fill="none">
@@ -177,7 +177,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.aboutSettings", "About")}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.aboutSettings", "About", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 44 52" fill="none">

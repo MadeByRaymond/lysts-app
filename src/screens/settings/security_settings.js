@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import Svg, { Rect, Circle, Path } from "react-native-svg"
 
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+
 import { dWidth } from '../../includes/variables';
 
 export default class settings extends Component {
@@ -82,6 +84,7 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                 </View>
+                {this.props.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>
         )
     }

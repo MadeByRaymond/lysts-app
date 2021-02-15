@@ -1,10 +1,12 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Keyboard } from 'react-native'
 import { Navigation } from "react-native-navigation";
+import NetInfo from "@react-native-community/netinfo";
 
 import Button from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import InfoForm from '../../components/Forms/profileForms/profileInfoForm';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {removeExcessWhiteSpace, validateEmail, goToScreen} from '../../includes/functions';
 import {Touchable} from '../../includes/variables';
@@ -17,6 +19,7 @@ export default class profileInfo extends Component {
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
     timeoutAlert;
+    unsubscribeNetworkUpdate;
 
     state={
        buttonDisabledStatus: true,
@@ -46,7 +49,16 @@ export default class profileInfo extends Component {
             type: '',
             title: '',
             subtitle: '',
-        }
+        },
+        hasNetworkConnection: true,
+    }
+
+    componentDidMount(){
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            this.setState({hasNetworkConnection: state.isConnected});
+        });
     }
 
     componentWillUnmount(){
@@ -250,7 +262,7 @@ export default class profileInfo extends Component {
                     </View>
                 </ScrollView>
                 
-                {this.state.buttonDisabledStatus ? null : (<Button 
+                {this.state.hasNetworkConnection ? this.state.buttonDisabledStatus ? null : (<Button 
                   disabled = {this.state.savingData}
                   onPress={()=>{
                     Keyboard.dismiss();
@@ -278,7 +290,7 @@ export default class profileInfo extends Component {
                             }
                         }
                     }))
-                }}>{this.state.savingData ? 'Saving...' : 'Save'}</Button>)}
+                }}>{this.state.savingData ? 'Saving...' : 'Save'}</Button>) : <NoConnectionAlert />}
             </View>
         )
     }
