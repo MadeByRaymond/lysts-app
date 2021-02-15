@@ -104,8 +104,9 @@ export default class save_archive extends Component {
               })
             }}
             updateUIFunction = {
-              this.state.isSaved 
-              ? (code, value) => {
+              // this.state.isSaved 
+              // ? 
+              (code, value) => {
                 this.setState((prevState) => {
                   return ({
                     listData: prevState.listData.map((item, i) => {
@@ -121,8 +122,17 @@ export default class save_archive extends Component {
                   }) 
                 })
               }
-              : () => {this.setState({silentReload: true})} 
+              // : () => {this.setState({silentReload: true})} 
             }
+
+            saveWishlistError = {() => {this.setState({
+              alertMessage: {
+                show: true,
+                type: 'error',
+                title: 'Error Saving Wishlist',
+                subtitle: ''
+              }
+            })}}
           />
         )
     }

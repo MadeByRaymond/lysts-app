@@ -10,7 +10,7 @@ import SaveButton from '../saveWishlistButton/saveButton';
 let dHeight = Dimensions.get("window").height;
 let dWidth = Dimensions.get("window").width;
 
-  export default function portraitListItem({data, cardsPerRow, action, updateUIFunction}) {
+  export default function portraitListItem({data, cardsPerRow, action,savingInProgress, updateUIFunction, saveWishlistError}) {
     let Icon = iconSVG[data.type.toLowerCase()];
     // let cardsPerRow = dWidth > 575 ? 3 : 2
     let cardWidth = ((dWidth /cardsPerRow ) - 30);
@@ -30,7 +30,8 @@ let dWidth = Dimensions.get("window").width;
                         
                         <View style={styles.savedIconBox}>
                             <TouchableOpacity activeOpacity={0.9} hitSlop={{top:16, bottom: 16, left: 3444}}>
-                                <SaveButton saveFunc={() => onBookmark(!data.saved, data.code, ()=>{updateUIFunction ? updateUIFunction(data.code, !data.saved) : null} )} width={20} height={20} savedStatus={data.saved ? 'saved' : 'unsaved'} />
+                                {/* <SaveButton saveFunc={() => onBookmark(!data.saved, data.code, ()=>{updateUIFunction ? updateUIFunction(data.code, !data.saved) : null} )} width={20} height={20} savedStatus={data.saved ? 'saved' : 'unsaved'} /> */}
+                                <SaveButton saveFunc={() => onBookmark(!data.saved, data.code,()=>{savingInProgress ? savingInProgress(data.code) : null}, (value) => {updateUIFunction ? updateUIFunction(data.code, value) : null}, saveWishlistError )} width={20} height={20} savedStatus={data.saved == null ? 'loading' : (data.saved ? 'saved' : 'unsaved')} />
                             </TouchableOpacity>
                         </View>
                         <View>

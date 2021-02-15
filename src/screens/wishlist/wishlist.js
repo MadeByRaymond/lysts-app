@@ -150,6 +150,14 @@ export default class Wishlist extends Component {
           })
         }}
         updateUIFunction = {() => {this.setState({silentReload: true})}}
+        saveWishlistError = {() => {this.setState({
+              alertMessage: {
+                show: true,
+                type: 'error',
+                title: 'Error Saving Wishlist',
+                subtitle: ''
+              }
+            })}}
       />
       )
   }

@@ -2,7 +2,8 @@ import debounce from 'lodash.debounce';
 import {app as realmApp} from '../../../storage/realm';
 
 
-export const onBookmark = debounce(async (value, wishlistCode, savingInProgress, updateUIFunction) => {
+export const onBookmark = debounce(async (value, wishlistCode, savingInProgress, updateUIFunction, saveWishlistError) => {
+    let finalValue = value;
     try {
         await savingInProgress();
         let newSavedList = [];
@@ -36,6 +37,8 @@ export const onBookmark = debounce(async (value, wishlistCode, savingInProgress,
         const customUserData = await user.refreshCustomData();
         console.log(customUserData);
 
+        finalValue = value
+
         // updateUIFunction ? updateUIFunction() : null;
         
         // this.setState({
@@ -43,8 +46,9 @@ export const onBookmark = debounce(async (value, wishlistCode, savingInProgress,
         //   updateSettings: true
         // }, () =>{this.props.updateUI ? this.props.updateUI() : null; alert("Updated Successfully!!")})
     } catch (error) {
-        alert("Error updating your information");
+        finalValue = !value;
+        saveWishlistError();
     } finally{
-        updateUIFunction ? updateUIFunction() : null;
+        updateUIFunction ? updateUIFunction(finalValue) : null;
     }
   }, 1000, {leading: true,trailing: false});
