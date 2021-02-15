@@ -25,6 +25,7 @@ import WishlistEmptySVG from '../../SVG_Files/UI_SVG/noWishlist/noWishlist';
 import {Bottom as FadeBottom} from '../../UIComponents/GradientFade/gradientFade';
 import {getCategoryDisplay, onShare} from '../../includes/functions';
 import {TouchableIOSHighlight, dWidth, dHeight} from '../../includes/variables';
+import {categories} from '../../includes/datasets';
 
 import {app as realmApp} from '../../../storage/realm';
 import * as Schemas from '../../../storage/schemas';
@@ -58,7 +59,7 @@ export default class wishlistDetails extends Component {
         // notLoggedIn: (this.user) ? ((!this.user.isLoggedIn) ? true : false) : true,
         wishlistInfo:{
             name: '',
-            category: '',
+            category: categories[0],
             ownerId: '',
             owner: '',
             dateCreated: '',
@@ -381,6 +382,7 @@ export default class wishlistDetails extends Component {
     }
 
     openRealm = async() => {
+        let noLoading = {loading: false,silentReload: false}
         try{
         //   if (this.state.notLoggedIn){
         //     await this.anonymousLogin()
@@ -426,13 +428,12 @@ export default class wishlistDetails extends Component {
               user: this.user,
               partitionValue: "public",
               error: async (s, e) => {
-                console.log("Connection ==>", await NetInfo.fetch());
-                this.setState({
-                    loading: false,
-                    silentReload: false,
+                this.state.wishlistInfo.listItems.length <= 0 
+                ? this.setState({
+                    ...noLoading,
                     noData: {
                         value:true, 
-                        message: "Oops! Error loading wishlist.", 
+                        message: "Oops! Error loading wishlist", 
                         svgComponent: wishlistDetailsError, 
                         eachOnNewLine:true, 
                         action: {
@@ -440,9 +441,17 @@ export default class wishlistDetails extends Component {
                             function: () => this.setState({loading: true, silentReload: false})
                         }
                     }
-                }, ()=>{
-                    console.log( `An error occurred with syncs session with details: \n${s} \n\nError Details: \n${e}`);
-                })}
+                }) 
+                : this.setState({
+                    ...noLoading,
+                    alertMessage: {
+                        show: true,
+                        type: 'warning',
+                        title: 'Retrying To Sync With Server...',
+                        subtitle: 'Kindly check you network connection'
+                    }
+                })
+              }
             },
           };
 
@@ -532,12 +541,12 @@ export default class wishlistDetails extends Component {
           }
           
         } catch (error) {
-            this.setState({
-                loading: false,
-                silentReload: false,
+            this.state.wishlistInfo.listItems.length <= 0 
+            ? this.setState({
+                ...noLoading,
                 noData: {
                     value:true, 
-                    message: "Oops! Error loading wishlist.", 
+                    message: "Oops! Error loading wishlist", 
                     svgComponent: wishlistDetailsError, 
                     eachOnNewLine:true, 
                     action: {
@@ -545,9 +554,15 @@ export default class wishlistDetails extends Component {
                         function: () => this.setState({loading: true, silentReload: false})
                     }
                 }
-            }, ()=>{
-                // throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
-
+            }) 
+            : this.setState({
+                ...noLoading,
+                alertMessage: {
+                    show: true,
+                    type: 'warning',
+                    title: 'Retrying To Sync With Server...',
+                    subtitle: 'Kindly check you network connection'
+                }
             })
         }
       }
@@ -791,7 +806,7 @@ export default class wishlistDetails extends Component {
         // })
         .catch((error) => {
             errorCallbackFunc();
-            console.error('Error:', error);
+            console.log('Error:', error);
         });
     }
 
@@ -800,20 +815,20 @@ export default class wishlistDetails extends Component {
 
     renderList = () => {
         return this.state.wishlistInfo.listItems.map((item, i) => {
-            let TouchableView = this.state.isOwner ? TouchableOpacity : View;
+            let TouchableView = (this.state.isOwner && this.state.hasNetworkConnection) ? TouchableOpacity : View;
             let ifItemCompleted = item.status === 'completed' ? true : false
-            let displayCheck = ifItemCompleted ? (
-                <Svg width={20} height={20} viewBox="0 0 70 70" fill="none" >
-                    <Circle cx={35.158} cy={35.36} r={34.56} fill="#28A664" />
-                    <Path
-                        d="M17.158 35.36l11.52 11.52 24.48-23.04"
-                        stroke="#fff"
-                        strokeWidth={5.76}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </Svg> 
-            ) : null;
+            // let displayCheck = ifItemCompleted ? (
+            //     <Svg width={20} height={20} viewBox="0 0 70 70" fill="none" >
+            //         <Circle cx={35.158} cy={35.36} r={34.56} fill="#28A664" />
+            //         <Path
+            //             d="M17.158 35.36l11.52 11.52 24.48-23.04"
+            //             stroke="#fff"
+            //             strokeWidth={5.76}
+            //             strokeLinecap="round"
+            //             strokeLinejoin="round"
+            //         />
+            //     </Svg> 
+            // ) : null;
             return (
             
             <TouchableView disabled={!this.state.hasNetworkConnection} activeOpacity={0.7} onPress={() => this.onUpdateItemStatus(ifItemCompleted ? 'active' : 'completed' , i)} key={i}>
@@ -981,6 +996,8 @@ export default class wishlistDetails extends Component {
     showWishlistDetails = () =>{
         let listInfo = this.state.wishlistInfo;
         let CategoryImage = ImageSVG[listInfo.category.toLowerCase()];
+        console.log('image index ==> ', listInfo);
+        console.log('category image ==>', ImageSVG[listInfo.category.toLowerCase()])
         // let CategoryImage = ImageSVG['job_promotion'];
         let CategoryImageColor = CategoryImage().color ? CategoryImage().color : null;
         let CategoryImageSVG= CategoryImage({width: dWidth-60, height: dHeight/2.8}).svg;

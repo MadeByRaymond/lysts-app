@@ -1,154 +1,309 @@
-import React, { Component } from 'react'
-import { Text, View, StyleSheet, Dimensions, ImageBackground, TextInput } from 'react-native'
+// import React, { Component } from 'react'
+// import { Text, View, StyleSheet, Dimensions, ImageBackground, TextInput } from 'react-native'
+// import Realm from 'realm';
+// import debounce from 'lodash.debounce';
+// import { Navigation } from "react-native-navigation";
+// import NetInfo from "@react-native-community/netinfo";
+
+// import Header from '../../components/Headers/createWishlistHeader';
+// import Modal from '../../UIComponents/Modals/DefaultModal'
+// import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
+// import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+// import {goToViewWishlistScreen} from '../../includes/functions';
+
+// import {app as realmApp} from '../../../storage/realm';
+
+// let dHeight = Dimensions.get("window").height;
+// let dWidth = Dimensions.get("window").width;
+
+// export class Home extends Component {
+
+//     user = realmApp.currentUser;
+//     notLoggedIn = (this.user) ? ((!this.user.isLoggedIn) ? true : false) : true
+//     notLoggedInAndAnonymous = (this.user) ? ((!this.user.isLoggedIn || this.user.providerType == 'anon-user') ? true : false) : true
+
+//     state={
+//         wishlistCode: ''
+//     }
+
+//     goToAddScreen = debounce(() =>{
+//         // alert('ddd')
+//         Navigation.push('WISHLIST_SCREEN', {
+//           component: {
+//             name: 'com.lysts.screen.selectCategory', // Push the screen registered with the 'Settings' key
+//             options: { // Optional options object to configure the screen
+//               bottomTabs: {
+//                 animate: false,
+//                 visible: false
+//               },
+//             },
+//             passProps: {
+//               setNewListAdded: ((shoNewListModal, name, code, shareLink) => {this.setState({newListAdded: shoNewListModal,
+//                 newListInfoModal:{
+//                   wishlistName: name,
+//                   wishListCode: code,
+//                   shareLink: shareLink
+//                 }})})
+//             }
+//           }
+//         }).then(() => {
+//             Navigation.mergeOptions(this.props.componentId,{
+//                 bottomTabs: {
+//                     currentTabIndex: 0
+//                 }
+//             })
+//         });
+        
+//       }, 1000, {leading: true,trailing: false})
+
+//       handelNewWishlistModal = () => {
+//         // Navigation.updateProps('PROFILE_SCREEN_ID', {
+//         //   status: 'offline'
+//         // });
+//         return(
+//           <Modal 
+//             isVisible={this.state.newListAdded}
+//             closeFunction = {() => {this.setState({newListAdded: false})}}
+//             type= 'newWishlist'
+//             modalTitle='Wishlist created'
+//             modalSubtitle='Share your wishlist link or list code with friends and family'
+            
+//             newListInfoModal = {this.state.newListInfoModal}
+//           />
+//         )
+//       }
+
+//     render() {
+//         // let userBg = require("../../assets/images/home_bg.png");
+//         let userBg = {uri: 'home_bg'};
+//         let guestBg = require("../../assets/images/guest_home_bg.png");
+//         // switch (notLoggedInAndAnonymous) {
+//         //     case true:
+//         //         x = require("../../assets/images/home_bg.png");
+//         //         break;
+
+//         //     case false:
+//         //         x = require("../../assets/images/signin_bg");
+//         //         break;
+        
+//         //     default:
+//         //         x = require("../../assets/images/home_bg.png");
+//         //         break;
+//         // }
+        
+//         return (
+//             <ImageBackground source={this.notLoggedInAndAnonymous ? guestBg : userBg} style={styles.image}>
+//                 <View style={styles.container}>
+//                     {this.state.newListAdded ? this.handelNewWishlistModal() : null}
+//                     {this.notLoggedInAndAnonymous ? null : (<ButtonView onPress={() => {this.goToAddScreen()}} floatingViewStyle={{top: dWidth > 575 ? (dHeight - (56 + 56) - 77) : (dHeight - (56 + 56) - 37)}}>Create a wishlist</ButtonView>)}    
+//                     <View style={[styles.titleWrapper, this.notLoggedInAndAnonymous ? styles.guestTitleWrapper : null]}>
+//                         {this.notLoggedInAndAnonymous ? (
+//                             <View style={styles.guestTitle}><Header 
+//                                 text = {'Search \nWishlists'}
+//                                 subText='Sign in to save or bookmark wishlist searches'
+//                                 onPress={() => {Navigation.pop(this.props.componentId);}}
+//                             /></View>
+//                         ) : (<View>
+//                             <View><Text style={styles.title}>Hello there,</Text></View>
+//                             <View><Text style={styles.title}>Welcome Home!</Text></View>
+//                         </View>)}
+//                     </View>
+//                     <View style={[styles.searchInputContainer, this.notLoggedInAndAnonymous ? {marginTop: 100} : null]}>
+//                         <TextInput 
+//                           value={this.state.wishlistCode}
+//                           onChangeText = {(val) => {
+//                               let codeValue = val.trimStart().trim().toUpperCase();
+//                               this.setState({
+//                                   wishlistCode: codeValue 
+//                               })
+//                           }}
+//                           onSubmitEditing = {(e) => {
+//                             if(this.notLoggedIn){
+//                                 const credentials = Realm.Credentials.anonymous(); // create an anonymous credential
+//                                 realmApp.logIn(credentials)
+//                                 .then((parsedRes) =>{
+//                                     console.log(parsedRes);
+//                                     if(parsedRes.error){
+//                                         console.log(parsedRes.error); 
+//                                     }else{
+//                                         goToViewWishlistScreen(this.props.componentId, e.nativeEvent.text)
+//                                     }
+//                                 })
+//                                 .catch((error) => {
+//                                     console.log(error);          
+//                                 })
+//                             }else{
+//                                 goToViewWishlistScreen(this.props.componentId, e.nativeEvent.text)
+//                             }
+                            
+//                           }}
+//                           style={[styles.searchInput, this.state.wishlistCode.trim() !== '' ? {paddingTop: 20,} : null]} 
+//                           placeholder="🎁  Enter wishlist code" 
+//                           placeholderTextColor="rgba(68, 87, 124, 0.4)"  
+//                           textAlign= 'center'
+//                           autoCapitalize='characters'
+//                           maxLength= {6}
+//                           returnKeyType = 'search'
+//                         />
+//                     </View>
+//                 </View>
+//             </ImageBackground>
+//         )
+//     }
+// }
+
+import React, {useState, useEffect} from 'react'
+import { Text, View, StyleSheet, ImageBackground, TextInput } from 'react-native'
 import Realm from 'realm';
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
+import NetInfo from "@react-native-community/netinfo";
 
 import Header from '../../components/Headers/createWishlistHeader';
 import Modal from '../../UIComponents/Modals/DefaultModal'
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 import {goToViewWishlistScreen} from '../../includes/functions';
+import {dHeight, dWidth} from '../../includes/variables';
 
 import {app as realmApp} from '../../../storage/realm';
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+let userBg = {uri: 'home_bg'};
+let guestBg = require("../../assets/images/guest_home_bg.png");
 
-export class Home extends Component {
+let user = realmApp.currentUser;
+let notLoggedIn = (user) ? ((!user.isLoggedIn) ? true : false) : true
+let notLoggedInAndAnonymous = (user) ? ((!user.isLoggedIn || user.providerType == 'anon-user') ? true : false) : true
 
-    user = realmApp.currentUser;
-    notLoggedIn = (this.user) ? ((!this.user.isLoggedIn) ? true : false) : true
-    notLoggedInAndAnonymous = (this.user) ? ((!this.user.isLoggedIn || this.user.providerType == 'anon-user') ? true : false) : true
+let unsubscribeNetworkUpdate;
 
-    state={
-        wishlistCode: ''
-    }
-
-    goToAddScreen = debounce(() =>{
-        // alert('ddd')
-        Navigation.push('WISHLIST_SCREEN', {
-          component: {
-            name: 'com.lysts.screen.selectCategory', // Push the screen registered with the 'Settings' key
-            options: { // Optional options object to configure the screen
-              bottomTabs: {
-                animate: false,
-                visible: false
-              },
-            },
-            passProps: {
-              setNewListAdded: ((shoNewListModal, name, code, shareLink) => {this.setState({newListAdded: shoNewListModal,
+let goToAddScreen = debounce((componentId,setNewListAdded) =>{
+    // alert('ddd')
+    Navigation.push('WISHLIST_SCREEN', {
+      component: {
+        name: 'com.lysts.screen.selectCategory', // Push the screen registered with the 'Settings' key
+        options: { // Optional options object to configure the screen
+          bottomTabs: {
+            animate: false,
+            visible: false
+          },
+        },
+        passProps: {
+          setNewListAdded: ((showNewListModal, name, code, shareLink) => {
+            setNewListAdded({
+                newListAdded: showNewListModal,
                 newListInfoModal:{
-                  wishlistName: name,
-                  wishListCode: code,
-                  shareLink: shareLink
-                }})})
-            }
-          }
-        }).then(() => {
-            Navigation.mergeOptions(this.props.componentId,{
-                bottomTabs: {
-                    currentTabIndex: 0
+                    wishlistName: name,
+                    wishListCode: code,
+                    shareLink: shareLink
                 }
             })
-        });
-        
-      }, 1000, {leading: true,trailing: false})
-
-      handelNewWishlistModal = () => {
-        // Navigation.updateProps('PROFILE_SCREEN_ID', {
-        //   status: 'offline'
-        // });
-        return(
-          <Modal 
-            isVisible={this.state.newListAdded}
-            closeFunction = {() => {this.setState({newListAdded: false})}}
-            type= 'newWishlist'
-            modalTitle='Wishlist created'
-            modalSubtitle='Share your wishlist link or list code with friends and family'
-            
-            newListInfoModal = {this.state.newListInfoModal}
-          />
-        )
+          })
+        }
       }
+    }).then(() => {
+        Navigation.mergeOptions(componentId,{
+            bottomTabs: {
+                currentTabIndex: 0
+            }
+        })
+    });
+    
+}, 1000, {leading: true,trailing: false})
 
-    render() {
-        // let userBg = require("../../assets/images/home_bg.png");
-        let userBg = {uri: 'home_bg'};
-        let guestBg = require("../../assets/images/guest_home_bg.png");
-        // switch (notLoggedInAndAnonymous) {
-        //     case true:
-        //         x = require("../../assets/images/home_bg.png");
-        //         break;
-
-        //     case false:
-        //         x = require("../../assets/images/signin_bg");
-        //         break;
+let handelNewWishlistModal = (newListAdded,setNewListAdded) => {
+    // Navigation.updateProps('PROFILE_SCREEN_ID', {
+    //   status: 'offline'
+    // });
+    return(
+      <Modal 
+        isVisible={newListAdded.newListAdded}
+        closeFunction = {() => setNewListAdded({newListAdded: false})}
+        type= 'newWishlist'
+        modalTitle='Wishlist created'
+        modalSubtitle='Share your wishlist link or list code with friends and family'
         
-        //     default:
-        //         x = require("../../assets/images/home_bg.png");
-        //         break;
-        // }
-        
-        return (
-            <ImageBackground source={this.notLoggedInAndAnonymous ? guestBg : userBg} style={styles.image}>
-                <View style={styles.container}>
-                    {this.state.newListAdded ? this.handelNewWishlistModal() : null}
-                    {this.notLoggedInAndAnonymous ? null : (<ButtonView onPress={() => {this.goToAddScreen()}} floatingViewStyle={{top: dWidth > 575 ? (dHeight - (56 + 56) - 77) : (dHeight - (56 + 56) - 37)}}>Create a wishlist</ButtonView>)}    
-                    <View style={[styles.titleWrapper, this.notLoggedInAndAnonymous ? styles.guestTitleWrapper : null]}>
-                        {this.notLoggedInAndAnonymous ? (
-                            <View style={styles.guestTitle}><Header 
-                                text = {'Search \nWishlists'}
-                                subText='Sign in to save or bookmark wishlist searches'
-                                onPress={() => {Navigation.pop(this.props.componentId);}}
-                            /></View>
-                        ) : (<View>
-                            <View><Text style={styles.title}>Hello there,</Text></View>
-                            <View><Text style={styles.title}>Welcome Home!</Text></View>
-                        </View>)}
-                    </View>
-                    <View style={[styles.searchInputContainer, this.notLoggedInAndAnonymous ? {marginTop: 100} : null]}>
-                        <TextInput 
-                          value={this.state.wishlistCode}
-                          onChangeText = {(val) => {
-                              let codeValue = val.trimStart().trim().toUpperCase();
-                              this.setState({
-                                  wishlistCode: codeValue 
-                              })
-                          }}
-                          onSubmitEditing = {(e) => {
-                            if(this.notLoggedIn){
-                                const credentials = Realm.Credentials.anonymous(); // create an anonymous credential
-                                realmApp.logIn(credentials)
-                                .then((parsedRes) =>{
-                                    console.log(parsedRes);
-                                    if(parsedRes.error){
-                                        console.log(parsedRes.error); 
-                                    }else{
-                                        goToViewWishlistScreen(this.props.componentId, e.nativeEvent.text)
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.log(error);          
-                                })
-                            }else{
-                                goToViewWishlistScreen(this.props.componentId, e.nativeEvent.text)
-                            }
-                            
-                          }}
-                          style={[styles.searchInput, this.state.wishlistCode.trim() !== '' ? {paddingTop: 20,} : null]} 
-                          placeholder="🎁  Enter wishlist code" 
-                          placeholderTextColor="rgba(68, 87, 124, 0.4)"  
-                          textAlign= 'center'
-                          autoCapitalize='characters'
-                          maxLength= {6}
-                          returnKeyType = 'search'
-                        />
-                    </View>
-                </View>
-            </ImageBackground>
-        )
-    }
+        newListInfoModal = {newListAdded.newListInfoModal}
+      />
+    )
 }
+
+export default function home(props) {
+    const [newListAdded, setNewListAdded] = useState({newListAdded:false})
+    const [wishlistCode, setWishlistCode] = useState('')
+    const [hasNetworkConnection, setHasNetworkConnection] = useState(true)
+
+    useEffect(() => {
+        unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            setHasNetworkConnection(state.isConnected);
+        });
+        return () => {
+            unsubscribeNetworkUpdate();
+        };
+    }, []);
+
+    return (
+        <ImageBackground source={notLoggedInAndAnonymous ? guestBg : userBg} style={styles.image}>
+            <View style={styles.container}>
+                {newListAdded.newListAdded ? handelNewWishlistModal(newListAdded,setNewListAdded) : null}
+                {hasNetworkConnection 
+                  ? notLoggedInAndAnonymous ? null : (<ButtonView onPress={() => {goToAddScreen(props.componentId,setNewListAdded)}} floatingViewStyle={{top: dWidth > 575 ? (dHeight - (56 + 56) - 77) : (dHeight - (56 + 56) - 37)}}>Create a wishlist</ButtonView>)
+                  : <NoConnectionAlert />
+                }    
+                <View style={[styles.titleWrapper, notLoggedInAndAnonymous ? styles.guestTitleWrapper : null]}>
+                    {notLoggedInAndAnonymous ? (
+                        <View style={styles.guestTitle}><Header 
+                            text = {'Search \nWishlists'}
+                            subText='Sign in to save or bookmark wishlist searches'
+                            onPress={() => {Navigation.pop(props.componentId);}}
+                        /></View>
+                    ) : (<View>
+                        <View><Text style={styles.title}>Hello there,</Text></View>
+                        <View><Text style={styles.title}>Welcome Home!</Text></View>
+                    </View>)}
+                </View>
+                <View style={[styles.searchInputContainer, notLoggedInAndAnonymous ? {marginTop: 100} : null]}>
+                    <TextInput 
+                      value={wishlistCode}
+                      onChangeText = {(val) => {
+                          setWishlistCode(val.trimStart().trim().toUpperCase())
+                      }}
+                      onSubmitEditing = {(e) => {
+                        if(notLoggedIn){
+                            realmApp.logIn(Realm.Credentials.anonymous())// logs in with an anonymous credential
+                            .then((parsedRes) =>{
+                                // console.log(parsedRes);
+                                if(parsedRes.error){
+                                    console.log(parsedRes.error); 
+                                }else{
+                                    goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
+                                }
+                            })
+                            .catch((error) => {
+                                console.log(error);          
+                            })
+                        }else{
+                            goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
+                        }
+                        
+                      }}
+                      style={[styles.searchInput, wishlistCode.trim() !== '' ? {paddingTop: 20,} : null]} 
+                      placeholder="🎁  Enter wishlist code" 
+                      placeholderTextColor="rgba(68, 87, 124, 0.4)"  
+                      textAlign= 'center'
+                      autoCapitalize='characters'
+                      maxLength= {6}
+                      returnKeyType = 'search'
+                    />
+                </View>
+                { hasNetworkConnection ? null : <View style={{flex:1, position: 'absolute', width:dWidth, height: dHeight, backgroundColor:'rgba(0, 0, 0, 0.05);', zIndex:999}}></View>}
+            </View>
+        </ImageBackground>
+    )
+}
+
 
 const styles = StyleSheet.create({
     container:{
@@ -223,4 +378,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Home
+// export default Home

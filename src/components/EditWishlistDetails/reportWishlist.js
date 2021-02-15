@@ -1,15 +1,18 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
+import NetInfo from "@react-native-community/netinfo";
 
 import ReportForm from '../Forms/wishlistForms/wishlistReportForm';
 import ModalButtonView from '../../UIComponents/Buttons/ModalButton/modalButtonView';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {removeExcessWhiteSpace, validateEmail} from '../../includes/functions';
 import {dWidth, dHeight} from '../../includes/variables';
 
 export default class reportWishlist extends Component {
     timeoutAlert;
+    unsubscribeNetworkUpdate;
     state={
         showEmailError:false,
         showReasonError: false,
@@ -33,10 +36,20 @@ export default class reportWishlist extends Component {
             type: '',
             title:'',
             subtitle: ''
-        }
+        },
+        hasNetworkConnection: true
     }
 
+    componentDidMount(){
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+          console.log("Connection type", state.type);
+          console.log("Is connected?", state.isConnected);
+          this.setState({hasNetworkConnection: state.isConnected});
+        });
+      }
+    
     componentWillUnmount(){
+        this.unsubscribeNetworkUpdate();
         clearTimeout(this.timeoutAlert)
     }
 
@@ -110,7 +123,7 @@ export default class reportWishlist extends Component {
                     userLoggedIn = {this.props.userLoggedIn}
                   />
                 </View>
-                <View style={styles.ModalButtonWrapper}>
+                {this.state.hasNetworkConnection ? <View style={styles.ModalButtonWrapper}>
                     <ModalButtonView 
                         buttonText = {this.state.sendingReport ? 'Sending...' : 'Send Report'}
                         onPress={() => {
@@ -140,7 +153,12 @@ export default class reportWishlist extends Component {
                         }}
                         disabled = {this.state.sendingReport}
                     />
-                </View>
+                </View> : <NoConnectionAlert 
+                      wrapperContainerStyle={{
+                        width: '100%',
+                        bottom: 0
+                      }}
+                  />}
 
                 {this.state.alertMessage.show ? (<ErrorSuccessAlert 
                     type = {this.state.alertMessage.type}

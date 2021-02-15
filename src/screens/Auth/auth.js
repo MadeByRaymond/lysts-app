@@ -13,7 +13,7 @@ import {goToScreen} from '../../includes/functions';
 import {signInAuth} from '../../services/AuthServiceProvider'
 
 // REDUX ACTIONS 
-import {signInAuth} from '../../store/actions';
+// import {signInAuth} from '../../store/actions';
 
 // let data = [];
 
@@ -106,7 +106,7 @@ export class Auth extends Component {
                                 () => this.setState({
                                     isLoading:true,
                                     loginWith: 'google'
-                                }, () => {signInAuth("demo", ()=>{this.setState({isLoading:false,loginWith: ''})})}) } >
+                                }, () => {signInAuth("demo", ()=> this.setState({isLoading:false,loginWith: ''}))}) } >
                                 <View style={[styles.button, styles.whiteButton]}>
                                     <View><Text style={[styles.buttonText, styles.whiteButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'google') ? 'Please wait...' : 'Continue with Google'}</Text></View>
                                     <View style={styles.svgWrapper}>
@@ -144,7 +144,7 @@ export class Auth extends Component {
                                 () => this.setState({
                                     isLoading:true,
                                     loginWith: 'facebook'
-                                }, () => {signInAuth("facebook", ()=>{this.setState({isLoading:false,loginWith: ''})})})} >
+                                }, () => {signInAuth("facebook", ()=>this.setState({isLoading:false,loginWith: ''}))})} >
                                 <View style={[styles.button, styles.blueButton]}>
                                     <View><Text style={[styles.buttonText, styles.blueButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'facebook') ? 'Please wait...' : 'Continue with Facebook'}</Text></View>
                                     <View style={styles.svgWrapper}>

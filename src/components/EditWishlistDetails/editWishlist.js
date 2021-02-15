@@ -2,11 +2,13 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
 import Wizard from 'react-native-wizard';
 import Svg, { Path } from "react-native-svg"
+import NetInfo from "@react-native-community/netinfo";
 
 import InfoForm from '../Forms/wishlistForms/wishlistInfoForm';
 import ItemsForm from '../Forms/wishlistForms/wishlistItemsForm';
 import ModalButtonView from '../../UIComponents/Buttons/ModalButton/modalButtonView';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {removeExcessWhiteSpace} from '../../includes/functions';
 import {dWidth, dHeight} from '../../includes/variables';
@@ -14,6 +16,7 @@ import {dWidth, dHeight} from '../../includes/variables';
 export default class editWishlist extends Component {
     wizard = React.createRef();
     timeoutAlert;
+    unsubscribeNetworkUpdate;
 
     initialList = this.props.wishlistInfo.listItems.map((itemObject) => (itemObject.item));
 
@@ -43,7 +46,8 @@ export default class editWishlist extends Component {
             type: '',
             title:'',
             subtitle: ''
-        }
+        },
+        hasNetworkConnection: true
 
         // listItemObjects: this.props.wishlistInfo.listItems,
 
@@ -62,6 +66,20 @@ export default class editWishlist extends Component {
         // ]
         // }
     }
+
+
+    componentDidMount(){
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+          console.log("Connection type", state.type);
+          console.log("Is connected?", state.isConnected);
+          this.setState({hasNetworkConnection: state.isConnected});
+        });
+      }
+    
+      componentWillUnmount(){
+        this.unsubscribeNetworkUpdate();
+        clearTimeout(this.timeoutAlert)
+      }
 
     setInfoState = (parentKey, childKey, childValue) => {
         this.setState({
@@ -224,7 +242,7 @@ export default class editWishlist extends Component {
 
             this.props.closeFunction ? this.props.closeFunction() : null
                 
-            alert("Updated Successfully!!");
+            // alert("Updated Successfully!!");
     
             // this.setState({isArchived: value,updateSettings: true}, ()=>{this.props.updateUI ? this.props.updateUI() : null; alert("Updated Successfully!!")});
         } catch (error) {
@@ -343,12 +361,17 @@ export default class editWishlist extends Component {
                         }}
                     />
                   </View>
-                  <View style={styles.ModalButtonWrapper}>
+                  {this.state.hasNetworkConnection ? <View style={styles.ModalButtonWrapper}>
                     <ModalButtonView 
                         buttonText = 'Save'
                         onPress={() => {this.saveWishlist()}}
                     />
-                  </View>
+                  </View> : <NoConnectionAlert 
+                      wrapperContainerStyle={{
+                        width: '100%',
+                        bottom: 0
+                      }}
+                  />}
                   {this.state.alertMessage.show ? (<ErrorSuccessAlert 
                     type = {this.state.alertMessage.type}
                     title = {this.state.alertMessage.title}
