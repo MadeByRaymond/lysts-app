@@ -70,7 +70,7 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
             break;
 
         case 'warning':
-            primaryColor = '#EFB92C';
+            primaryColor = '#d49d0d';
             SVGIcon = (<Svg
                 width={28}
                 height={28}

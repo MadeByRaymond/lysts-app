@@ -3,6 +3,7 @@ import { Text, StyleSheet, View, Image, TouchableOpacity, ScrollView } from 'rea
 import Svg, { Rect, Circle, Path } from "react-native-svg"
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
+import NetInfo from "@react-native-community/netinfo";
 
 import {app as realmApp} from '../../../storage/realm'
 import {loginRoot} from '../../../App';
@@ -19,6 +20,7 @@ export default class settings extends Component {
 
     user = realmApp.currentUser;
     timeoutAlert;
+    unsubscribeNetworkUpdate;
 
     state={
       loggingOut: false,
@@ -28,10 +30,20 @@ export default class settings extends Component {
         type: '',
         title: '',
         subtitle: '',
-      }
+      },
+      hasNetworkConnection: true,
     }
 
+    componentDidMount(){
+      this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected);
+        this.setState({hasNetworkConnection: state.isConnected});
+      });
+    }
+  
     componentWillUnmount(){
+      this.unsubscribeNetworkUpdate();
       clearTimeout(this.timeoutAlert);
     }
 
@@ -172,7 +184,7 @@ export default class settings extends Component {
     
     render() {
       this.state.loggingOut ? this.logoutHandler() : null;
-
+      this.state.alertMessage.show ? this.resetAlert() : null
         return (
             <View style={styles.container}>
               {this.state.reportModal ? this.reportModal() : null}
@@ -193,7 +205,7 @@ export default class settings extends Component {
                   overScrollMode = 'auto'
                 >
                   <View style={styles.settingsWrapper}>
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.securitySettings", "Security", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.securitySettings", "Security")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 60 44" fill="none">
@@ -215,7 +227,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.notificationSettings", "Notifications", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.notificationSettings", "Notifications")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 59 53" fill="none">
@@ -271,7 +283,7 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.aboutSettings", "About", {hasNetworkConnection: this.props.hasNetworkConnection})}}>
+                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{this.goToScreenHandler("com.lysts.screen.aboutSettings", "About")}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingSVGWrapper}>
                           <Svg width={35} height={30} viewBox="0 0 44 52" fill="none">
@@ -300,8 +312,16 @@ export default class settings extends Component {
                     <View style={styles.divider}></View>
                     
                     <TouchableOpacity disabled={this.state.loggingOut} activeOpacity={0.8} onPress={()=>{
-                      this.setState({
+                      
+                      this.setState(this.state.hasNetworkConnection ? {
                         loggingOut: true
+                      } : {
+                        alertMessage:{
+                          show: true,
+                          type: 'warning',
+                          title: 'No Network Connection',
+                          subtitle: 'Request can\'t be completed at this time.',
+                        }
                       })
                     }}>
                       <View style={styles.settingRow}>

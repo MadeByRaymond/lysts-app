@@ -5,6 +5,7 @@ import SelectPicker from 'react-native-picker-select';
 import Sound from 'react-native-sound'
 // import AsyncStorage from '@react-native-community/async-storage';
 import debounce from 'lodash.debounce';
+import NetInfo from "@react-native-community/netinfo";
 
 import {message} from '../../services/FCMService';
 
@@ -17,6 +18,7 @@ import {LocalNotification} from '../../services/LocalPushController';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 export default class settings extends Component {
+  unsubscribeNetworkUpdate;
   constructor(props) {
     super(props);
 
@@ -55,19 +57,27 @@ export default class settings extends Component {
         id: 'SID-0',
         sound: 'default_notification_sound_long_expected_548.mp3',
         title: 'Default'
-      }
+      },
+      hasNetworkConnection: true,
     }
   }  
   
+  
   componentDidMount(){
+    this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected);
+      this.setState({hasNetworkConnection: state.isConnected});
+    });
     // createChannel(this.state.notificationSound.sound);
-
-    
   }
 
   componentWillUnmount(){
+    this.unsubscribeNetworkUpdate();
     //  /*stopSampleSound();*/
   }
+
+  component
 
     testNotification = () => {
       LocalNotification();
@@ -191,7 +201,7 @@ export default class settings extends Component {
                 /> */}
                 <View style={styles.titleWrapper}><Text style={styles.title}>Get notification about</Text></View>
                 <View style={styles.settingsWrapper}>
-                  <TouchableOpacity disabled={!this.props.hasNetworkConnection} activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
+                  <TouchableOpacity disabled={!this.state.hasNetworkConnection} activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
                     return ({savingData: true, notifications: {...prevState.notifications, appUpdates: !prevState.notifications.appUpdates} });
                   })}}>
                     <View style={styles.settingRow}>
@@ -228,7 +238,7 @@ export default class settings extends Component {
                       </View>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity disabled={!this.props.hasNetworkConnection} activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
+                  <TouchableOpacity disabled={!this.state.hasNetworkConnection} activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
                     return ({savingData: true, notifications: {...prevState.notifications, systemNotifications: !prevState.notifications.systemNotifications} });
                   })}}>
                     <View style={styles.settingRow}>
@@ -396,7 +406,7 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                 </View>
-                {this.props.hasNetworkConnection ? null : <NoConnectionAlert />}
+                {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>
         )
     }

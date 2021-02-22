@@ -1,12 +1,29 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
 import Svg, { Rect, Circle, Path } from "react-native-svg"
+import NetInfo from "@react-native-community/netinfo";
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import { dWidth } from '../../includes/variables';
 
 export default class settings extends Component {
+  unsubscribeNetworkUpdate;
+  state={
+    hasNetworkConnection: true,
+  }
+
+  componentDidMount(){
+    this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+      console.log("Connection type", state.type);
+      console.log("Is connected?", state.isConnected);
+      this.setState({hasNetworkConnection: state.isConnected});
+    });
+  }
+
+  componentWillUnmount(){
+    this.unsubscribeNetworkUpdate();
+  }
     render() {
         return (
             <View style={styles.container}>
@@ -84,7 +101,7 @@ export default class settings extends Component {
                     </View>
                   </TouchableOpacity>
                 </View>
-                {this.props.hasNetworkConnection ? null : <NoConnectionAlert />}
+                {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>
         )
     }

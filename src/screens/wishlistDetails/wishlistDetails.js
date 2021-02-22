@@ -1069,7 +1069,6 @@ export default class wishlistDetails extends Component {
                 })
             }
         }
-        this.state.alertMessage.show ? this.resetAlert() : null;
         // let AvatarSVGView = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') 
         //                     ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] 
         //                     : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
@@ -1162,6 +1161,7 @@ export default class wishlistDetails extends Component {
     render() {
         this.state.goBack ?  Navigation.pop(this.props.componentId) : null;
         this.state.silentReload ? this.openRealm() : null;
+        this.state.alertMessage.show ? this.resetAlert() : null;
         this.showTopBar = this.state.scrollPosition > ((dHeight/2.8) + 16) ? true : false;
         this.showTopBar = this.state.loading ? true : this.showTopBar;
         if(this.showTopBar){
