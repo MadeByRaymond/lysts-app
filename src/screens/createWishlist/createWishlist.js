@@ -388,7 +388,7 @@ class createWishlist extends Component {
             // }
         //   console.log(datas);
 
-            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
+            this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `https://lystsapp.com/wishlink/${this.wishlistCode}`, {
                 id: 'temp_id',
                 name: this.state.wishlistInfo.name.value,
                 type: this.state.wishlistInfo.category.value,

@@ -137,7 +137,7 @@ export default class wishlistDetails extends Component {
             },
             {
                 text: 'Share to...',
-                action: () => {onShare('Share your Wishlink', `Checkout my Wishlist on Lysts App with lystsapp://wishlink/${this.props.wishlistCode}`, this.state.wishlistInfo.name)},
+                action: () => {onShare('Share your Wishlink', `Checkout my Wishlist on Lysts App with https://lystsapp.com/wishlink/${this.props.wishlistCode}`, this.state.wishlistInfo.name)},
                 disabled: false
             },
             {
@@ -180,7 +180,7 @@ export default class wishlistDetails extends Component {
             },
             {
                 text: 'Share to...',
-                action: () => {onShare('Share this Wishlink', `Checkout ${this.state.wishlistInfo.owner}'s Wishlist on Lysts App with lystsapp://wishlink/${this.props.wishlistCode}`, this.state.wishlistInfo.name)},
+                action: () => {onShare('Share this Wishlink', `Checkout ${this.state.wishlistInfo.owner}'s Wishlist on Lysts App with https://lystsapp.com/wishlink/${this.props.wishlistCode}`, this.state.wishlistInfo.name)},
                 disabled: false
             },
             {

@@ -7,6 +7,8 @@ import PushNotification from "react-native-push-notification";
 import {message, inAppMessaging} from './src/services/FCMService';
 import {app as realmApp} from './storage/realm';
 
+import {goToViewWishlistScreen} from './src/includes/functions'
+
 import AsyncStorage from '@react-native-community/async-storage';
 
 // DEV IMPORTS
@@ -139,6 +141,17 @@ message
 
 
 inAppMessaging().setMessagesDisplaySuppressed(false);
+
+Linking.getInitialURL().then(({url}) => {
+  // console.log("Linking opened ==> ",url);
+  console.log("Linking opened ==> ",url.slice(url.lastIndexOf('/')+1));
+}).catch((e)=>{});
+
+Linking.addEventListener('url', ({url}) =>{
+  let wishlist_code = url.slice(url.lastIndexOf('/')+1)
+  console.log("Linking opened ==> ",wishlist_code);
+  goToViewWishlistScreen('WISHLIST_SCREEN', wishlist_code)
+});
 
 export const splashRoot = {
   root: {
