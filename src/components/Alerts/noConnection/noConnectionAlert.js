@@ -1,5 +1,5 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React, {useEffect} from 'react'
+import { StyleSheet, Text, View, Vibration } from 'react-native'
 import Svg, { Rect, Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
 import { Shadow } from 'react-native-neomorph-shadows';
@@ -7,6 +7,9 @@ import { Shadow } from 'react-native-neomorph-shadows';
 import {dWidth} from '../../../includes/variables'
 
 export default function noConnectionAlert(props) {
+    useEffect(() => {
+      Vibration.vibrate(300);
+    }, []);
     return (
         <Animatable.View animation="fadeInUp" duration={500} useNativeDriver={true} style={[styles.wrapper, props.wrapperContainerStyle ? props.wrapperContainerStyle : null]}>
           <Shadow

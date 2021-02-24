@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Vibration } from 'react-native'
 import Svg, { Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
 import { Shadow } from 'react-native-neomorph-shadows';
+import Sound from 'react-native-sound';
 
 import {dHeight, dWidth} from '../../../includes/variables'
 
@@ -15,7 +16,37 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
     }, 4000);
 
     useEffect(() => {
-      Vibration.vibrate(300);
+      if(type == 'success'){
+        let alertSound = new Sound('success_sound.mp3', Sound.MAIN_BUNDLE, (error) => {
+          if (error) {
+              // console.log('failed to load the sound', error);
+              return;
+          }
+          // loaded successfully
+          // console.log('duration in seconds: ' + alertSound.getDuration() + 'number of channels: ' + alertSound.getNumberOfChannels());
+          
+          
+          // Stop the sound and rewind to the beginning
+          alertSound.stop(() => {
+              // Note: If you want to play a sound after stopping and rewinding it,
+              // it is important to call play() in a callback.
+              
+              // Play the sound with an onEnd callback
+              alertSound.play((success) => {
+                  if (success) {
+                      console.log('successfully finished playing');
+                  } else {
+                      console.log('playback failed due to audio decoding errors');
+                  }
+                  alertSound.release();
+              });
+
+              
+          });
+        })
+      }else{
+        Vibration.vibrate(300);
+      }
         return () => {
             clearTimeout(exitAlertTimeout);
         }
