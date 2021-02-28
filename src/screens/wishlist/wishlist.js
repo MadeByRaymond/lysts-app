@@ -80,7 +80,7 @@ export default class Wishlist extends Component {
 
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
-
+    // console.log(global.launchWithCode);
     if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
       goToViewWishlistScreen(
         this.props.componentId,
