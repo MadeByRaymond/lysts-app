@@ -62,10 +62,6 @@ export class Auth extends Component {
             console.log(error);
         }
     }
-
-    componentDidMount(){
-        // this.props.onSignInAuth("ttt");
-    }
     
 
     render() {

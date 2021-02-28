@@ -10,6 +10,7 @@ import {dWidth, dHeight, Touchable} from '../../includes/variables';
 import {loginRoot} from '../../../App';
 
 
+let prevComponentId;
 
 export default class App extends Component {
   onBoardingRef = React.createRef();
@@ -24,6 +25,15 @@ export default class App extends Component {
     buttonContentArrow: true,
     changeButtonWidth: false,
   }
+
+// componentDidMount(){
+//     prevComponentId = global.activeComponentId;
+//     global.activeComponentId = this.props.componentId;
+// }
+
+// componentWillUnmount() {
+//     global.activeComponentId = prevComponentId;
+// }
 
   
 toggleAnimation=(isLastPage)=>{

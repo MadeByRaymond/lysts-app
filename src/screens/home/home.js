@@ -117,22 +117,22 @@ export default function home(props) {
                           setWishlistCode(val.trimStart().trim().toUpperCase())
                       }}
                       onSubmitEditing = {(e) => {
-                        if(notLoggedIn){
-                            realmApp.logIn(Realm.Credentials.anonymous())// logs in with an anonymous credential
-                            .then((parsedRes) =>{
-                                // console.log(parsedRes);
-                                if(parsedRes.error){
-                                    console.log(parsedRes.error); 
-                                }else{
-                                    goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
-                                }
-                            })
-                            .catch((error) => {
-                                console.log(error);          
-                            })
-                        }else{
+                        // if(notLoggedIn){
+                        //     realmApp.logIn(Realm.Credentials.anonymous())// logs in with an anonymous credential
+                        //     .then((parsedRes) =>{
+                        //         // console.log(parsedRes);
+                        //         if(parsedRes.error){
+                        //             console.log(parsedRes.error); 
+                        //         }else{
+                        //             goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
+                        //         }
+                        //     })
+                        //     .catch((error) => {
+                        //         console.log(error);          
+                        //     })
+                        // }else{
                             goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
-                        }
+                        // }
                         
                       }}
                       style={[styles.searchInput, wishlistCode.trim() !== '' ? {paddingTop: 20,} : null]} 

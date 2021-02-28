@@ -396,7 +396,7 @@ class createWishlist extends Component {
                 saved: false,
             });
             Navigation.popToRoot(this.props.componentId);
-            Vibration.vibrate(350);
+            // Vibration.vibrate(350);
           }).catch((e) => {
             console.log(e);
             this.setState({
