@@ -12,11 +12,22 @@ import {categories} from '../../includes/datasets';
 import {getCategoryDisplay} from '../../includes/functions'
 import {Touchable, dWidth, dHeight} from '../../includes/variables';
 
+let prevComponentId;
+
 class selectCategory extends Component {
 
     state={
         categories: categories,
         selectedCategory: null
+    }
+
+    componentDidMount(){
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
+    }
+
+    componentWillUnmount() {
+        global.activeComponentId = prevComponentId;
     }
 
     goBack = () =>{

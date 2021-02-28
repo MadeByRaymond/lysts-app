@@ -6,7 +6,9 @@ import {ObjectId} from 'bson';
 import Reactotron from 'reactotron-react-native';
 import { connect } from 'react-redux';
 
-import {getRealmApp} from '../../../storage/realm';
+import {getRealmApp, app as realmApp} from '../../../storage/realm';
+
+import {goToViewWishlistScreen} from '../../includes/functions';
 
 import {dWidth, dHeight} from '../../includes/variables'
 import {goToScreen} from '../../includes/functions';
@@ -16,6 +18,8 @@ import {signInAuth} from '../../services/AuthServiceProvider'
 // import {signInAuth} from '../../store/actions';
 
 // let data = [];
+
+let prevComponentId;
 
 export class Auth extends Component {
     // constructor(props) {
@@ -27,6 +31,30 @@ export class Auth extends Component {
     state = {
         isLoading:false,
         loginWith: ''
+    }
+
+    componentDidMount(){
+        // this.props.onSignInAuth("ttt");
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
+
+        realmApp.logIn(Realm.Credentials.anonymous())
+        .then((parsedRes) =>{
+            // console.log(parsedRes);
+            if(parsedRes.error){
+                console.log(parsedRes.error); 
+            }else if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
+                goToViewWishlistScreen(this.props.componentId,global.launchWithCode)
+                global.launchWithCode = '';
+            }
+        })
+        .catch((error) => {
+            console.log(error);          
+        })
+    }
+
+    componentWillUnmount() {
+        global.activeComponentId = prevComponentId;
     }
 
     renSchema = async() => {

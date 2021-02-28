@@ -13,6 +13,8 @@ import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
 import {app as realmApp} from '../../../storage/realm';
 
+let prevComponentId;
+
 export default class customizeAvatar extends Component {
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
@@ -95,6 +97,9 @@ export default class customizeAvatar extends Component {
     }
 
     componentDidMount(){
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
+
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
             console.log("Connection type", state.type);
             console.log("Is connected?", state.isConnected);
@@ -103,6 +108,8 @@ export default class customizeAvatar extends Component {
     }
 
     componentWillUnmount(){
+        global.activeComponentId = prevComponentId;
+        
         this.props.onCloseFunc ? this.props.onCloseFunc() : null;
     }
 

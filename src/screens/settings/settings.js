@@ -16,6 +16,8 @@ import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccess
 
 import {goToScreen} from '../../includes/functions'
 
+let prevComponentId;
+
 export default class settings extends Component {
 
     user = realmApp.currentUser;
@@ -40,9 +42,14 @@ export default class settings extends Component {
         console.log("Is connected?", state.isConnected);
         this.setState({hasNetworkConnection: state.isConnected});
       });
+      
+      prevComponentId = global.activeComponentId;
+      global.activeComponentId = this.props.componentId;
     }
-  
-    componentWillUnmount(){
+
+    componentWillUnmount() {
+      global.activeComponentId = prevComponentId;
+ 
       this.unsubscribeNetworkUpdate();
       clearTimeout(this.timeoutAlert);
     }

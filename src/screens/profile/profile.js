@@ -16,6 +16,8 @@ import NoConnectionAlert from '../../components/Alerts/noConnection/noConnection
 
 import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
+let prevComponentId;
+
 export default class profile extends Component {
     // Class Variables 
     user = realmApp.currentUser;
@@ -49,6 +51,13 @@ export default class profile extends Component {
             console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
+        
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
+    }
+
+    componentWillUnmount() {
+        global.activeComponentId = prevComponentId;
     }
 
 

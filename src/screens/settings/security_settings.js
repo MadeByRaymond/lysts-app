@@ -7,6 +7,8 @@ import NoConnectionAlert from '../../components/Alerts/noConnection/noConnection
 
 import { dWidth } from '../../includes/variables';
 
+let prevComponentId;
+
 export default class settings extends Component {
   unsubscribeNetworkUpdate;
   state={
@@ -19,9 +21,14 @@ export default class settings extends Component {
       console.log("Is connected?", state.isConnected);
       this.setState({hasNetworkConnection: state.isConnected});
     });
+
+    prevComponentId = global.activeComponentId;
+    global.activeComponentId = this.props.componentId;
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
+    global.activeComponentId = prevComponentId;
+
     this.unsubscribeNetworkUpdate();
   }
     render() {

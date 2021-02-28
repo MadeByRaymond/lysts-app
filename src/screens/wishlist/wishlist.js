@@ -29,6 +29,8 @@ import * as SaveSVG from '../../SVG_Files/saveSVG/saveSVG';
 
 // let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
 
+let prevComponentId;
+
 export default class Wishlist extends Component {
 
   // Class Variables
@@ -75,9 +77,34 @@ export default class Wishlist extends Component {
 
     this.user.customData.settings.notification.appUpdates ? message.subscribeToTopic('app_updates') : message.unsubscribeFromTopic('app_updates')
     this.user.customData.settings.notification.systemNotifications ? message.subscribeToTopic('general') : message.unsubscribeFromTopic('general')
+
+    prevComponentId = global.activeComponentId;
+    global.activeComponentId = this.props.componentId;
+
+    if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
+      goToViewWishlistScreen(
+        this.props.componentId,
+        global.launchWithCode,
+        false,
+        (showAlertInfo={showAlert:false, type:'', message:''}) => {
+            this.setState({
+              silentReload: true, 
+              alertMessage:{
+                show:showAlertInfo.showAlert, 
+                type:showAlertInfo.type,
+                title:showAlertInfo.message,
+                subtitle: ''
+              }
+            })
+        })
+
+        global.launchWithCode = '';
+    }
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
+    global.activeComponentId = prevComponentId;
+
     this.unsubscribeNetworkUpdate();
     clearTimeout(this.timeoutAlert)
   }

@@ -17,6 +17,8 @@ import {app as realmApp} from '../../../storage/realm';
 let userBg = {uri: 'home_bg'};
 let guestBg = require("../../assets/images/guest_home_bg.png");
 
+let prevComponentId;
+
 let user = realmApp.currentUser;
 let notLoggedIn = (user) ? ((!user.isLoggedIn) ? true : false) : true
 let notLoggedInAndAnonymous = (user) ? ((!user.isLoggedIn || user.providerType == 'anon-user') ? true : false) : true
@@ -85,8 +87,13 @@ export default function home(props) {
             console.log("Is connected?", state.isConnected);
             setHasNetworkConnection(state.isConnected);
         });
+
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = props.componentId;
+
         return () => {
             unsubscribeNetworkUpdate();
+            global.activeComponentId = prevComponentId;
         };
     }, []);
 

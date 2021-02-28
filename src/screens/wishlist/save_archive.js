@@ -23,6 +23,8 @@ import {WishlistSchemas, UserSchemas} from '../../../storage/schemas';
 // import PushNotificationIOS from "@react-native-community/push-notification-ios";
 // import PushNotification from "react-native-push-notification";
 
+let prevComponentId;
+
 export default class save_archive extends Component {
     // Class Variables
     realm;
@@ -60,9 +62,14 @@ export default class save_archive extends Component {
         this.setState({hasNetworkConnection: state.isConnected});
         
       });
+
+      prevComponentId = global.activeComponentId;
+      global.activeComponentId = this.props.componentId;
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
+      global.activeComponentId = prevComponentId;
+
       this.unsubscribeNetworkUpdate();
       clearTimeout(this.timeoutAlert);
     }

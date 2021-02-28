@@ -144,13 +144,29 @@ inAppMessaging().setMessagesDisplaySuppressed(false);
 
 Linking.getInitialURL().then(({url}) => {
   // console.log("Linking opened ==> ",url);
-  console.log("Linking opened ==> ",url.slice(url.lastIndexOf('/')+1));
+  // console.log("Linking opened ==> ",url.slice(url.lastIndexOf('/')+1));
+  if(url.toLowerCase().includes('/wishlink/')){
+    let wishlist_code = url.substring(url.lastIndexOf('/wishlink/') + 10);
+    if(wishlist_code.length == 6){
+      global.launchWithCode = wishlist_code;
+    }
+  }
 }).catch((e)=>{});
 
 Linking.addEventListener('url', ({url}) =>{
-  let wishlist_code = url.slice(url.lastIndexOf('/')+1)
-  console.log("Linking opened ==> ",wishlist_code);
-  goToViewWishlistScreen('WISHLIST_SCREEN', wishlist_code)
+  if(url.toLowerCase().includes('/wishlink/')){
+    let wishlist_code = url.substring(url.lastIndexOf('/wishlink/') + 10);
+    // console.log("Linking opened ==> ",wishlist_code);
+    // Navigation.
+    if(
+      wishlist_code.length == 6
+      && typeof global.activeComponentId !== 'undefined' 
+      && global.activeComponentId !== null 
+      && (typeof global.activeComponentId == 'string' && global.activeComponentId.trim() !== '')
+    ){
+      goToViewWishlistScreen(global.activeComponentId, wishlist_code)
+    }
+  }
 });
 
 export const splashRoot = {

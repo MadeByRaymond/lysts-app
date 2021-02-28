@@ -17,6 +17,8 @@ import {LocalNotification} from '../../services/LocalPushController';
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
+let prevComponentId;
+
 export default class settings extends Component {
   unsubscribeNetworkUpdate;
   constructor(props) {
@@ -70,9 +72,14 @@ export default class settings extends Component {
       this.setState({hasNetworkConnection: state.isConnected});
     });
     // createChannel(this.state.notificationSound.sound);
+    
+    prevComponentId = global.activeComponentId;
+    global.activeComponentId = this.props.componentId;
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
+    global.activeComponentId = prevComponentId;
+
     this.unsubscribeNetworkUpdate();
     //  /*stopSampleSound();*/
   }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Realm from 'realm';
-import { Text, StyleSheet, View, BackHandler, Vibration } from 'react-native'
+import { Text, StyleSheet, View, BackHandler} from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
 import NetInfo from "@react-native-community/netinfo";
@@ -20,6 +20,8 @@ import {Touchable, dWidth, dHeight} from '../../includes/variables';
 import {app as realmApp} from '../../../storage/realm';
 import {WishlistSchemas} from '../../../storage/schemas';
 import {ObjectId} from 'bson';
+
+let prevComponentId;
 
 class createWishlist extends Component {
     
@@ -123,6 +125,9 @@ class createWishlist extends Component {
     }
 
     componentDidMount() {
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
+
         BackHandler.addEventListener(
             "hardwareBackPress",
             this.backAction
@@ -137,6 +142,8 @@ class createWishlist extends Component {
     }
     
     componentWillUnmount() {
+        global.activeComponentId = prevComponentId;
+
         BackHandler.removeEventListener(
             "hardwareBackPress",
             this.backAction

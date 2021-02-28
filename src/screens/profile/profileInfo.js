@@ -15,6 +15,8 @@ import {app as realmApp} from '../../../storage/realm';
 
 import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
+let prevComponentId;
+
 export default class profileInfo extends Component {
     user = realmApp.currentUser;
     userData = realmApp.currentUser.customData;
@@ -59,9 +61,14 @@ export default class profileInfo extends Component {
             console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
+
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
+        global.activeComponentId = prevComponentId;
+        
         this.props.onCloseFunc ? this.props.onCloseFunc() : null;
         clearTimeout(this.timeoutAlert);
     }

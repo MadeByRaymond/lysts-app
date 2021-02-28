@@ -33,6 +33,7 @@ import * as Schemas from '../../../storage/schemas';
 // import {ObjectId} from 'bson';
 
 let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
+let prevComponentId;
 
 export default class wishlistDetails extends Component {
 
@@ -311,6 +312,9 @@ export default class wishlistDetails extends Component {
         //   }
 
         //   openRealm();
+    
+        prevComponentId = global.activeComponentId;
+        global.activeComponentId = this.props.componentId;
     }
 
     componentDidCatch(error, info){
@@ -330,6 +334,8 @@ export default class wishlistDetails extends Component {
             this.realm.isInTransaction ? this.realm.cancelTransaction() : null;
             this.realm.isClosed ? null : this.realm.close();
         }
+        
+        global.activeComponentId = prevComponentId;
     }
 
     getWishlistFromRealm = async () => {

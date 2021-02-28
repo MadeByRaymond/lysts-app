@@ -6,8 +6,9 @@ import NetInfo from "@react-native-community/netinfo";
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 let unsubscribeNetworkUpdate;
+let prevComponentId;
 
-export default function about_settings() {
+export default function about_settings(props) {
   const [hasNetworkConnection, setNetworkConnection] = useState(true);
 
   useEffect(() => {
@@ -17,8 +18,12 @@ export default function about_settings() {
       setNetworkConnection(state.isConnected)
     });
 
+    prevComponentId = global.activeComponentId;
+    global.activeComponentId = props.componentId;
+
     return () => {
       unsubscribeNetworkUpdate()
+      global.activeComponentId = prevComponentId;
     };
   }, []);
 
