@@ -393,11 +393,13 @@ export const getRoot = async () =>{
     if((realmApp.currentUser !== null) && (typeof realmApp.currentUser !== 'undefined') && (realmApp.currentUser.isLoggedIn && realmApp.currentUser.providerType != 'anon-user')){
       navRoot = mainRoot;
     }else{
-      console.log('diff, ');
+      // console.log('diff, ');
       let lastOpenedDate = await AsyncStorage.getItem('lystsApp:appStorage:lastOpenedDate');
-      console.log('diff, ', lastOpenedDate);
+      // console.log('diff, ', lastOpenedDate);
+
+      // GET Time Since Last Launch - Check if its greater than 12 hours
       let hours = Math.abs(Math.floor(((new Date().getTime()) - (new Date(lastOpenedDate).getTime())) / (60*60*1000)));
-      navRoot = (hours > 1) ? onBoardingRoot : loginRoot;
+      navRoot = (hours > 12) ? onBoardingRoot : loginRoot;
     }
 
     await AsyncStorage.setItem('lystsApp:appStorage:lastOpenedDate', `${new Date()}`);
@@ -407,44 +409,4 @@ export const getRoot = async () =>{
     await AsyncStorage.setItem('lystsApp:appStorage:lastOpenedDate', `${new Date()}`);
     return onBoardingRoot;
   }
-
-
-  // let tokenAvailable;
-  // try {
-  //   tokenAvailable = await AsyncStorage.multiGet(['awesomeproject:auth:expiresIn', 'awesomeproject:auth:token']);
-  //   // console.log(tokenAvailable);
-    
-  //   let expTime  = tokenAvailable[0][1] || null;
-  //   let tokenStored  = tokenAvailable[1][1] || null;
-
-  //   // console.log(tokenStored);
-
-  //   // console.log(expTime);
-    
-
-  //   if (expTime !== null) {
-  //     let now = new Date();
-  //     let expDate = new Date(parseInt(expTime));
-  //     // console.log(now);
-      
-
-  //     if (expDate > now) {
-  //       return tokenStored !== null ? true : false;
-  //     }else{
-  //       return false;
-  //     }
-  //   }else{
-  //     return false;
-  //   }
-  // } catch(e) {
-  //   return false;
-  // }
 }
-
-
-
-
-
-
-
-// BackgroundNotification
