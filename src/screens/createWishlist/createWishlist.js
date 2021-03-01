@@ -354,19 +354,19 @@ class createWishlist extends Component {
                 });
               });
 
-              console.log({ 
-                _id : new ObjectId(),
-                _partition : 'public',
-                name: this.state.wishlistInfo.name.value,
-                category: this.state.wishlistInfo.category.value,
-                code: `${this.wishlistCode}`,
-                dateCreated: new Date(),
-                dateModified: new Date(),
-                description: this.state.wishlistInfo.description.value,
-                owner: this.user.id,
-                status: 'active',
-                listItems
-            });
+            //   console.log({ 
+            //     _id : new ObjectId(),
+            //     _partition : 'public',
+            //     name: this.state.wishlistInfo.name.value,
+            //     category: this.state.wishlistInfo.category.value,
+            //     code: `${this.wishlistCode}`,
+            //     dateCreated: new Date(),
+            //     dateModified: new Date(),
+            //     description: this.state.wishlistInfo.description.value,
+            //     owner: this.user.id,
+            //     status: 'active',
+            //     listItems
+            //   });
 
             // let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}'`).sorted("dateModified", false);
             
