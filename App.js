@@ -145,7 +145,7 @@ inAppMessaging().setMessagesDisplaySuppressed(false);
 Linking.getInitialURL().then((url) => {
   // console.log("Linking opened ==> ",url);
   // console.log("Linking opened ==> ",url.slice(url.lastIndexOf('/')+1));
-  console.log('wishlink ==> Loading...', url);
+  // console.log('wishlink ==> Loading...', url);
   if(url.toLowerCase().includes('/wishlink/')){
     let wishlist_code = url.substring(url.lastIndexOf('/wishlink/') + 10);
     console.log('wishlink ==> ', wishlist_code);

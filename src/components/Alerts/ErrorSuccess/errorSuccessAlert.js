@@ -156,8 +156,8 @@ const styles = StyleSheet.create({
     width: dWidth,
     // bottom: 29,
     // right: 37,
-    // bottom: 15,
-    top: (dHeight - 55 - 15),
+    bottom: 15,
+    // top: (dHeight - 55 - 15),
     flexDirection: 'row',
     justifyContent: 'center'
   },

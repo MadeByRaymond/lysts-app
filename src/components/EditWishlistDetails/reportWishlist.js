@@ -165,6 +165,10 @@ export default class reportWishlist extends Component {
                     type = {this.state.alertMessage.type}
                     title = {this.state.alertMessage.title}
                     subtitle = {this.state.alertMessage.subtitle}
+                    wrapperContainerStyle={{
+                        width: '100%',
+                        bottom: 0
+                      }}
                 /> )
                 : null}
             </View>

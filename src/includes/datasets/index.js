@@ -24,6 +24,6 @@ export const wishlistReportReasons = [
 ];
 
 export const issueReportReasons = [
-    'Other',
-    'Other 2'
+    'Other 3',
+    'Other 4'
 ];
