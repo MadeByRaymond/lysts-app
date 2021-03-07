@@ -31,7 +31,7 @@ export default function about_settings(props) {
     <View style={styles.container}>
         <View style={styles.titleWrapper}><Text style={styles.title}>Helpful information</Text></View>
         <View style={styles.settingsWrapper}>
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/app-updates")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 53 53" fill="none">
@@ -57,7 +57,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/privacy-policy")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={32} viewBox="0 0 40 53" fill="none">
@@ -87,7 +87,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/tnc")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 58 51" fill="none">
@@ -113,7 +113,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("mailto:contact.lystsapp@gmail.com?subject=&body=")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("mailto:contact@lystsapp.com?subject=&body=&cc=<lystsapp@gmail.com>")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 58 56" fill="none">
