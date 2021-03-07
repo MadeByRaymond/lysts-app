@@ -767,11 +767,11 @@ export default class wishlistDetails extends Component {
         }
         
         let data = {
-            service_id: 'service_mmevngd',
-            template_id: 'template_u7na939',
-            user_id: 'user_BQqm4mon2VH841IwUesJQ',
+            // service_id: 'service_mmevngd',
+            // template_id: 'template_u7na939',
+            // user_id: 'user_BQqm4mon2VH841IwUesJQ',
             template_params: {
-                reply_to: !this.notLoggedInAndAnonymous ? this.user.customData.contactEmail : email,
+                email: !this.notLoggedInAndAnonymous ? this.user.customData.contactEmail : email,
                 from_name: !this.notLoggedInAndAnonymous ? this.user.customData.fullName : 'Anonymous',
                 wishlist_owner_name: this.state.wishlistInfo.owner,
                 wishlist_name: this.state.wishlistInfo.name,
@@ -779,41 +779,79 @@ export default class wishlistDetails extends Component {
                 wishlist_code: this.props.wishlistCode,
                 wishlist_owner_id: this.state.wishlistInfo.ownerId,
                 wishlist_items: wishlist_items.trim(),
-                report_type: type,
-                message: message
+                subject: type,
+                message: message,
+                type: 'wishlist'
+
             }
         };
 
-        fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST', // or 'PUT'
+        // fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        //     method: 'POST', // or 'PUT'
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify(data),
+        // })
+        // .then(response => {
+        //     if (response.ok) {
+        //         callbackFunc();
+        //         this.setState({reportModal: false,
+        //             alertMessage: {
+        //                 show: true,
+        //                 type: 'success',
+        //                 title: 'Report Sent!',
+        //                 subtitle: ''
+        //             }});
+                
+        //     } else {
+        //         return response.text()
+        //           .then(text => Promise.reject(text));
+        //     }
+        // })
+        // // .then(data => {
+        // //     console.log('Success:', data);
+        // // })
+        // .catch((error) => {
+        //     errorCallbackFunc();
+        //     console.log('Error:', error);
+        // });
+
+        fetch('https://www.lystsapp.com/app-mail.php', 
+          {
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'no-cors', // no-cors, *cors, same-origin
+            credentials: 'include', // include, *same-origin, omit
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (response.ok) {
+            // redirect: 'follow', // manual, *follow, error
+            // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+            body: JSON.stringify(data.template_params) // body data type must match "Content-Type" header
+          }
+        )
+        .then((response) => response.text())
+        .then((responseData) => {
+            // alert(responseData);
+            if(responseData.trim() == 'success'){
                 callbackFunc();
-                this.setState({reportModal: false,
+                this.setState({
+                    reportModal: false,
                     alertMessage: {
                         show: true,
                         type: 'success',
                         title: 'Report Sent!',
                         subtitle: ''
-                    }});
-                
-            } else {
-                return response.text()
-                  .then(text => Promise.reject(text));
+                    }
+                });
+            }else{
+                errorCallbackFunc();
             }
         })
-        // .then(data => {
-        //     console.log('Success:', data);
-        // })
-        .catch((error) => {
+        .catch((err) => {
+            console.log('Error Occurred ==> ', err);
             errorCallbackFunc();
-            console.log('Error:', error);
-        });
+        })
     }
 
 
