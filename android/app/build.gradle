@@ -130,7 +130,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.lysts"
+        applicationId "com.madebyraymond.lysts"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

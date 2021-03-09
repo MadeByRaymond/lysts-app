@@ -1,4 +1,4 @@
-package com.lysts;
+package com.madebyraymond.lysts;
 
 import android.app.Activity;
 import android.content.Intent;

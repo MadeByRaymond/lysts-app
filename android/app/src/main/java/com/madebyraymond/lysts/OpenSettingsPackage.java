@@ -1,4 +1,4 @@
-package com.lysts;
+package com.madebyraymond.lysts;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

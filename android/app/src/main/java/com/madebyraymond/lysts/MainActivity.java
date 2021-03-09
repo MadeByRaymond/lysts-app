@@ -1,4 +1,4 @@
-package com.lysts;
+package com.madebyraymond.lysts;
 
 import com.reactnativenavigation.NavigationActivity;
 

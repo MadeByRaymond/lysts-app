@@ -35,12 +35,12 @@ android_library(
 
 android_build_config(
     name = "build_config",
-    package = "com.lysts",
+    package = "com.madebyraymond.lysts",
 )
 
 android_resource(
     name = "res",
-    package = "com.lysts",
+    package = "com.madebyraymond.lysts",
     res = "src/main/res",
 )
 
