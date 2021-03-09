@@ -1,7 +1,5 @@
-import { AppRegistry, Platform, Alert, Linking } from 'react-native';
+import { Linking } from 'react-native';
 import { Navigation } from "react-native-navigation";
-import {Provider} from 'react-redux';
-import configureStore from './src/store/config';
 import PushNotification from "react-native-push-notification";
 
 import {message, inAppMessaging} from './src/services/FCMService';
@@ -15,9 +13,6 @@ import AsyncStorage from '@react-native-community/async-storage';
 if(__DEV__) {
   import('./ReactotronConfig').then(() => console.log('Reactotron Configured'))
 }
-
-// REDUX STORE 
-const store = configureStore();
 
 // SPLASH SCREENS IMPORTS
 import Splash from "./src/screens/splashScreen/splashScreen";
@@ -46,9 +41,8 @@ import SecuritySettings from  "./src/screens/settings/security_settings";
 // APP COMPONENTS IMPORTS
 import SavedButton from "./src/components/saveWishlistButton/saveButton";
 
-// DEMO SCREEN
-import Demo from "./src/screens/demo";
-Navigation.registerComponent('com.lysts.screen.demo', () => Demo);
+// DEMO REDUX SCREEN SCREEN
+// Navigation.registerComponentWithRedux('com.lysts.screen.auth', () => Auth, Provider, store);
 
 // SPLASH SCREEN
 Navigation.registerComponent('com.lysts.screen.splash', () => Splash);
@@ -57,7 +51,7 @@ Navigation.registerComponent('com.lysts.screen.splash', () => Splash);
 Navigation.registerComponent('com.lysts.screen.onboarding', () => OnBoarding);
 
 // AUTH SCREEN
-Navigation.registerComponentWithRedux('com.lysts.screen.auth', () => Auth, Provider, store);
+Navigation.registerComponent('com.lysts.screen.auth', () => Auth);
 
 // APP SCREEN COMPONENTS REGISTER
 Navigation.registerComponent('com.lysts.screen.wishlist', () => Wishlist);
