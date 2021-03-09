@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "160920764637",
-    "project_id": "mylystsapp-demo1",
-    "storage_bucket": "mylystsapp-demo1.appspot.com"
+    "project_number": "800349679354",
+    "project_id": "lysts-app-001",
+    "storage_bucket": "lysts-app-001.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:160920764637:android:4c438c0209244e90ff9b34",
+        "mobilesdk_app_id": "1:800349679354:android:d113c762955333ecf3a343",
         "android_client_info": {
-          "package_name": "com.lysts"
+          "package_name": "com.madebyraymond.lysts"
         }
       },
       "oauth_client": [
         {
-          "client_id": "160920764637-9649vgv300lr22dkkrq8de86ue9a70or.apps.googleusercontent.com",
+          "client_id": "800349679354-fokicfsvbvqqustdrekqn5jcb3s9k511.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDzdiv8joSvSm_1l5gL1HiQ6XvtoPhyXxs"
+          "current_key": "AIzaSyDJOC6iRVz6vNvgzWutTfkN6DtG6FZMvY8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "160920764637-9649vgv300lr22dkkrq8de86ue9a70or.apps.googleusercontent.com",
+              "client_id": "800349679354-fokicfsvbvqqustdrekqn5jcb3s9k511.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
