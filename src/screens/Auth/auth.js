@@ -5,6 +5,7 @@ import Svg, { Rect, Path } from "react-native-svg"
 import {ObjectId} from 'bson';
 import Reactotron from 'reactotron-react-native';
 import { connect } from 'react-redux';
+import NetInfo from "@react-native-community/netinfo";
 
 import {getRealmApp, app as realmApp} from '../../../storage/realm';
 
@@ -12,7 +13,10 @@ import {goToViewWishlistScreen} from '../../includes/functions';
 
 import {dWidth, dHeight} from '../../includes/variables'
 import {goToScreen} from '../../includes/functions';
-import {signInAuth} from '../../services/AuthServiceProvider'
+import {signInAuth} from '../../services/AuthServiceProvider';
+
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
+import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 // REDUX ACTIONS 
 // import {signInAuth} from '../../store/actions';
@@ -22,39 +26,47 @@ import {signInAuth} from '../../services/AuthServiceProvider'
 let prevComponentId;
 
 export class Auth extends Component {
-    // constructor(props) {
-    //     super(props);
-        
-    //     // console.log(realm); 
-    // }
+    unsubscribeNetworkUpdate;
+    timeoutAlert;
 
     state = {
         isLoading:false,
-        loginWith: ''
+        loginWith: '',
+        alertMessage:{
+          show: false,
+          type: '',
+          title: '',
+          subtitle: '',
+        },
+        hasNetworkConnection: true,
     }
 
     componentDidMount(){
-        // this.props.onSignInAuth("ttt");
+        this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
+            console.log("Connection type", state.type);
+            console.log("Is connected?", state.isConnected);
+            this.setState({hasNetworkConnection: state.isConnected});
+        });
+
         prevComponentId = global.activeComponentId;
         global.activeComponentId = this.props.componentId;
 
-        realmApp.logIn(Realm.Credentials.anonymous())
-        .then((parsedRes) =>{
-            // console.log(parsedRes);
+        signInAuth('anonymous', false, (parsedRes) =>{
             if(parsedRes.error){
                 console.log(parsedRes.error); 
             }else if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
                 goToViewWishlistScreen(this.props.componentId,global.launchWithCode)
                 global.launchWithCode = '';
             }
-        })
-        .catch((error) => {
-            console.log(error);          
+        }, (error) => {
+            // console.log(error);          
         })
     }
 
     componentWillUnmount() {
         global.activeComponentId = prevComponentId;
+        this.unsubscribeNetworkUpdate();
+        clearTimeout(this.timeoutAlert);
     }
 
     renSchema = async() => {
@@ -90,9 +102,17 @@ export class Auth extends Component {
             console.log(error);
         }
     }
+
+    resetAlert = () => {
+        this.timeoutAlert = setTimeout(()=>{
+            this.setState({alertMessage: {show: false}})
+            clearTimeout(this.timeoutAlert);
+        }, 4500)
+    }
     
 
     render() {
+        this.state.alertMessage.show ? this.resetAlert() : null;
         return (
             <ImageBackground source={require("../../assets/images/signin_bg.png")} style={styles.bgImage}>
                 <View style={styles.container}>
@@ -126,11 +146,27 @@ export class Auth extends Component {
                     </View>
                     <View style={styles.buttonsWrapper}>
                         <View style={[styles.buttonContainer]}>
-                            <TouchableOpacity disabled={this.state.isLoading} activeOpacity={0.8} onPress={
+                            <TouchableOpacity disabled={(this.state.isLoading || !this.state.hasNetworkConnection) ? true : false} activeOpacity={0.8} onPress={
                                 () => this.setState({
                                     isLoading:true,
                                     loginWith: 'google'
-                                }, () => {signInAuth("demo", ()=> this.setState({isLoading:false,loginWith: ''}))}) } >
+                                }, () => {
+                                    signInAuth("demo", true, ()=> {
+                                        this.setState({isLoading:false,loginWith: ''});
+                                    }, ()=>{
+                                        this.setState({
+                                            isLoading:false,
+                                            loginWith: '',
+                                            alertMessage:{
+                                                show: true,
+                                                type: 'error',
+                                                title: 'Couldn\'t Sign In',
+                                                subtitle: 'Try again or contact support if this continues',
+                                            }
+                                        });
+                                    })
+                                }) 
+                            } >
                                 <View style={[styles.button, styles.whiteButton]}>
                                     <View><Text style={[styles.buttonText, styles.whiteButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'google') ? 'Please wait...' : 'Continue with Google'}</Text></View>
                                     <View style={styles.svgWrapper}>
@@ -164,11 +200,27 @@ export class Auth extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.buttonContainer]}>
-                            <TouchableOpacity disabled={this.state.isLoading} activeOpacity={0.8} onPress={
+                            <TouchableOpacity disabled={(this.state.isLoading || !this.state.hasNetworkConnection) ? true : false} activeOpacity={0.8} onPress={
                                 () => this.setState({
                                     isLoading:true,
                                     loginWith: 'facebook'
-                                }, () => {signInAuth("facebook", ()=>this.setState({isLoading:false,loginWith: ''}))})} >
+                                }, () => {
+                                    signInAuth("facebook", true, ()=> {
+                                        this.setState({isLoading:false,loginWith: ''});
+                                    }, ()=>{
+                                        this.setState({
+                                            isLoading:false,
+                                            loginWith: '',
+                                            alertMessage:{
+                                                show: true,
+                                                type: 'error',
+                                                title: 'Couldn\'t Sign In',
+                                                subtitle: 'Try again or contact support if this continues',
+                                            }
+                                        });
+                                    })
+                                }) 
+                            } >
                                 <View style={[styles.button, styles.blueButton]}>
                                     <View><Text style={[styles.buttonText, styles.blueButtonText]}>{ (this.state.isLoading && this.state.loginWith.trim() == 'facebook') ? 'Please wait...' : 'Continue with Facebook'}</Text></View>
                                     <View style={styles.svgWrapper}>
@@ -216,6 +268,15 @@ export class Auth extends Component {
                         </View>
                     </View>
                 </View>
+                {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
+
+                {this.state.alertMessage.show ? (<ErrorSuccessAlert 
+                    type = {this.state.alertMessage.type}
+                    title = {this.state.alertMessage.title}
+                    subtitle = {this.state.alertMessage.subtitle}
+                /> )
+                : null}
+
             </ImageBackground>
             
         )
