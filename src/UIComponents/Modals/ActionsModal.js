@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 import Modal from 'react-native-modal';
 import Sound from 'react-native-sound';
 
 
-import {TouchableIOSHighlight, Touchable} from '../../includes/variables';
+import {TouchableIOSHighlight} from '../../includes/variables';
 
 const ActionsModal = (props) => {
     return (

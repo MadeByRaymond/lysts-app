@@ -1,18 +1,6 @@
-import {ObjectId} from 'bson';
+// import {ObjectId} from 'bson';
 
 class WishlistSchemas {
-  // constructor({
-  //   name,
-  //   partition,
-  //   status = Task.STATUS_OPEN,
-  //   id = new ObjectId(),
-  // }) {
-  //   this._partition = partition;
-  //   this._id = id;
-  //   this.name = name;
-  //   this.status = status;
-  // }
-
   static wishlistSchema = {
     name: 'wishlist',
     properties: {
@@ -54,6 +42,7 @@ class UserSchemas {
       displayName: 'string?',
       fullName: 'string?',
       lastModified: 'date?',
+      lastModifiedLog: 'string?',
       savedLists: 'string[]',
       settings: 'user_settings',
       userID: 'string?',

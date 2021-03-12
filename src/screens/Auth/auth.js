@@ -1,13 +1,7 @@
 import React, { Component } from 'react'
-import { Text, View, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native'
-import Realm from 'realm';
-import Svg, { Rect, Path } from "react-native-svg"
-import {ObjectId} from 'bson';
-import Reactotron from 'reactotron-react-native';
-import { connect } from 'react-redux';
+import { Text, View, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import Svg, { Rect, Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
-
-import {getRealmApp, app as realmApp} from '../../../storage/realm';
 
 import {goToViewWishlistScreen} from '../../includes/functions';
 
@@ -17,11 +11,6 @@ import {signInAuth} from '../../services/AuthServiceProvider';
 
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
-
-// REDUX ACTIONS 
-// import {signInAuth} from '../../store/actions';
-
-// let data = [];
 
 let prevComponentId;
 
@@ -43,8 +32,8 @@ export class Auth extends Component {
 
     componentDidMount(){
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
 
@@ -53,7 +42,7 @@ export class Auth extends Component {
 
         signInAuth('anonymous', false, (parsedRes) =>{
             if(parsedRes.error){
-                console.log(parsedRes.error); 
+                // console.log(parsedRes.error); 
             }else if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
                 goToViewWishlistScreen(this.props.componentId,global.launchWithCode)
                 global.launchWithCode = '';
@@ -67,40 +56,6 @@ export class Auth extends Component {
         global.activeComponentId = prevComponentId;
         this.unsubscribeNetworkUpdate();
         clearTimeout(this.timeoutAlert);
-    }
-
-    renSchema = async() => {
-        try {
-            const app = getRealmApp();
-            const credentials = Realm.Credentials.anonymous();
-            let user = await app.logIn(credentials);
-            assert(user.id === app.currentUser.id)
-            console.log(user.identity);
-            let config = {
-                schema: [{
-                    name: 'List',
-                    properties: {
-                        _id: 'objectId',
-                        _partition: 'string',
-                        name: 'string',
-                        status: 'string',
-                    },
-                    primaryKey: '_id',
-                    }],
-                sync: {
-                    user: user,
-                    partitionValue: '"lists"',
-                },
-            };
-            console.log("realm");
-            let realm = await Realm.open(config);
-            console.log(realm);
-
-            return realm;
-
-        } catch (error) {
-            console.log(error);
-        }
     }
 
     resetAlert = () => {
@@ -282,24 +237,11 @@ export class Auth extends Component {
         )
     }
 }
-
-
-// const mapStateToProps = (state) =>{
-//     return{
-//       isLoading: state.ui.isLoading
-//     }
-//   }
   
-//   const mapDispatchToProps = dispatch => {
-//       return {
-//           onSignInAuth: (data) => dispatch(signInAuth(data))
-//       };
-//   };
-  
-  export default Auth;
+export default Auth;
 
 
-  const styles = StyleSheet.create({
+const styles = StyleSheet.create({
       container:{
           flex:1, 
           // backgroundColor: '#ffffff',
@@ -375,4 +317,4 @@ export class Auth extends Component {
       //     width: 20,
       //     backgroundColor: 'red'
       // }
-  })
+})

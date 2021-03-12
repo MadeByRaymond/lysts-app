@@ -19,11 +19,23 @@ export const categories = [
 ];
 
 export const wishlistReportReasons = [
-    'Other',
-    'Other 2'
+    'It\'s Spam',
+    'It\'s Inappropriate',
+    'Other'
 ];
 
 export const issueReportReasons = [
-    'Other 3',
-    'Other 4'
+    'An Issue / Bug',
+    'A Feature Request',
+    'Other'
 ];
+
+export const avatarCustomizer = { 
+    skinTone : ['#FFE5BA','#F9C9B6','#ECA08A','#AC6651','#77311D'],
+    hairColor : ['#000000','#263238','#535461','#A57939','#C1453E','#EA5A47','#FAD08C','#F8E99F','#8DC6CC','#D2EFF3','#FC909F','#FFFDF3'],
+    shirtColor : ['#000000','#6BD9E9','#47E6B1','#FFA4D2','#224762','#F8E99F','#B1CC33','#FFFFFF'],
+    shirtCollarColor : ['#000000','#D2EFF3','#AFFFE4','#FFDAED','#D1ECFF','#FFF7CF','#F3FFB9','#EBE7F2'],
+    eyeGlass : ['#000000','#F4D150','#224762','#B1CC33','#FAD08C','#FFFDF3'],
+    jewelry : ['#000000','#F4D150','#224762','#B1CC33','#FAD08C','#FFFDF3'],
+    bgColor : ['#FFEDEF','#F9E59D','#E0DDFF','#E9F6EF','#EFEFEF'],
+}

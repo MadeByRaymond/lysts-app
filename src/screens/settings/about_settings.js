@@ -13,8 +13,8 @@ export default function about_settings(props) {
 
   useEffect(() => {
     unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-      console.log("Connection type", state.type);
-      console.log("Is connected?", state.isConnected);
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
       setNetworkConnection(state.isConnected)
     });
 

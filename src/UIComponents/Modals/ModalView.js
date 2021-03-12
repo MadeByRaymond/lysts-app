@@ -1,11 +1,9 @@
 import React from 'react'
-import { StyleSheet, View,Dimensions } from 'react-native'
-
+import { StyleSheet, View } from 'react-native'
 import Modal from 'react-native-modal';
 import { BlurView } from "@react-native-community/blur";
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {dWidth} from '../../includes/variables';
 
 const ModalView = (props) => {
     return (

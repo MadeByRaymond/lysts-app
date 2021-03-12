@@ -1,10 +1,9 @@
 import React from 'react'
-import { StyleSheet, Text, View,Dimensions } from 'react-native'
+import { StyleSheet, View } from 'react-native';
+
+import {dHeight, dWidth} from '../../../includes/variables';
 
 import Button from './buttonWithShadow';
-
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
 
 const floatingButton = (props) => {
     return (

@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions, Platform, TouchableNativeFeedback, TouchableOpacity, PixelRatio  } from 'react-native';
+import { StyleSheet, Text, View, PixelRatio  } from 'react-native';
 
 import { Shadow } from 'react-native-neomorph-shadows';
 

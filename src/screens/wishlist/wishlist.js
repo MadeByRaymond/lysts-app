@@ -1,10 +1,6 @@
 import React, {Component} from 'react';
 import Realm from 'realm';
-import { View, Text, StyleSheet, Dimensions, PixelRatio, Button, ScrollView, TouchableOpacity, TouchableWithoutFeedback, Platform } from 'react-native';
-import LottieView from 'lottie-react-native';
-import debounce from 'lodash.debounce';
-import { Navigation } from "react-native-navigation";
-import * as Animatable from 'react-native-animatable';
+import { View, Text, StyleSheet } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import {message} from '../../services/FCMService';
 
@@ -13,7 +9,6 @@ import {WishlistSchemas} from '../../../storage/schemas';
 
 import FabView from '../../UIComponents/Buttons/FabButton/fabButton';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
-import ModalButtonView from '../../UIComponents/Buttons/ModalButton/modalButtonView';
 import ListView from '../../components/wishlistList/wishlistList';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import Modal from '../../UIComponents/Modals/DefaultModal'
@@ -21,13 +16,7 @@ import {noInternet, noWishlist} from '../../SVG_Files/UI_SVG/errors';
 import ErrorView from '../../components/Errors/errorView';
 import {dWidth, dHeight} from '../../includes/variables';
 import {goToViewWishlistScreen, goToScreen} from '../../includes/functions';
-import Loader from '../../components/Loader/loader'
-
-import WishlistEmptySVG from '../../SVG_Files/UI_SVG/noWishlist/noWishlist';
-import * as iconSVG from '../../SVG_Files/wishlistIconsSVG/';
-import * as SaveSVG from '../../SVG_Files/saveSVG/saveSVG';
-
-// let pexels = (value) =>{return PixelRatio.getPixelSizeForLayoutSize(value)};
+import Loader from '../../components/Loader/loader';
 
 let prevComponentId;
 
@@ -57,21 +46,15 @@ export default class Wishlist extends Component {
       //   name: 'Raymond’s Ultimate House Warming List',
       //   type: 'Graduation',
       //   saved: true,
-      // },
-      // {
-      //   id: '1234',
-      //   name: 'Raymond’s Ultimate House Warming List',
-      //   type: 'Birthday',
-      //   saved: true,
-      // },
+      // }
     ],
     alertMessage:{show:false, type:'',title:'',subtitle:''}
   }
 
   componentDidMount(){
     this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-      console.log("Connection type", state.type);
-      console.log("Is connected?", state.isConnected);
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
       this.setState({hasNetworkConnection: state.isConnected});
     });
 
@@ -80,7 +63,7 @@ export default class Wishlist extends Component {
 
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
-    // console.log(global.launchWithCode);
+    
     if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
       goToViewWishlistScreen(
         this.props.componentId,
@@ -126,21 +109,6 @@ export default class Wishlist extends Component {
       }, ()=>{console.log('New state==> ',this.state);})})
     });
   }
-  // debounce(() =>{
-  //   // alert('ddd')
-  //   Navigation.push(this.props.componentId, {
-  //     component: {
-  //       name: 'com.lysts.screen.selectCategory', // Push the screen registered with the 'Settings' key
-  //       options: { // Optional options object to configure the screen
-  //         bottomTabs: {
-  //           animate: false,
-  //           visible: false
-  //         },
-  //       },
-  //       passProps: 
-  //     }
-  //   });
-  // }, 1000, {leading: true,trailing: false})
 
 
   renderNoItems = () =>{
@@ -189,22 +157,22 @@ export default class Wishlist extends Component {
       )
   }
 
-  showLoading = () => (
-    <View style={{
+  showLoading = () => {
+    this.getWishlists();
+
+    return (<View style={{
       flex: 1,
       justifyContent: "center"
-  }}>
+    }}>
       <Loader lottieViewStyle={{opacity:0.9}} />
-      {this.getWishlists()}
-  </View>
-  )
+  </View>)
+}
 
 
   getWishlistsFromRealm = () => {
     let listData = [];
     let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}' && status == 'active'`).sorted("dateModified", true);
         
-    console.log(wishlistData);
     if (wishlistData.length < 1) { 
       listData = [];
     } 
@@ -230,12 +198,9 @@ export default class Wishlist extends Component {
   }
 
 
-  getWishlists = (checkIfLoading = true) => {
+  getWishlists = async() => {
     try{
-      console.log(`Logged in with the user: ${this.user.id}`);
-      // If should show loading screen when loading
-      // checkIfLoading ? ((!this.state.isLoading) ? this.setState({isLoading: true}) : null ) : null;
-      
+      // console.log(`Logged in with the user: ${this.user.id}`);      
       
       const config = {
         schema: [
@@ -250,60 +215,38 @@ export default class Wishlist extends Component {
               isLoading: false,
               silentReload: false,
             }, ()=>{
-                console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);
+                // console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);
             })
           }
         },
       };
       
-      console.log("log step 2");
-    //   realm = await Realm.open(config);
-    if(this.realm != null && !this.realm.isClosed){
-      this.getWishlistsFromRealm();
-    }else{
-      Realm.open(config).then((realm) => {
-        console.log("log step 3/5");
-        this.realm = realm;
+
+      if(this.realm != null && !this.realm.isClosed){
         this.getWishlistsFromRealm();
-        
-    //   console.log(datas);
-        console.log("log step 3");
-      }).catch((e) => {
-        this.setState({
-          isLoading: false,
-          silentReload: false,
-        }, ()=>{
-          console.log(e);
-        })
-      }).finally(() => {
-        // if (Realm !== null && !Realm.) {
-        //     // Real.close();
-        //   }
-      });
-    }
+      }else{
+        this.realm = await Realm.open(config);
+        this.getWishlistsFromRealm();
+      }
       
     } catch (error) {
         this.setState({
           isLoading: false,
           silentReload: false,
         }, ()=>{
-            throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
+            // throw `Error opening realm: ${JSON.stringify(error,null,2)}`;
         })
-        
     }
   }
 
   handelModal = () => {
-    // Navigation.updateProps('PROFILE_SCREEN_ID', {
-    //   status: 'offline'
-    // });
     return(
       <Modal 
         isVisible={this.state.newListAdded}
         closeFunction = {() => {this.setState({newListAdded: false})}}
         type= 'newWishlist'
         modalTitle='Wishlist created'
-        modalSubtitle='Share your wishlist link or list code with friends and family'
+        modalSubtitle='Share your wishlist link or lyst code with friends and family'
         
         newListInfoModal = {this.state.newListInfoModal}
       />
@@ -327,17 +270,13 @@ export default class Wishlist extends Component {
       }else{
         whatToRender = (<ErrorView message="No Internet Connection" svg={noInternet} />)
       }
-    }else if (this.state.isLoading && !hasData){
-      whatToRender = this.showLoading();
+    }else if (this.state.isLoading && hasData){
+      whatToRender = this.renderItemsList();
+      this.getWishlists();
     }else if (this.state.isLoading){
-        whatToRender = this.renderItemsList();
-        this.getWishlists();
+      whatToRender = this.showLoading();
     } else {
-      if (hasData){
-        whatToRender = this.renderItemsList();
-      }else{
-        whatToRender = this.renderNoItems();
-      }
+      whatToRender = hasData ? this.renderItemsList() : this.renderNoItems();
     }
 
     this.state.silentReload ? this.getWishlists() : null;
@@ -397,29 +336,5 @@ const styles = StyleSheet.create({
     flex:1,
     width: '100%',
     zIndex: 1,
-  },
-
-
-  noContentWrapper:{
-    flex: 1,
-    width: '100%',
-    justifyContent:'center',
-    alignItems:'center'
-  },
-  noContentSVG:{
-    opacity: 0.6,
-    marginTop: 21,
-    marginBottom: 30
-  },
-  noContentText:{
-    textAlign:'center',
-    color:'rgba(68, 87, 124, 0.9)',
-    // fontSize: pexels(9.5),
-    fontSize: 25,
-    fontFamily: 'Poppins-Medium'
-  },
-  noContentTextAction:{
-    marginLeft:5, 
-    color:'#CFA280'
   }
 })

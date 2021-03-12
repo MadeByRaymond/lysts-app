@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, View } from 'react-native'
 import NetInfo from "@react-native-community/netinfo";
 
 import ReportForm from '../Forms/wishlistForms/wishlistReportForm';
@@ -8,7 +8,7 @@ import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccess
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {removeExcessWhiteSpace, validateEmail} from '../../includes/functions';
-import {dWidth, dHeight} from '../../includes/variables';
+import {dHeight} from '../../includes/variables';
 
 export default class reportWishlist extends Component {
     timeoutAlert;
@@ -42,8 +42,8 @@ export default class reportWishlist extends Component {
 
     componentDidMount(){
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-          console.log("Connection type", state.type);
-          console.log("Is connected?", state.isConnected);
+        //   console.log("Connection type", state.type);
+        //   console.log("Is connected?", state.isConnected);
           this.setState({hasNetworkConnection: state.isConnected});
         });
       }

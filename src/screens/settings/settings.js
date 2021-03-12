@@ -1,12 +1,10 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, Image, TouchableOpacity, ScrollView } from 'react-native';
-import Svg, { Rect, Circle, Path } from "react-native-svg"
-import debounce from 'lodash.debounce';
+import { Text, StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import Svg, { Path } from "react-native-svg";
 import { Navigation } from "react-native-navigation";
 import NetInfo from "@react-native-community/netinfo";
 
-import {app as realmApp} from '../../../storage/realm'
-import {loginRoot} from '../../../App';
+import {app as realmApp} from '../../../storage/realm';
 import {signOutAuth} from '../../services/AuthServiceProvider';
 
 import CreditSVG from '../../SVG_Files/UI_SVG/Credits/credits';
@@ -14,7 +12,7 @@ import NavHeader from '../../components/Headers/profileNavHeader';
 import DefaultModal from '../../UIComponents/Modals/DefaultModal';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
-import {goToScreen} from '../../includes/functions'
+import {goToScreen, onReport} from '../../includes/functions'
 
 let prevComponentId;
 
@@ -38,8 +36,8 @@ export default class settings extends Component {
 
     componentDidMount(){
       this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-        console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected);
+        // console.log("Connection type", state.type);
+        // console.log("Is connected?", state.isConnected);
         this.setState({hasNetworkConnection: state.isConnected});
       });
       
@@ -68,120 +66,36 @@ export default class settings extends Component {
       }
       goToScreen(this.props.componentId,screenName, screenProps, screenOptionsObject)
     }
-    // goToScreenHandler = debounce((screenName, title='', screenProps = null, screenOptions = null) =>{
-    //     // alert('ddd')
-    //     Navigation.push(this.props.componentId, {
-    //       component: {
-    //         name: screenName, // Push the screen registered with the 'Settings' key
-    //         options: { // Optional options object to configure the screen
-    //           bottomTabs: {
-    //             animate: false,
-    //             visible: false
-    //           },
-    //           topBar: {
-    //             title: {
-    //                 text: title
-    //             },
-    //             visible: true,
-    //             drawBehind: false,
-    //             animate: true,
-    //           },
-    //           ...screenOptions
-    //         },
-    //         passProps: screenProps
-    //       }
-    //     });
-    //   }, 1000, {leading: true,trailing: false})
-
 
     reportHandler = (type, message, email='', callbackFunc = ()=>{}, errorCallbackFunc = ()=>{}) => {
      
       let data = {
-          // service_id: 'service_mmevngd',
-          // template_id: 'template_u7na939',
-          // user_id: 'user_BQqm4mon2VH841IwUesJQ',
           template_params: {
               email: this.user.customData.contactEmail,
               from_name: this.user.customData.fullName,
-              // wishlist_owner_name: this.state.wishlistInfo.owner,
-              // wishlist_name: this.state.wishlistInfo.name,
-              // wishlist_description: this.state.wishlistInfo.description,
-              // wishlist_code: this.props.wishlistCode,
-              // wishlist_owner_id: this.state.wishlistInfo.ownerId,
-              // wishlist_items: wishlist_items.trim(),
               subject: type,
               message: message,
               type: 'app'
           }
       };
 
-
-      fetch('https://www.lystsapp.com/app-mail.php', 
-        {
-          method: 'POST', // *GET, POST, PUT, DELETE, etc.
-          mode: 'no-cors', // no-cors, *cors, same-origin
-          credentials: 'include', // include, *same-origin, omit
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          // redirect: 'follow', // manual, *follow, error
-          // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-          body: JSON.stringify(data.template_params) // body data type must match "Content-Type" header
-        }
+      // SENDS API CALL USING FETCH API 
+      onReport(
+        data.template_params,
+        () => {
+          callbackFunc();
+          this.setState({
+              reportModal: false,
+              alertMessage: {
+                  show: true,
+                  type: 'success',
+                  title: 'Report Sent!',
+                  subtitle: ''
+              }
+          });
+        },
+        () => errorCallbackFunc()
       )
-      .then((response) => response.text())
-      .then((responseData) => {
-          // alert(responseData);
-          if(responseData.trim() == 'success'){
-              callbackFunc();
-              this.setState({
-                  reportModal: false,
-                  alertMessage: {
-                      show: true,
-                      type: 'success',
-                      title: 'Report Sent!',
-                      subtitle: ''
-                  }
-              });
-          }else{
-              errorCallbackFunc();
-          }
-      })
-      .catch((err) => {
-          console.log('Error Occurred ==> ', err);
-          errorCallbackFunc();
-      })
-
-      // fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      //     method: 'POST', // or 'PUT'
-      //     headers: {
-      //         'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify(data),
-      // })
-      // .then(response => {
-      //     if (response.ok) {
-      //         callbackFunc();
-      //         this.setState({reportModal: false,
-      //             alertMessage: {
-      //                 show: true,
-      //                 type: 'success',
-      //                 title: 'Report Sent!',
-      //                 subtitle: ''
-      //             }});
-              
-      //     } else {
-      //         return response.text()
-      //           .then(text => Promise.reject(text));
-      //     }
-      // })
-      // // .then(data => {
-      // //     console.log('Success:', data);
-      // // })
-      // .catch((error) => {
-      //     errorCallbackFunc();
-      //     console.log('Error:', error);
-      // });
     }
 
     reportModal = () => (
@@ -193,8 +107,6 @@ export default class settings extends Component {
 
           reportFunction = {this.reportHandler}
           userLoggedIn = {true}
-          // userInfo = {this.user}
-          // wishlistCode = {this.props.wishlistCode}
       />
     )
 
@@ -211,17 +123,11 @@ export default class settings extends Component {
             }
           })
         }
-      )
-      // realmApp.currentUser.logOut().then(()=>{
-      //   Navigation.setRoot(loginRoot);
-      // }).catch(() => {
-      //   this.setState({loggingOut: false}, () => {alert('Error with login you out')})
-      // })
+      );
     }
 
     resetAlert = () => {
-      this.timeoutAlert = setTimeout(()=>{
-          
+      this.timeoutAlert = setTimeout(()=>{        
         this.setState({alertMessage: {show: false}})
           clearTimeout(this.timeoutAlert);
       }, 4500)

@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Dimensions, PixelRatio, ScrollView, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Shadow } from 'react-native-neomorph-shadows';
 
 import {getCategoryDisplay, onBookmark} from '../../includes/functions';
@@ -7,8 +7,8 @@ import {getCategoryDisplay, onBookmark} from '../../includes/functions';
 import * as iconSVG from '../../SVG_Files/wishlistIconsSVG/';
 import SaveButton from '../saveWishlistButton/saveButton';
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {dWidth} from '../../includes/variables';
+
 
   export default function portraitListItem({data, cardsPerRow, action,savingInProgress, updateUIFunction, saveWishlistError}) {
     let Icon = iconSVG[data.type.toLowerCase()];

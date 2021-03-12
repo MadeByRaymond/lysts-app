@@ -1,16 +1,9 @@
 import React from 'react'
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native'
-import Svg, { Rect, Circle } from "react-native-svg"
-
-// import * as AvatarSVG from '../../SVG_Files/avatarSVG';
-
-// import {app as realmApp} from '../../../storage/realm';
+import Svg, { Rect, Circle } from "react-native-svg";
 
 
 const profileNavHeader = ({theme = 'theme1' ,avatarImage, onPressFunc}) => {
-    // let AvatarSVGView = realmApp.currentUser.customData.avatarFeatures.avatarId.toLowerCase().includes('f') 
-    //                     ? AvatarSVG.Female[realmApp.currentUser.customData.avatarFeatures.avatarId] 
-    //                     : AvatarSVG.Male[realmApp.currentUser.customData.avatarFeatures.avatarId];
     return (
         <View style={styles.headerWrapper}>
             <TouchableOpacity onPress={onPressFunc}>
@@ -34,8 +27,7 @@ const profileNavHeader = ({theme = 'theme1' ,avatarImage, onPressFunc}) => {
                 <View style={styles.profileWrapper}>
                 <View style={styles.profileAvatarWrapper}>
                     <Image source={{uri: avatarImage}} resizeMethod='scale' resizeMode='cover' style={styles.profileAvatar} />
-                        {/* <AvatarSVGView width={60} height={60} avatarFeatures={realmApp.currentUser.customData.avatarFeatures} /> */}
-                    {/* </Image> */}
+                    {/* <AvatarSVGView width={60} height={60} avatarFeatures={realmApp.currentUser.customData.avatarFeatures} /> */}
                 </View>
                 <View style={styles.profileTextWrapper}><Text style={styles.profileText}>Profile</Text></View>
                 </View>

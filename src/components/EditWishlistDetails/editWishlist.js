@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native'
 import Wizard from 'react-native-wizard';
-import Svg, { Path } from "react-native-svg"
+import Svg, { Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
 
 import InfoForm from '../Forms/wishlistForms/wishlistInfoForm';
@@ -11,7 +11,7 @@ import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccess
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import {removeExcessWhiteSpace} from '../../includes/functions';
-import {dWidth, dHeight} from '../../includes/variables';
+import {dHeight} from '../../includes/variables';
 
 export default class editWishlist extends Component {
     wizard = React.createRef();
@@ -47,31 +47,14 @@ export default class editWishlist extends Component {
             title:'',
             subtitle: ''
         },
-        hasNetworkConnection: true
-
-        // listItemObjects: this.props.wishlistInfo.listItems,
-
-        // wishlistInfo:{
-        //     name: 'Raymond’s Ultimate House Warming List',
-        //     category: 'house_warming',
-        //     ownerId: '',
-        //     owner: 'Dora Patsone',
-        //     dateCreated: '12/12/2020',
-        //     description:'Awesome news!!!. I just got a new place so please nothing cheap 😂😂😂. Here’s my list folks.',
-        //     listItems: [
-            // {
-                //     item: 'Gold, Frankincense and Myrrh',
-                //     status: 'active'
-                // }
-        // ]
-        // }
+        hasNetworkConnection: true,
     }
 
 
     componentDidMount(){
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-          console.log("Connection type", state.type);
-          console.log("Is connected?", state.isConnected);
+        //   console.log("Connection type", state.type);
+        //   console.log("Is connected?", state.isConnected);
           this.setState({hasNetworkConnection: state.isConnected});
         });
       }
@@ -95,15 +78,8 @@ export default class editWishlist extends Component {
 
     onAddItem = () => {
         this.setState(state => {
-        //   if (state.listItems.includes("")){
-        //       if(state.listItems.){
-        //         let d = [].
-        //       }
-        //   }
-          const listItems = state.listItems.includes("") ? state.listItems : state.listItems.concat('');
-     
           return {
-            listItems
+            listItems : state.listItems.includes("") ? state.listItems : state.listItems.concat('')
           };
         });
       };
@@ -130,10 +106,8 @@ export default class editWishlist extends Component {
 
     onRemoveItem = (index) => {
         this.setState(state => {
-          const listItems = state.listItems.filter((item, i) => index !== i);
-     
           return {
-            listItems,
+            listItems: state.listItems.filter((item, i) => index !== i),
           };
         });
       };
@@ -194,8 +168,6 @@ export default class editWishlist extends Component {
     saveWishlist = () => {
         try{
             let realm = this.props.realmInfo;
-            // let wishlistObject = realm.objects("wishlist").filtered(`code == '${this.props.wishlistCode}'`)[0]; 
-            // let listItems = JSON.parse(JSON.stringify(wishlistObject.listItems));
 
             realm.write(() => {
                 let wishlistData = realm.objects("wishlist").filtered(`code == '${this.props.wishlistCode}'`)[0]; 
@@ -217,22 +189,16 @@ export default class editWishlist extends Component {
                     // Do Nothing
                 }else{
                     let wishlistItems = filteredListItems.map(item => {
-                        // return {item, status: "active"}
-                        // let val = true;
-
                         for (let listItem of listItems) {
                             if(listItem.item == item){
                                 return { item,status: listItem.status}
                             } 
-                            // return listItem.item == item ? {item,status: listItem.status} : {item, status: "active"}
                         }
 
                         return {item, status: "active"}
                     });
 
                     wishlistData.listItems = wishlistItems;
-
-                    // console.log('New wishlist data => ', wishlistData.listItems);
                 }
             });
 
@@ -241,10 +207,6 @@ export default class editWishlist extends Component {
             this.props.updateUI ? this.props.updateUI() : null;
 
             this.props.closeFunction ? this.props.closeFunction() : null
-                
-            // alert("Updated Successfully!!");
-    
-            // this.setState({isArchived: value,updateSettings: true}, ()=>{this.props.updateUI ? this.props.updateUI() : null; alert("Updated Successfully!!")});
         } catch (error) {
             this.setState({
                 alertMessage:{

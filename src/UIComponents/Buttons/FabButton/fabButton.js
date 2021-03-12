@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, Dimensions, Platform, TouchableNativeFeedback, TouchableOpacity  } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { Shadow } from 'react-native-neomorph-shadows';
 import Svg, { Path } from "react-native-svg"
@@ -15,7 +15,7 @@ const fabButton = (props) => {
                 >
                 <Touchable useForeground={true} activeOpacity={0.9} {...props}>    
                     <View style={styles.button}>
-                        <Svg width={16} height={16} viewBox="0 0 39 39" fill="none" {...props}>
+                        <Svg width={16} height={16} viewBox="0 0 39 39" fill="none">
                             <Path
                                 d="M19.521.72v37.44M.8 19.44h37.44"
                                 stroke="#fff"

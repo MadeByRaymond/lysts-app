@@ -1,11 +1,10 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions, FlatList } from 'react-native'
+import { StyleSheet, FlatList } from 'react-native'
 
 import PortraitListItem from './portraitListItem';
 import HorizontalListItem from './horizontalListItem';
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {dWidth} from '../../includes/variables';
 
 const wishlistList = (props) => {
     let cardsPerRow_Portrait = dWidth > 575 ? 3 : 2;

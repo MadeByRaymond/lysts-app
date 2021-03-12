@@ -29,25 +29,25 @@ const DefaultModal = (props) => {
                 <TouchableWithoutFeedback onPress={() => {
                     // console.log(this.animatableView)
                     animatableView.current.bounceIn(300).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
-                    let alertSound = new Sound('click_s7.mp3', Sound.MAIN_BUNDLE, (error) => {
+                    let clickSound = new Sound('click_s7.mp3', Sound.MAIN_BUNDLE, (error) => {
                       if (error) {
                           return;
                       }
                       // loaded successfully
                       
                       // Stop the sound and rewind to the beginning
-                      alertSound.stop(() => {
+                      clickSound.stop(() => {
                           // Note: If you want to play a sound after stopping and rewinding it,
                           // it is important to call play() in a callback.
                           
                           // Play the sound with an onEnd callback
-                          alertSound.play((success) => {
+                          clickSound.play((success) => {
                               if (success) {
                                   console.log('successfully finished playing');
                               } else {
                                   console.log('playback failed due to audio decoding errors');
                               }
-                              alertSound.release();
+                              clickSound.release();
                           });
             
                           
