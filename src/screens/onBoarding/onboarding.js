@@ -1,16 +1,16 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity, Platform, TouchableNativeFeedback, Animated } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import React, { Component } from 'react';
 import Onboarding from 'react-native-onboarding-swiper';
 import Svg, { Path } from "react-native-svg";
 import LottieView from 'lottie-react-native';
 import {Navigation} from 'react-native-navigation';
 
-import {dWidth, dHeight, Touchable} from '../../includes/variables';
+import {dWidth, Touchable} from '../../includes/variables';
 
 import {loginRoot} from '../../../App';
 
 
-let prevComponentId;
+// let prevComponentId;
 
 export default class App extends Component {
   onBoardingRef = React.createRef();
@@ -88,7 +88,7 @@ toggleAnimation=(isLastPage)=>{
                 speed={1}
             />),
             title: 'Share with Friends',
-            subtitle: 'Send your wishlist code and links with friends, family or Santa?',
+            subtitle: 'Share your wishlist code and links with friends, family or Santa?',
         },
         {
             backgroundColor: '#FEFFD2',
@@ -108,9 +108,6 @@ toggleAnimation=(isLastPage)=>{
     let isLastPage = (this.state.pageIndex == (pages.length-1)) ? true : false;
 
     this.state.changeButtonWidth ? this.toggleAnimation(isLastPage) : null;
-
-    // let ccc = "Send your wishlist code and links with friends, family or Ssanta?";
-    // alert(ccc.indexOf('Santa?'))
 
     return (
         <View style={{flex: 1}}>

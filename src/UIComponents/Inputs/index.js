@@ -27,17 +27,7 @@ export function InputText(props) {
 }
 
 export function SelectInput(props) {
-    // console.log('items:' , JSON.stringify(props.itemsList));
     return (
-        // <TextInput 
-        //     style={[styles.generalStyle, props.infoState[props.targetKey].focused ? styles.focusedStyle : null]} 
-        //     value={props.infoState[props.targetKey].value} 
-        //     onChangeText={(val) => props.setInfoState(props.targetKey, 'value', val)} 
-        //     onFocus = {(e) => props.setInfoState(props.targetKey, 'focused', true)}
-        //     onBlur = {(e) => props.setInfoState(props.targetKey, 'focused', false)}
-        //     placeholder= {props.placeholder}
-        //     placeholderTextColor = 'rgba(153, 153, 153, 0.6)'
-        // />
         <SelectPicker 
             value = {props.infoState[props.targetKey].value}
             onValueChange={(val) => {

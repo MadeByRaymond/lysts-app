@@ -1,8 +1,6 @@
-import React, { Component } from 'react'
-import { Text, StyleSheet, View, Image, TouchableOpacity } from 'react-native';
-import Svg, { Rect, Circle } from "react-native-svg"
+import React, { Component } from 'react';
+import { Text, StyleSheet, View } from 'react-native';
 import {Navigation} from 'react-native-navigation';
-import LottieView from 'lottie-react-native';
 import NetInfo from "@react-native-community/netinfo";
 
 import {noSaved, noArchive, noInternet} from '../../SVG_Files/UI_SVG/errors';
@@ -14,14 +12,11 @@ import NoConnectionAlert from '../../components/Alerts/noConnection/noConnection
 import {goToViewWishlistScreen} from '../../includes/functions';
 import ListView from '../../components/wishlistList/wishlistList';
 import * as Fade from '../../UIComponents/GradientFade/gradientFade';
-import Loader from '../../components/Loader/loader'
-import { dHeight, Touchable } from '../../includes/variables';
+import Loader from '../../components/Loader/loader';
+import { dHeight, mongoClientCluster } from '../../includes/variables';
 
 import {app as realmApp} from '../../../storage/realm';
-import {WishlistSchemas, UserSchemas} from '../../../storage/schemas';
-
-// import PushNotificationIOS from "@react-native-community/push-notification-ios";
-// import PushNotification from "react-native-push-notification";
+import {WishlistSchemas} from '../../../storage/schemas';
 
 let prevComponentId;
 
@@ -57,8 +52,8 @@ export default class save_archive extends Component {
 
     componentDidMount(){
       this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-        console.log("Connection type", state.type);
-        console.log("Is connected?", state.isConnected);
+        // console.log("Connection type", state.type);
+        // console.log("Is connected?", state.isConnected);
         this.setState({hasNetworkConnection: state.isConnected});
         
       });
@@ -110,8 +105,6 @@ export default class save_archive extends Component {
               })
             }}
             updateUIFunction = {
-              // this.state.isSaved 
-              // ? 
               (code, value) => {
                 this.setState((prevState) => {
                   return ({
@@ -128,7 +121,6 @@ export default class save_archive extends Component {
                   }) 
                 })
               }
-              // : () => {this.setState({silentReload: true})} 
             }
 
             saveWishlistError = {() => {this.setState({
@@ -158,7 +150,6 @@ export default class save_archive extends Component {
           marginTop: -90
       }}>
           <Loader lottieViewStyle={{opacity:0.9}} />
-          {/* {this.getWishlists()} */}
       </View>
       )
     }
@@ -185,49 +176,33 @@ export default class save_archive extends Component {
           })
 
           wishlistData = this.realm.objects("wishlist").filtered(`status == 'active' && (${filter})`).sorted("dateCreated", true);
-          // console.log(wishlistData.length);
+
           if(wishlistData.length > 0){
             wishlistData.forEach((val,i) => {
               ownersFilter.push({userID : val.owner})
-              // if (i == 0){
-              //   ownersFilter.push({userID : val.owner})
-              //   ownersFilter = `userID == '${val.owner}'`
-              // }else{
-              //   ownersFilter = ownersFilter + ` || userID == '${val.owner}'`
-              // }
             });
 
-            let ownerDataTemp = await this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists").db("lysts").collection("users").find({
+            let ownerDataTemp = await this.user.mongoClient(mongoClientCluster).db("lysts").collection("users").find({
               $or: ownersFilter
             })
 
-            // ownerData = this.realm.objects('user').filtered(ownersFilter);
             ownerData = JSON.parse(JSON.stringify(ownerDataTemp));
-            // console.log('bbbbb ==> ', ownerData);
           }
-          // ownerData = this.realm.objects("user").filtered(`userID == '${wishlistData[0].owner}'`);
         }  else{
           wishlistData = [];
         }    
             
-        // console.log(wishlistData);
         if (wishlistData.length < 1) { 
           listData = [];
         } else {
           
           for (const val of wishlistData) {
             let ownerName = '';
-            // console.log("ownerData");
             ownerData.forEach(user => {
-              // console.log('userID ==>',user.userID);
-              // console.log('owner ==>',val.owner);
               if (user.userID == val.owner){
                 ownerName = (
                   (typeof user.displayName == 'undefined' || user.displayName == null || user.displayName.trim() == "") 
                   ? user.fullName.trim().trimStart() : user.displayName.trim().trimStart());
-
-                  // console.log('ownerName ==>',ownerName);
-                // break;
               }
             })
 
@@ -238,9 +213,7 @@ export default class save_archive extends Component {
               code: val.code,
               owner: this.state.isSaved ? ownerName : this.user.id,
               saved: this.user.customData.savedLists.includes(val.code)
-            })
-
-            // console.log('List Data ==> ', listData);
+            });
           }
           
         }
@@ -257,9 +230,7 @@ export default class save_archive extends Component {
     }
 
     getWishlists = async() => {
-      try{
-        // console.log(`Logged in with the user: ${this.user.id}`);  
-        
+      try{        
         const config = {
           schema: [
             WishlistSchemas.wishlistSchema,
@@ -274,52 +245,22 @@ export default class save_archive extends Component {
                 silentReload: false,
                 alertMessage: {
                     show: true,
-                    type: 'error',
+                    type: 'warning',
                     title: 'Oops! Error Syncing With Server...',
                     subtitle: 'Kindly check your network connection'
                 }
-              })
-              // this.setState({
-              //   isLoading: false,
-              //   silentReload: false
-              // }, () => { console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);})
+              });
             }
           },
         };
         
-        // console.log("log step 2");
-        // realm = await Realm.open(config);
-      if(this.realm != null && !this.realm.isClosed){
-        // console.log('hhhh:', this.realm.schema);
-        await this.getWishlistsFromRealm();
-      }else{
-        // console.log("log step 2/5");
-        this.realm = await Realm.open(config)
-        // console.log("log step 3/5");
-        // console.log('hhhh:', this.realm.schema);
-        await this.getWishlistsFromRealm();
-        // console.log("log step 3");
-      //   Realm.open(config).then((realm) => {
-      //     console.log("log step 3/5");
-      //     console.log('hhhh:', realm.schema);
-      //     this.realm = realm;
-      //     // return this.getWishlistsFromRealm();
-          
-      // //   console.log(datas);
-      //     // console.log("log step 3");
-      //   }).then(() => {
-      //     console.log("log step 3");
-      //   }).catch((e) => {
-      //     this.setState({
-      //       isLoading: false,
-      //       silentReload: false
-      //     }, () => {console.log(e);})
-      //   }).finally(() => {
-      //     // if (Realm !== null && !Realm.) {
-      //     //     // Real.close();
-      //     //   }
-      //   });
-      }
+
+        if(this.realm != null && !this.realm.isClosed){
+          await this.getWishlistsFromRealm();
+        }else{
+          this.realm = await Realm.open(config);
+          await this.getWishlistsFromRealm();
+        }
         
       } catch (error) {
         this.setState({
@@ -328,16 +269,10 @@ export default class save_archive extends Component {
           alertMessage: {
               show: true,
               type: 'error',
-              title: 'Oops! Error Syncing With Server...',
+              title: 'Couldn\'t Sync With Server...',
               subtitle: 'Kindly check your network connection'
           }
-        })
-        // this.setState({
-        //   isLoading: false,
-        //   silentReload: false
-        // }, () => { throw `Error opening realm: ${JSON.stringify(error,null,2)}`;})
-         
-          
+        });   
       }
     }
 

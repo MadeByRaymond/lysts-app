@@ -17,8 +17,6 @@ const Form = (props) => {
         })
     });
 
-    // console.log('categ: ', JSON.stringify(categoryList));
-
     return (
         <ScrollView showsVerticalScrollIndicator = {false}>
             <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss()}} >
@@ -33,7 +31,7 @@ const Form = (props) => {
     )
 }
 
-export default Form
+export default Form;
 
 const styles = StyleSheet.create({
     container:{

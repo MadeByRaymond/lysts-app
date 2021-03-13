@@ -1,7 +1,8 @@
-import React from 'react';
 import { Share } from 'react-native';
 import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
+
+import {mailAPI_URL} from '../variables';
 
 
 
@@ -106,7 +107,7 @@ export const goToViewWishlistScreen = debounce((componentId, code, saveStatus = 
     });
   }, 1000, {leading: true,trailing: false})
 
-export const goToScreen = debounce((id, screenName,screenProps = {}, screenOptions = {}) =>{
+export const goToScreen = debounce((id, screenName,screenProps = {}, screenOptions = {}, callbackFunc=()=>{}) =>{
     // alert('ddd')
     Navigation.push(id, {
       component: {
@@ -120,7 +121,37 @@ export const goToScreen = debounce((id, screenName,screenProps = {}, screenOptio
         },
         passProps: screenProps
       }
-    });
+    }).then(callbackFunc);
   }, 1000, {leading: true,trailing: false})
+
+
+export const onReport = (template_params={}, callbackFunc = ()=>{}, errorCallbackFunc = ()=>{}) => {
+
+  fetch(mailAPI_URL, 
+    {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'no-cors', // no-cors, *cors, same-origin
+      credentials: 'include', // include, *same-origin, omit
+      headers: {
+          'Content-Type': 'application/json',
+      },
+      // redirect: 'follow', // manual, *follow, error
+      // referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+      body: JSON.stringify(template_params) // body data type must match "Content-Type" header
+    }
+  )
+  .then((response) => response.text())
+  .then((responseData) => {
+      if(responseData.trim() == 'success'){
+          callbackFunc();
+      }else{
+          errorCallbackFunc();
+      }
+  })
+  .catch((err) => {
+      // console.log('Error Occurred ==> ', err);
+      errorCallbackFunc();
+  })
+}
 
 

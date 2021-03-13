@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, Text, View, Keyboard, ScrollView, TouchableWithoutFeedback, TouchableOpacity, Dimensions  } from 'react-native'
+import { StyleSheet, Text, View, Keyboard, ScrollView, TouchableWithoutFeedback, TouchableOpacity  } from 'react-native'
 import Svg, { Path, Circle, Defs, LinearGradient, Stop } from "react-native-svg"
 
 import {ItemsInput as Input} from '../../../UIComponents/Inputs/index';
 import * as Fade from '../../../UIComponents/GradientFade/gradientFade';
 
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
+import {dWidth} from '../../../includes/variables';
 
 function CircleSVG(props) {
   return (
@@ -103,7 +102,6 @@ const wishlistItemsForm = (props) => {
                 }} >
                     <View style={[styles.container, props.customFormWrapperStyle ? props.customFormWrapperStyle : null]}>
                         {items}
-                        {/* <View style={styles.inputWrapper}><Input.InputText targetKey ='name' {...props} placeholder='Wishlist Name' maxLength = {35} /></View> */}
                     </View>
                 </TouchableWithoutFeedback>
             </ScrollView>  
@@ -115,7 +113,7 @@ const wishlistItemsForm = (props) => {
     )
 }
 
-export default wishlistItemsForm
+export default wishlistItemsForm;
 
 const styles = StyleSheet.create({
     container:{

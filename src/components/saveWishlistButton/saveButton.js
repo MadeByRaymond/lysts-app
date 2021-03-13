@@ -1,18 +1,11 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import * as SaveIcon from '../../SVG_Files/saveSVG/saveSVG';
 import {Touchable} from '../../includes/variables';
 
 const saveButton = (props) => {
     let Icon = props.savedStatus == 'loading' ? SaveIcon.Loading :  props.savedStatus == 'saved' ? SaveIcon.Saved : SaveIcon.Unsaved;
-    // if(props.savedStatus == 'saved'){
-    //     Icon = SaveIcon.Saved
-    // }else if(props.savedStatus == 'unsaved'){
-    //     Icon = SaveIcon.Unsaved
-    // }else if(props.savedStatus == 'loading'){
-    //     Icon = SaveIcon.Unsaved
-    // }
     let TouchableView  = props.savedStatus == 'loading' ? View : Touchable;
 
     let color = props.color ? props.color : '#E76666';

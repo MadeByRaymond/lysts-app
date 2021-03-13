@@ -1,6 +1,6 @@
-import React, {useState,useEffect}from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import LottieView from 'lottie-react-native'
+import React, {useState,useEffect}from 'react';
+import { StyleSheet, View } from 'react-native';
+import LottieView from 'lottie-react-native';
 import {Text as AnimatableText} from 'react-native-animatable';
 
 
@@ -67,15 +67,6 @@ export default function loader({lottieViewStyle = null}) {
             <View style={styles.loaderCaptionWrapper}>
                 {attentionSeeker}
             </View>
-            {/* <LottieView 
-                style={{width: '100%', height: 250, marginTop: -80, alignSelf: 'center', backgroundColor:'transparent'}}
-                source={require('../../lotti_animations/lf30_editor_6DkvCd.json')} 
-                autoPlay 
-                loop={false}
-                autoSize= {true}
-                speed={0.5}
-                // progress={this.state.loaderProgress}
-            /> */}
         </View>
     )
 }

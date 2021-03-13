@@ -4,7 +4,7 @@ import { StyleSheet, Text, View,Dimensions } from 'react-native';
 import HeaderText from '../../UIComponents/Texts/createHeaderText';
 import BackButton from '../../UIComponents/Buttons/BackButton/backButton';
 
-let dWidth = Dimensions.get("window").width;
+import {dWidth} from '../../includes/variables';
 
 const createWishlistHeader = (props) => {
     return (

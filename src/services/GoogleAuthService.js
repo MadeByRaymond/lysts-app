@@ -1,6 +1,3 @@
-// import React from "react";
-// import { View } from "react-native";
-// import Realm from "realm";
 import { GoogleSignin, statusCodes } from '@react-native-community/google-signin';
 
 // You must configure `webClientId` and `offlineAccess` to get the auth code

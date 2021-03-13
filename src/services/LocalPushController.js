@@ -4,11 +4,11 @@ import PushNotification from "react-native-push-notification";
 export const configurePushNotification = () => {
   PushNotification.configure({
     onRegister: function(token){
-        console.log('TOKEN ==> ', token);
+        /* console.log('TOKEN ==> ', token); */
     },
     // (required) Called when a remote or local notification is opened or received
     onNotification: function(notification) {
-        console.log('LOCAL NOTIFICATION ==>', notification)
+        /* console.log('LOCAL NOTIFICATION ==>', notification) */
     },
 
     permissions: {
@@ -22,58 +22,9 @@ export const configurePushNotification = () => {
 });
 }
 
-
-
-    // let channel 
-    //   PushNotification.getChannels(function (channel_ids) {
-    //       console.log(channel_ids); // ['channel_id_1']
-    //       channel = channel_ids
-    //       console.log('channel',channel_ids)
-    //   });
-    //   PushNotification.channelExists(channel, function (exists) {
-          
-    //       console.log(exists); // true/false
-
-          
-    //   });
-
-      
-    //    PushNotification.localNotification({
-    //       channelId: _.toString(channel),
-    //       title: "My Notification Title", // (optional)
-    //       message: "My Notification Message", // (required)
-
-    //   });
-
-    // PushNotification.createChannel(
-    //     {
-    //         channelId: 'lysts-app-channel', // (required)
-    //         channelName: "Lysts Demo Channel2", // (required)
-    //         channelDescription: "A channel to categorize your notifications", // (optional) default: undefined.
-    //         importance: 4, // (optional) default: 4. Int value of the Android notification importance
-    //         soundName: 'notification_sound.mp3',
-    //         vibrate:true
-    //     },
-    //     (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
-    // );
-
-    // PushNotification.getApplicationIconBadgeNumber(function (number) {
-    //     if (number > 0) {
-    //       PushNotification.setApplicationIconBadgeNumber(0);
-    //     }
-    //   })
-
-    // PushNotification.getChannels(function(channels) {
-    //     console.log(channels);
-    //   });
-
-    // PushNotification.channelExists('lysts-app-channel', function (exists) {
-    //   console.log(`Channel exists ==> '${exists}'`); // true/false
-    // });
-
 export const createChannel = (sound = 'default_notification_sound_long_expected_548.mp3') =>{
   PushNotification.channelExists('lysts-app-channel', function (exists) {
-    console.log(`Channel exists ==> '${exists}'`); // true/false
+    /* console.log(`Channel exists ==> '${exists}'`); // true/false  */
     if(!exists){
       PushNotification.createChannel(
         {
@@ -84,7 +35,7 @@ export const createChannel = (sound = 'default_notification_sound_long_expected_
             soundName: sound,
             vibrate:true
         },
-        (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+        (created) => {/*console.log(`createChannel returned '${created}'`)  */} // (optional) callback returns whether the channel was created, false means it already existed.
       );
     }
   });
@@ -92,16 +43,16 @@ export const createChannel = (sound = 'default_notification_sound_long_expected_
 
 export const recreateChannel = (sound = 'default_notification_sound_long_expected_548.mp3') =>{
   PushNotification.getChannels(function (channel_ids) {
-    console.log('Here is a list of Channels ==> ', channel_ids); // ['channel_id_1']
+    /*console.log('Here is a list of Channels ==> ', channel_ids); // ['channel_id_1']  */
   });
   PushNotification.channelExists('lysts-app-channel', function (exists) {
-    console.log(`Channel exists ==> '${exists}'`); // true/false
+    /*console.log(`Channel exists ==> '${exists}'`); // true/false  */
     if(exists){
       PushNotification.deleteChannel('lysts-app-channel');
-      console.log('Channel Deleted');
+      /*console.log('Channel Deleted'); */
     }
 
-    console.log('Creating Channel with sound: ', sound);
+    /*console.log('Creating Channel with sound: ', sound); */
 
     PushNotification.createChannel(
       {
@@ -112,7 +63,7 @@ export const recreateChannel = (sound = 'default_notification_sound_long_expecte
           soundName: sound,
           vibrate:true
       },
-      (created) => console.log(`createChannel returned '${created}'`) // (optional) callback returns whether the channel was created, false means it already existed.
+      (created) => {/*console.log(`createChannel returned '${created}'`) */} // (optional) callback returns whether the channel was created, false means it already existed.
     );
   });
 }

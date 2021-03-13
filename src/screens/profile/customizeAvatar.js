@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Switch, Image } from 'react-native'
-// import Svg, { Circle, Path } from "react-native-svg"
-import Svg, { Circle, Mask, G, Path, Ellipse } from "react-native-svg"
+import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
+import Svg, { Circle, Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
 
-import { dWidth, dHeight, sWidth, sHeight, Touchable } from '../../includes/variables';
+import { dWidth, dHeight, Touchable } from '../../includes/variables';
+import { avatarCustomizer } from '../../includes/datasets';
+import { saveUserData_MongoCRUD } from '../../includes/functions';
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
@@ -20,37 +21,6 @@ export default class customizeAvatar extends Component {
     userData = realmApp.currentUser.customData;
     unsubscribeNetworkUpdate;
 
-    skinTone = ['#FFE5BA','#F9C9B6','#ECA08A','#AC6651','#77311D'];
-    hairColor = ['#000000','#263238','#535461','#A57939','#C1453E','#EA5A47','#FAD08C','#F8E99F','#8DC6CC','#D2EFF3','#FC909F','#FFFDF3'];
-    shirtColor = ['#000000','#6BD9E9','#47E6B1','#FFA4D2','#224762','#F8E99F','#B1CC33','#FFFFFF'];
-    shirtCollarColor = ['#000000','#D2EFF3','#AFFFE4','#FFDAED','#D1ECFF','#FFF7CF','#F3FFB9','#EBE7F2'];
-    eyeGlass = ['#000000','#F4D150','#224762','#B1CC33','#FAD08C','#FFFDF3'];
-    jewelry = ['#000000','#F4D150','#224762','#B1CC33','#FAD08C','#FFFDF3'];
-    bgColor = ['#FFEDEF','#F9E59D','#E0DDFF','#E9F6EF','#EFEFEF'];
-
-    // AvatarSVGItems= {
-    //     M001 : require('../../assets/images/avatars/M001.png'),
-    //     M002 : require('../../assets/images/avatars/M002.png'),
-    //     M003 : require('../../assets/images/avatars/M003.png'),
-    //     M004 : require('../../assets/images/avatars/M004.png'),
-    //     M005 : require('../../assets/images/avatars/M005.png'),
-    //     M006 : require('../../assets/images/avatars/M006.png'),
-    //     M007 : require('../../assets/images/avatars/M007.png'),
-    //     M008 : require('../../assets/images/avatars/M008.png'),
-    //     M009 : require('../../assets/images/avatars/M009.png'),
-    //     M010 : require('../../assets/images/avatars/M010.png'),
-    //     F001 : require('../../assets/images/avatars/F001.png'),
-    //     F002 : require('../../assets/images/avatars/F002.png'),
-    //     F003 : require('../../assets/images/avatars/F003.png'),
-    //     F004 : require('../../assets/images/avatars/F004.png'),
-    //     F005 : require('../../assets/images/avatars/F005.png'),
-    //     F006 : require('../../assets/images/avatars/F006.png'),
-    //     F007 : require('../../assets/images/avatars/F007.png'),
-    //     F008 : require('../../assets/images/avatars/F008.png'),
-    //     F009 : require('../../assets/images/avatars/F009.png'),
-    //     F010 : require('../../assets/images/avatars/F010.png'),
-    // }
-
     AvatarSVGKeys = {
         Male: Object.keys(AvatarSVG['Male']),
         Female: Object.keys(AvatarSVG['Female'])
@@ -58,10 +28,9 @@ export default class customizeAvatar extends Component {
 
 
     state = {
-        accordionActive : false,
-        scrollPosition: 0,
+       accordionActive : false,
+       scrollPosition: 0,
 
-        
        showSaveButton: false,
        savingData: false,
 
@@ -101,8 +70,8 @@ export default class customizeAvatar extends Component {
         global.activeComponentId = this.props.componentId;
 
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
     }
@@ -119,9 +88,9 @@ export default class customizeAvatar extends Component {
             return (
                 <TouchableOpacity  key={i} activeOpacity={0.8} onPress={()=>{this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, [feature]:item }}))}}>
                 <View style={[styles.colorPicker, {
-                backgroundColor: item, 
-                borderColor: ((item.toLowerCase() == '#FFFDF3'.toLowerCase()) || (item.toLowerCase() ==  '#FFFFFF'.toLowerCase())) ? '#B8BDC4' : item
-            }]}>
+                    backgroundColor: item, 
+                    borderColor: ((item.toLowerCase() == '#FFFDF3'.toLowerCase()) || (item.toLowerCase() ==  '#FFFFFF'.toLowerCase())) ? '#B8BDC4' : item
+                }]}>
                 {item == selectedValue ? (<Svg
                     width={20}
                     height={20}
@@ -156,14 +125,14 @@ export default class customizeAvatar extends Component {
                                 trackColor={{ false: "#767577", true: "#DCBCA8" }}
                                 thumbColor={(this.state.avatarFeatures[feature] == 'none') ? "#f4f3f4" : "#C06A46" }
                                 ios_backgroundColor="#3e3e3e"
-                                onValueChange={(val) => {this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, [feature]: val ? this[feature][0] : 'none'}}))}}
+                                onValueChange={(val) => {this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, [feature]: val ? avatarCustomizer[feature][0] : 'none'}}))}}
                                 value={(this.state.avatarFeatures[feature] == 'none') ? false : true}
                             />
                         </View>) 
                     : null}
                 </View>
                 <View style={[styles.colorPickerWrapper, (this.state.avatarFeatures[feature] == 'none') ? {opacity: 0.6} : null]}>
-                    {this.renderColorPicker(feature, this[feature], this.state.avatarFeatures[feature], disabled)}
+                    {this.renderColorPicker(feature, avatarCustomizer[feature], this.state.avatarFeatures[feature], disabled)}
                 </View>
             </View>
         )
@@ -208,40 +177,28 @@ export default class customizeAvatar extends Component {
         })
     }
 
-    onSaveAvatar= async()=>{
-        try {
-            const mongo = this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists");
-            const collection = mongo.db("lysts").collection("users");
-
-            const filter = {
-                userID: this.user.id, // Query for the user object of the logged in user
-            };
-
-            const updateDoc = {
-                $set: {
-                    avatarFeatures: this.state.avatarFeatures,
-                    lastModified: new Date()
-                },
-            };
-            const result = await collection.updateMany(filter, updateDoc);
-            console.log(result);
-
-            const customUserData = await this.user.refreshCustomData();
-            console.log(customUserData);
-            
-            this.props.refreshInfo(customUserData);
-
-            this.setState({
-                showSaveButton: false,
-                savingData: false,
-                alertMessage:{
-                    show: true,
-                    type: 'success',
-                    title: 'Saved Successfully!',
-                    subtitle: '',
-                }
-            })
-        } catch (error) {
+    onSaveAvatar= ()=>{
+        saveUserData_MongoCRUD(
+            {},
+            {
+                avatarFeatures: this.state.avatarFeatures,
+                lastModifiedLog: 'Updated User Avatar',
+            }, 
+            (customUserData) => {
+                this.props.refreshInfo(customUserData);
+                this.setState({
+                    showSaveButton: false,
+                    savingData: false,
+                    alertMessage:{
+                        show: true,
+                        type: 'success',
+                        title: 'Saved Successfully!',
+                        subtitle: '',
+                    }
+                });
+            }
+        )
+        .catch((error) => {
             console.log(error);
             this.setState({
                 showSaveButton: true,
@@ -253,7 +210,7 @@ export default class customizeAvatar extends Component {
                     subtitle: '',
                 }
             })
-        }
+        });
     }
 
     startSaving = () => {
@@ -263,7 +220,6 @@ export default class customizeAvatar extends Component {
     }
 
     resetAlert = () => {
-        
         this.timeoutAlert = setTimeout(()=>{
             this.setState({alertMessage: {show: false}})
             clearTimeout(this.timeoutAlert);
@@ -300,10 +256,7 @@ export default class customizeAvatar extends Component {
                 stickyHeaderIndices = {[0]}
                 
                 onScroll={(e)=>{
-                    // this.setState({scrollPosition: e.nativeEvent.contentOffset.y})
-                    // console.log(e.nativeEvent.contentOffset.y)
                     if(e.nativeEvent.contentOffset.y < 500){
-                        // console.log(e.nativeEvent.contentOffset.y)
                         this.setState({scrollPosition: e.nativeEvent.contentOffset.y})
                     }
                 }}
@@ -322,21 +275,6 @@ export default class customizeAvatar extends Component {
                         <View style={styles.accordionWrapper}>
                             <View><Text style={[styles.sectionTitle,styles.accordionTitle]}>Select Avatar</Text></View>
                             <View>
-                                {/* <Svg
-                                    width={this.state.accordionActive ? 39 : 39}
-                                    height={this.state.accordionActive ? 10 : 25}
-                                    viewBox={this.state.accordionActive ? "0 0 39 20" : "0 0 21 40" }
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <Path
-                                        d={this.state.accordionActive ? "M2 2l17.5 15.5L36.667 2" : "M2.583 37.084l15.5-17.5-15.5-17.167"}
-                                        stroke="#44577C"
-                                        strokeWidth={4}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </Svg> */}
                                 <Svg
                                     width={39}
                                     height={8}

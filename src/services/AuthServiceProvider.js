@@ -7,25 +7,27 @@ import {getFacebookAccessToken} from './FacebookAuthService';
 
 import {loginRoot,mainRoot} from '../../App';
 
-export const signInAuth = async (type, callbackFunc = () => {}) =>{
+export const signInAuth = async (type, redirectAfterLogin = true, callbackFunc = (response) => {}, errorCallbackFunc = (err) =>{}) =>{
     try {
         let credentials;
         if(type == 'google'){
             credentials = Realm.Credentials.google(await getGoogleAuthCode())
         }else if(type == 'facebook'){
             await getFacebookAccessToken();
-        }else{
+        }else if(type == 'demo'){
             credentials = Realm.Credentials.emailPassword("demo@mymail.com", "password");
+        }else{
+            credentials = Realm.Credentials.anonymous();
         }
 
         let user = await realmApp.logIn(credentials);
         console.log("Successfully logged in!", user);
-        callbackFunc();
+        callbackFunc(user);
 
-        Navigation.setRoot(mainRoot);     
+        redirectAfterLogin ? Navigation.setRoot(mainRoot) : null;     
     } catch (error) {
         console.error("Failed to log in", error);
-        callbackFunc();
+        errorCallbackFunc(error);
     }
 }
 

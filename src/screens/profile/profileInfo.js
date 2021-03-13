@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity, Image, ScrollView, Keyboard } from 'react-native'
+import { Text, StyleSheet, View, TouchableOpacity, ScrollView, Keyboard } from 'react-native'
 import { Navigation } from "react-native-navigation";
 import NetInfo from "@react-native-community/netinfo";
 
@@ -8,8 +8,7 @@ import InfoForm from '../../components/Forms/profileForms/profileInfoForm';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
-import {removeExcessWhiteSpace, validateEmail, goToScreen} from '../../includes/functions';
-import {Touchable} from '../../includes/variables';
+import {removeExcessWhiteSpace, validateEmail, goToScreen, saveUserData_MongoCRUD} from '../../includes/functions';
 
 import {app as realmApp} from '../../../storage/realm';
 
@@ -57,8 +56,8 @@ export default class profileInfo extends Component {
 
     componentDidMount(){
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
 
@@ -75,61 +74,47 @@ export default class profileInfo extends Component {
     
 
     saveData = async () => {
-        try {
-            const mongo = this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists");
-            const collection = mongo.db("lysts").collection("users");
-
-            const filter = {
-                userID: this.user.id, // Query for the user object of the logged in user
-            };
-
-            const updateDoc = {
-                $set: {
-                    fullName:this.state.profileInfo.name.value,
-                    displayName:this.state.profileInfo.displayName.value,
-                    contactEmail : this.state.profileInfo.email.value,
-                    contactPhone: this.state.profileInfo.phone.value,
-                    lastModified: new Date()
-                },
-            };
-            const result = await collection.updateMany(filter, updateDoc);
-            console.log(result);
-
-            const customUserData = await this.user.refreshCustomData();
-            console.log(customUserData);
-            
-            this.props.refreshInfo(customUserData);
-
-            this.setState({
-                buttonDisabledStatus: true,
-                savingData: false,
-                profileInfo:{
-                    name: {
-                        value: customUserData.fullName,
-                        focused: false
+        saveUserData_MongoCRUD(
+            {},
+            {
+                fullName:this.state.profileInfo.name.value,
+                displayName:this.state.profileInfo.displayName.value,
+                contactEmail : this.state.profileInfo.email.value,
+                contactPhone: this.state.profileInfo.phone.value,
+                lastModifiedLog: 'Updated User Information'
+            },
+            (customUserData) =>  {
+                this.props.refreshInfo(customUserData);
+                this.setState({
+                    buttonDisabledStatus: true,
+                    savingData: false,
+                    profileInfo:{
+                        name: {
+                            value: customUserData.fullName,
+                            focused: false
+                        },
+                        displayName: {
+                            value: customUserData.displayName,
+                            focused: false
+                        },
+                        email: {
+                            value: customUserData.contactEmail,
+                            focused: false
+                        },
+                        phone:{
+                            value: customUserData.contactPhone,
+                            focused: false
+                        }
                     },
-                    displayName: {
-                        value: customUserData.displayName,
-                        focused: false
-                    },
-                    email: {
-                        value: customUserData.contactEmail,
-                        focused: false
-                    },
-                    phone:{
-                        value: customUserData.contactPhone,
-                        focused: false
+                    alertMessage:{
+                        show: true,
+                        type: 'success',
+                        title: 'Saved Successfully!',
+                        subtitle: '',
                     }
-                },
-                alertMessage:{
-                    show: true,
-                    type: 'success',
-                    title: 'Saved Successfully!',
-                    subtitle: '',
-                }
-            })
-        } catch (error) {
-            
+                })
+            }
+        ).catch ((error) => {
             this.setState({
                 buttonDisabledStatus: false,
                 savingData: false,
@@ -140,20 +125,12 @@ export default class profileInfo extends Component {
                     subtitle: '',
                 }
             })
-        }
+        });
     }
 
 
     setInfoState = (parentKey, childKey, childValue) =>{
         let buttonDisabledStatus = this.state.buttonDisabledStatus;
-        // if (parentKey == 'name'){
-        //     if(typeof childValue == 'boolean'){
-        //         if(this.state.profileInfo.name.value.trim() == '' || this.state.profileInfo.name.value.length < 3){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
-        //     } else if(childValue.toString().trim() == '' || childValue.toString().length < 3)
-        //     {buttonDisabledStatus = true;} else {buttonDisabledStatus = false;}
-        // }else{
-        //     if(this.state.profileInfo.name.value.trim() == '' || this.state.profileInfo.name.value.length < 3){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
-        // }
 
         if (parentKey == 'phone' || parentKey == 'displayName'){
             if(typeof childValue == 'boolean'){
@@ -182,8 +159,6 @@ export default class profileInfo extends Component {
                     ){buttonDisabledStatus = true;}else{buttonDisabledStatus = false;}
                 }
             }
-            
-            
             // if(childValue.toString().trim() == '' || (parentKey == 'email' && childValue.toString().length < 3))
             // {buttonDisabledStatus = true;} else {buttonDisabledStatus = false;}
             

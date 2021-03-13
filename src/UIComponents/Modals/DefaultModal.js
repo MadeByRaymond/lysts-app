@@ -2,7 +2,8 @@ import React, {useRef} from 'react';
 import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native';
 import * as Animatable from 'react-native-animatable';
 import Clipboard from "@react-native-community/clipboard";
-import Svg, { Rect } from "react-native-svg"
+import Svg, { Rect } from "react-native-svg";
+import Sound from 'react-native-sound';
 
 
 import ModalView from './ModalView';
@@ -27,8 +28,32 @@ const DefaultModal = (props) => {
               <View>
                 <TouchableWithoutFeedback onPress={() => {
                     // console.log(this.animatableView)
-                    animatableView.current.bounceIn(300).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled')),
-                    Clipboard.setString(props.newListInfoModal.wishListCode)
+                    animatableView.current.bounceIn(300).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
+                    let clickSound = new Sound('click_s7.mp3', Sound.MAIN_BUNDLE, (error) => {
+                      if (error) {
+                          return;
+                      }
+                      // loaded successfully
+                      
+                      // Stop the sound and rewind to the beginning
+                      clickSound.stop(() => {
+                          // Note: If you want to play a sound after stopping and rewinding it,
+                          // it is important to call play() in a callback.
+                          
+                          // Play the sound with an onEnd callback
+                          clickSound.play((success) => {
+                              if (success) {
+                                  console.log('successfully finished playing');
+                              } else {
+                                  console.log('playback failed due to audio decoding errors');
+                              }
+                              clickSound.release();
+                          });
+            
+                          
+                      });
+                    })
+                    Clipboard.setString(props.newListInfoModal.wishListCode);
                   }}>
                     <Animatable.View useNativeDriver={true} ref={animatableView} style={styles.modalCodeWrapper}>
                       <Svg width={svgWidth} height={(svgWidth*252)/638} viewBox="0 0 638 252" fill="none">

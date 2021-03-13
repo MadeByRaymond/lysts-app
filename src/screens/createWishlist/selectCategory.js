@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, Dimensions, ScrollView,Platform,TouchableNativeFeedback, TouchableOpacity } from 'react-native'
+import { Text, StyleSheet, View, ScrollView } from 'react-native'
 import {Navigation} from 'react-native-navigation';
-import debounce from 'lodash.debounce';
 
 import Header from '../../components/Headers/createWishlistHeader';
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
@@ -9,7 +8,7 @@ import * as Fade from '../../UIComponents/GradientFade/gradientFade';
 
 import * as iconSVG from '../../SVG_Files/wishlistIconsSVG';
 import {categories} from '../../includes/datasets';
-import {getCategoryDisplay} from '../../includes/functions'
+import {getCategoryDisplay, goToScreen} from '../../includes/functions'
 import {Touchable, dWidth, dHeight} from '../../includes/variables';
 
 let prevComponentId;
@@ -34,24 +33,12 @@ class selectCategory extends Component {
         Navigation.pop(this.props.componentId);
     }
 
-    goToNext = debounce(() =>{
-        // alert('ddd')
-        Navigation.push(this.props.componentId, {
-          component: {
-            name: 'com.lysts.screen.createWishlist', // Push the screen registered with the 'Settings' key
-            options: { // Optional options object to configure the screen
-              bottomTabs: {
-                animate: false,
-                visible: false
-              },
-            },
-            passProps: {
-                selectedCategory: this.state.selectedCategory,
-                setNewListAdded: this.props.setNewListAdded
-            }
-          }
-        });
-      }, 1000, {leading: true,trailing: false})
+    goToNext = () =>{
+        goToScreen(this.props.componentId, 'com.lysts.screen.createWishlist',{
+            selectedCategory: this.state.selectedCategory,
+            setNewListAdded: this.props.setNewListAdded
+        })
+      }
 
     listCategories = () =>{
         let categoriesList = this.state.categories;

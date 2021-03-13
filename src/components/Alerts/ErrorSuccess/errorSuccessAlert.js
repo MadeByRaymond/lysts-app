@@ -5,7 +5,7 @@ import * as Animatable from 'react-native-animatable';
 import { Shadow } from 'react-native-neomorph-shadows';
 import Sound from 'react-native-sound';
 
-import {dHeight, dWidth} from '../../../includes/variables'
+import {dWidth} from '../../../includes/variables'
 
 export default function errorSuccessAlert({title, subtitle, type = ('success' || 'error' || 'warning'), wrapperContainerStyle = null}) {
     const [animationState, setAnimationState] = useState("fadeInUp");
@@ -23,9 +23,7 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
               return;
           }
           // loaded successfully
-          // console.log('duration in seconds: ' + alertSound.getDuration() + 'number of channels: ' + alertSound.getNumberOfChannels());
-          
-          
+
           // Stop the sound and rewind to the beginning
           alertSound.stop(() => {
               // Note: If you want to play a sound after stopping and rewinding it,
@@ -34,9 +32,9 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
               // Play the sound with an onEnd callback
               alertSound.play((success) => {
                   if (success) {
-                      console.log('successfully finished playing');
+                      // console.log('successfully finished playing');
                   } else {
-                      console.log('playback failed due to audio decoding errors');
+                      // console.log('playback failed due to audio decoding errors');
                   }
                   alertSound.release();
               });
@@ -47,9 +45,10 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
       }else{
         Vibration.vibrate(300);
       }
-        return () => {
-            clearTimeout(exitAlertTimeout);
-        }
+
+      return () => {
+          clearTimeout(exitAlertTimeout);
+      }
     }, []);
 
     let SVGIcon;
@@ -152,7 +151,7 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
 const styles = StyleSheet.create({
   wrapper:{
     position: 'absolute',
-    zIndex: 999999999,
+    zIndex: 9999999999,
     width: dWidth,
     // bottom: 29,
     // right: 37,

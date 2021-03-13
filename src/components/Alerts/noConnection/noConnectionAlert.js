@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react'
 import { StyleSheet, Text, View, Vibration } from 'react-native'
-import Svg, { Rect, Path } from "react-native-svg"
+import Svg, { Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
 import { Shadow } from 'react-native-neomorph-shadows';
 
-import {dWidth} from '../../../includes/variables'
+import {dWidth} from '../../../includes/variables';
 
 export default function noConnectionAlert(props) {
     useEffect(() => {
@@ -46,7 +46,7 @@ export default function noConnectionAlert(props) {
 const styles = StyleSheet.create({
   wrapper:{
     position: 'absolute',
-    zIndex: 99999999,
+    zIndex: 999999999,
     width: dWidth,
     // bottom: 29,
     // right: 37,

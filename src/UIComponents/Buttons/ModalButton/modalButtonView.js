@@ -1,10 +1,7 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
 import Button from './modalButton';
-
-let dsHeight = Dimensions.get("screen").height;
-let dsWidth = Dimensions.get("screen").width;
 
 const modalButtonView = (props) => {
     return (

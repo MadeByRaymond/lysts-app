@@ -1,26 +1,25 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity, Linking, NativeModules, Platform  } from 'react-native';
+import { Text, StyleSheet, View, TouchableOpacity, NativeModules  } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
-import SelectPicker from 'react-native-picker-select';
-import Sound from 'react-native-sound'
-// import AsyncStorage from '@react-native-community/async-storage';
-import debounce from 'lodash.debounce';
 import NetInfo from "@react-native-community/netinfo";
 
 import {message} from '../../services/FCMService';
 
 import {dWidth} from '../../includes/variables';
+import {saveUserData_MongoCRUD} from '../../includes/functions';
 
 import {app as realmApp} from '../../../storage/realm';
 
 import {LocalNotification} from '../../services/LocalPushController';
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 
 let prevComponentId;
 
 export default class settings extends Component {
   unsubscribeNetworkUpdate;
+  timeoutAlert;
   constructor(props) {
     super(props);
 
@@ -61,14 +60,20 @@ export default class settings extends Component {
         title: 'Default'
       },
       hasNetworkConnection: true,
+      alertMessage:{
+        show: false,
+        type: '',
+        title: '',
+        subtitle: '',
+      },
     }
   }  
   
   
   componentDidMount(){
     this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-      console.log("Connection type", state.type);
-      console.log("Is connected?", state.isConnected);
+      // console.log("Connection type", state.type);
+      // console.log("Is connected?", state.isConnected);
       this.setState({hasNetworkConnection: state.isConnected});
     });
     // createChannel(this.state.notificationSound.sound);
@@ -81,6 +86,7 @@ export default class settings extends Component {
     global.activeComponentId = prevComponentId;
 
     this.unsubscribeNetworkUpdate();
+    clearTimeout(this.timeoutAlert);
     //  /*stopSampleSound();*/
   }
 
@@ -88,74 +94,18 @@ export default class settings extends Component {
 
     testNotification = () => {
       LocalNotification();
-      // PushNotification.localNotification({
-      //   /* Android Only Properties */
-      //   channelId: "your-channel-id", // (required) channelId, if the channel doesn't exist, it will be created with options passed above (importance, vibration, sound). Once the channel is created, the channel will not be update. Make sure your channelId is different if you change these options. If you have created a custom channel, it will apply options of the channel.
-      //   ticker: "My Notification Ticker", // (optional)
-      //   showWhen: true, // (optional) default: true
-      //   autoCancel: true, // (optional) default: true
-      //   // largeIconUrl: "https://www.example.tld/picture.jpg", // (optional) default: undefined
-      //   // smallIcon: "ic_notification", // (optional) default: "ic_notification" with fallback for "ic_launcher". Use "" for default small icon.
-      //   bigText: "My big text that will be shown when notification is expanded", // (optional) default: "message" prop
-      //   subText: "This is a subText", // (optional) default: none
-      //   // bigPictureUrl: "https://www.example.tld/picture.jpg", // (optional) default: undefined
-      //   color: "red", // (optional) default: system default
-      //   vibrate: true, // (optional) default: true
-      //   vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
-      //   tag: "some_tag", // (optional) add tag to message
-      //   group: "group", // (optional) add group to message
-      //   groupSummary: false, // (optional) set this notification to be the group summary for a group of notifications, default: false
-      //   ongoing: false, // (optional) set whether this is an "ongoing" notification
-      //   priority: "high", // (optional) set notification priority, default: high
-      //   visibility: "private", // (optional) set notification visibility, default: private
-      //   ignoreInForeground: false, // (optional) if true, the notification will not be visible when the app is in the foreground (useful for parity with how iOS notifications appear). should be used in combine with `com.dieam.reactnativepushnotification.notification_foreground` setting
-      //   shortcutId: "shortcut-id", // (optional) If this notification is duplicative of a Launcher shortcut, sets the id of the shortcut, in case the Launcher wants to hide the shortcut, default undefined
-      //   onlyAlertOnce: false, // (optional) alert will open only once with sound and notify, default: false
-        
-      //   when: null, // (optionnal) Add a timestamp pertaining to the notification (usually the time the event occurred). For apps targeting Build.VERSION_CODES.N and above, this time is not shown anymore by default and must be opted into by using `showWhen`, default: null.
-      //   usesChronometer: false, // (optional) Show the `when` field as a stopwatch. Instead of presenting `when` as a timestamp, the notification will show an automatically updating display of the minutes and seconds since when. Useful when showing an elapsed time (like an ongoing phone call), default: false.
-      //   timeoutAfter: null, // (optional) Specifies a duration in milliseconds after which this notification should be canceled, if it is not already canceled, default: null
-      
-      //   messageId: "google:message_id", // (optional) added as `message_id` to intent extras so opening push notification can find data stored by @react-native-firebase/messaging module. 
-      
-      //   actions: ["Yes", "No"], // (Android only) See the doc for notification actions to know more
-      //   invokeApp: true, // (optional) This enable click on actions to bring back the application to foreground or stay in background, default: true
-
-      //   /* iOS and Android properties */
-      //   id: 0, // (optional) Valid unique 32 bit integer specified as string. default: Autogenerated Unique ID
-      //   title: "My Notification Title", // (optional)
-      //   message: "My Notification Message", // (required)
-      //   userInfo: {}, // (optional) default: {} (using null throws a JSON value '<null>' error)
-      //   playSound: false, // (optional) default: true
-      //   soundName: "default", // (optional) Sound to play when the notification is shown. Value of 'default' plays the default sound. It can be set to a custom sound such as 'android.resource://com.xyz/raw/my_sound'. It will look for the 'my_sound' audio file in 'res/raw' directory and play it. default: 'default' (default sound is played)
-      //   number: 10, // (optional) Valid 32 bit integer specified as string. default: none (Cannot be zero)
-      //   repeatType: "day", // (optional) Repeating interval. Check 'Repeating Notifications' section for more info.
-      // });
     }
 
     saveData = async () => {
-      try {
-          const mongo = this.user.mongoClient("MongoDB-Atlas-mylystsapp-wishlists");
-          const collection = mongo.db("lysts").collection("users");
-
-          const filter = {
-              userID: this.user.id, // Query for the user object of the logged in user
-          };
-
-          const updateDoc = {
-              $set: {
-                settings: {
-                  notification: this.state.notifications
-                },
-                lastModified: new Date()
-              },
-          };
-          const result = await collection.updateMany(filter, updateDoc);
-          console.log(result);
-
-          const customUserData = await this.user.refreshCustomData();
-          console.log(customUserData);
-
+      saveUserData_MongoCRUD(
+        {},
+        {
+          settings: {
+            notification: this.state.notifications
+          },
+          lastModifiedLog : 'Updated Account/App Notification Settings'
+        },
+        async (customUserData) => {
           customUserData.settings.notification.appUpdates ? await message.subscribeToTopic('app_updates') : await message.unsubscribeFromTopic('app_updates')
           customUserData.settings.notification.systemNotifications ? await message.subscribeToTopic('general') : await message.unsubscribeFromTopic('general')
 
@@ -165,47 +115,40 @@ export default class settings extends Component {
               appUpdates: customUserData.settings.notification.appUpdates,
               systemNotifications: customUserData.settings.notification.systemNotifications
             }
-          }, alert("Saved Successfully!!"))
-      } catch (error) {
-          this.setState({
-              savingData: false
-          }, alert("Error saving your information"))
-      }
+          })
+        }
+      )
+      .catch(err => {
+        this.setState(prevState => ({
+          savingData: false,
+          notifications:{
+            appUpdates: !prevState.notifications.appUpdates,
+            systemNotifications: !prevState.notifications.systemNotifications
+          },
+          alertMessage:{
+            show: true,
+            type: 'error',
+            title: 'Couldn\'t Sync Settings With Server',
+            subtitle: 'Please Contact support if this continues',
+          }
+        }))
+      });
     }
 
-    // notificationSoundChangeHandler = (value) => {
-    //   //  /*stopSampleSound();*/
-    //   AsyncStorage.setItem('lystsApp:settings:notificationSound', JSON.stringify(value)).then(() => {
-    //     console.log('Saved value is: ' + JSON.stringify(value));
-    //     // this.setState({notificationSound:value});
-    //   }).catch((e) => {
-    //     alert('error while saving');
-    //   });
-    // }
+    resetAlert = () => {
+      this.timeoutAlert = setTimeout(()=>{
+          
+        this.setState({alertMessage: {show: false}})
+          clearTimeout(this.timeoutAlert);
+      }, 4500)
+    }
     
     render() {
         this.state.savingData ? this.saveData() : null;
-
-        // if(this.state.getStoredData){
-        //   AsyncStorage.getItem('lystsApp:settings:notificationSound').then((value) => {
-        //     console.log('gotten value is: ' + value);
-        //     this.setState({notificationSound:(value != null ? JSON.parse(value): this.notificationSounds[0]),getStoredData:false});
-        //   }).catch((e)=>{
-        //     alert('error while getting');
-        //   })
-        // }
+        this.state.alertMessage.show ? this.resetAlert() : null;
 
         return (
             <View style={styles.container}>
-                {/* <SoundsModal 
-                  modalState = {this.state.notificationModal}
-                  closeModal = {() => {this.setState({notificationModal: false}, ()=>{this.notificationSoundChangeHandler(this.state.notificationSound); recreateChannel(this.state.notificationSound.sound)})}}
-                  soundsList = {this.notificationSounds}
-                  notificationSound = {this.state.notificationSound}
-                  setNotificationSound = {(notificationSound) => {
-                    this.setState({notificationSound})
-                  }}
-                /> */}
                 <View style={styles.titleWrapper}><Text style={styles.title}>Get notification about</Text></View>
                 <View style={styles.settingsWrapper}>
                   <TouchableOpacity disabled={!this.state.hasNetworkConnection} activeOpacity={0.8} onPress={()=>{ /*stopSampleSound();*/ this.setState((prevState) => {
@@ -290,8 +233,6 @@ export default class settings extends Component {
                     NativeModules.OpenSettings.openNotificationSettings(data => {
                       console.log('call back data', data);
                     });
-                  // this.setState({notificationModal:true})
-                  // Linking.canOpenURL('app-settings:').then(support =>{ return Linking.openURL('app-settings://notification')}).catch(err=> {console.log(err)})
                   }}>
                     <View style={styles.settingRow}>
                       <View style={styles.settingSVGWrapper}>
@@ -329,55 +270,6 @@ export default class settings extends Component {
                       <View style={styles.settingTextWrapper}><Text style={styles.settingText}>Notification sound</Text></View>
                     </View>
                   </TouchableOpacity>
-                  {/* <View style={{marginLeft:20}}>
-                    <TouchableOpacity activeOpacity={0.8} hitSlop={{top:20, left:20, bottom:20, right:20,}} onPress={debounce(()=>{
-                      let notiSound = new Sound(this.state.notificationSound.sound, Sound.MAIN_BUNDLE, (error) => {
-                          if (error) {
-                              console.log('failed to load the sound', error);
-                              return;
-                          }
-                          // loaded successfully
-                          console.log('duration in seconds: ' + notiSound.getDuration() + 'number of channels: ' + notiSound.getNumberOfChannels());
-                          
-                          
-                          // Stop the sound and rewind to the beginning
-                          notiSound.stop(() => {
-                              // Note: If you want to play a sound after stopping and rewinding it,
-                              // it is important to call play() in a callback.
-                              
-                              // Play the sound with an onEnd callback
-                              notiSound.play((success) => {
-                                  if (success) {
-                                      console.log('successfully finished playing');
-                                  } else {
-                                      console.log('playback failed due to audio decoding errors');
-                                  }
-                                  notiSound.release();
-                              });
-
-                              
-                          });
-                      })
-                    }, 1000, {leading: true,trailing: false})}>
-                      <View style={styles.notificationSoundPlayWrapper}>
-                        <View><Text style={styles.notificationSoundPlayText}>{this.state.notificationSound.title}</Text></View>
-                        <View style={styles.notificationSoundPlayIcon}>
-                          <Svg
-                            width={16}
-                            height={16}
-                            viewBox="0 0 31 31"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <Path
-                              d="M15.5 0C6.953 0 0 6.953 0 15.5S6.953 31 15.5 31 31 24.047 31 15.5 24.047 0 15.5 0zm6.162 16.043l-9.042 5.813a.643.643 0 01-.658.023.645.645 0 01-.337-.567V9.688a.645.645 0 01.995-.543l9.042 5.813a.647.647 0 010 1.086z"
-                              fill="#63AAAD"
-                            />
-                          </Svg>
-                        </View>
-                      </View>
-                    </TouchableOpacity>
-                  </View> */}
                   
                   <TouchableOpacity activeOpacity={0.8} onPress={() => { /*stopSampleSound();*/ this.testNotification()}}>
                     <View style={styles.settingRow}>
@@ -414,6 +306,11 @@ export default class settings extends Component {
                   </TouchableOpacity>
                 </View>
                 {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
+                {this.state.alertMessage.show ? <ErrorSuccessAlert 
+                  type = {this.state.alertMessage.type}
+                  title = {this.state.alertMessage.title}
+                  subtitle = {this.state.alertMessage.subtitle}
+                /> : null}
             </View>
         )
     }

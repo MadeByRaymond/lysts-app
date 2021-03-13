@@ -1,7 +1,5 @@
 import React, {useState, useEffect} from 'react'
 import { Text, View, StyleSheet, ImageBackground, TextInput } from 'react-native'
-import Realm from 'realm';
-import debounce from 'lodash.debounce';
 import { Navigation } from "react-native-navigation";
 import NetInfo from "@react-native-community/netinfo";
 
@@ -9,67 +7,52 @@ import Header from '../../components/Headers/createWishlistHeader';
 import Modal from '../../UIComponents/Modals/DefaultModal'
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
-import {goToViewWishlistScreen} from '../../includes/functions';
+import {goToViewWishlistScreen, goToScreen} from '../../includes/functions';
 import {dHeight, dWidth} from '../../includes/variables';
 
 import {app as realmApp} from '../../../storage/realm';
 
 let userBg = {uri: 'home_bg'};
-let guestBg = require("../../assets/images/guest_home_bg.png");
+let guestBg = {uri: 'guest_home_bg'};
 
 let prevComponentId;
 
 let user = realmApp.currentUser;
-let notLoggedIn = (user) ? ((!user.isLoggedIn) ? true : false) : true
 let notLoggedInAndAnonymous = (user) ? ((!user.isLoggedIn || user.providerType == 'anon-user') ? true : false) : true
 
 let unsubscribeNetworkUpdate;
 
-let goToAddScreen = debounce((componentId,setNewListAdded) =>{
-    // alert('ddd')
-    Navigation.push('WISHLIST_SCREEN', {
-      component: {
-        name: 'com.lysts.screen.selectCategory', // Push the screen registered with the 'Settings' key
-        options: { // Optional options object to configure the screen
-          bottomTabs: {
-            animate: false,
-            visible: false
-          },
-        },
-        passProps: {
-          setNewListAdded: ((showNewListModal, name, code, shareLink) => {
-            setNewListAdded({
-                newListAdded: showNewListModal,
-                newListInfoModal:{
-                    wishlistName: name,
-                    wishListCode: code,
-                    shareLink: shareLink
-                }
-            })
+let goToAddScreen = (componentId,setNewListAdded) =>{
+    goToScreen(componentId, 'com.lysts.screen.selectCategory',  {
+        setNewListAdded: ((showNewListModal, name, code, shareLink) => {
+          setNewListAdded({
+              newListAdded: showNewListModal,
+              newListInfoModal:{
+                  wishlistName: name,
+                  wishListCode: code,
+                  shareLink: shareLink
+              }
           })
-        }
-      }
-    }).then(() => {
+        })
+      },{},
+      () => {
         Navigation.mergeOptions(componentId,{
             bottomTabs: {
                 currentTabIndex: 0
             }
         })
-    });
-    
-}, 1000, {leading: true,trailing: false})
+      }
+    );
+}
 
 let handelNewWishlistModal = (newListAdded,setNewListAdded) => {
-    // Navigation.updateProps('PROFILE_SCREEN_ID', {
-    //   status: 'offline'
-    // });
     return(
       <Modal 
         isVisible={newListAdded.newListAdded}
         closeFunction = {() => setNewListAdded({newListAdded: false})}
         type= 'newWishlist'
         modalTitle='Wishlist created'
-        modalSubtitle='Share your wishlist link or list code with friends and family'
+        modalSubtitle='Share your wishlist link or lyst code with friends and family'
         
         newListInfoModal = {newListAdded.newListInfoModal}
       />
@@ -83,8 +66,8 @@ export default function home(props) {
 
     useEffect(() => {
         unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             setHasNetworkConnection(state.isConnected);
         });
 
@@ -98,7 +81,7 @@ export default function home(props) {
     }, []);
 
     return (
-        <ImageBackground source={notLoggedInAndAnonymous ? guestBg : userBg} style={styles.image}>
+        <ImageBackground source={notLoggedInAndAnonymous ? guestBg : userBg} style={styles.image} resizeMethod='resize' resizeMode='cover'>
             <View style={styles.container}>
                 {newListAdded.newListAdded ? handelNewWishlistModal(newListAdded,setNewListAdded) : null}
                 {hasNetworkConnection 
@@ -124,23 +107,7 @@ export default function home(props) {
                           setWishlistCode(val.trimStart().trim().toUpperCase())
                       }}
                       onSubmitEditing = {(e) => {
-                        // if(notLoggedIn){
-                        //     realmApp.logIn(Realm.Credentials.anonymous())// logs in with an anonymous credential
-                        //     .then((parsedRes) =>{
-                        //         // console.log(parsedRes);
-                        //         if(parsedRes.error){
-                        //             console.log(parsedRes.error); 
-                        //         }else{
-                        //             goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
-                        //         }
-                        //     })
-                        //     .catch((error) => {
-                        //         console.log(error);          
-                        //     })
-                        // }else{
-                            goToViewWishlistScreen(props.componentId, e.nativeEvent.text)
-                        // }
-                        
+                            goToViewWishlistScreen(props.componentId, e.nativeEvent.text);
                       }}
                       style={[styles.searchInput, wishlistCode.trim() !== '' ? {paddingTop: 20,} : null]} 
                       placeholder="🎁  Enter wishlist code" 

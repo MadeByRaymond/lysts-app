@@ -1,12 +1,9 @@
 import React from 'react'
-import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, Text, View, ScrollView, TouchableWithoutFeedback } from 'react-native'
 
 import * as IconSVG from '../../SVG_Files/wishlistIconsSVG/';
 import {getCategoryDisplay} from '../../includes/functions';
 import * as Fade from '../../UIComponents/GradientFade/gradientFade';
-
-let dHeight = Dimensions.get("window").height;
-let dWidth = Dimensions.get("window").width;
 
 const creationPreview = (props) => {
     let Icon = IconSVG[props.category]

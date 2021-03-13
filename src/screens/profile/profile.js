@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
 import { Shadow } from 'react-native-neomorph-shadows';
-import debounce from 'lodash.debounce';
-import { Navigation } from "react-native-navigation";
 import ViewShot, {captureRef} from "react-native-view-shot";
 import NetInfo from "@react-native-community/netinfo";
 
 import {app as realmApp} from '../../../storage/realm';
 
-import {dHeight, dWidth, Touchable} from '../../includes/variables';
+import {dWidth} from '../../includes/variables';
 import {onShare, goToScreen} from '../../includes/functions';
 import ContactsModal from '../../UIComponents/Modals/DefaultModal';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
@@ -42,13 +40,13 @@ export default class profile extends Component {
 
     componentDidMount () {
         this.viewShot.current.capture().then(uri => {
-          console.log("avatarTempImage: ", uri);
+        //   console.log("avatarTempImage: ", uri);
           this.setState({avatarTempImage: uri})
         });
 
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
         });
         
@@ -61,25 +59,11 @@ export default class profile extends Component {
     }
 
 
-    goToScreen = debounce((screenName,screenProps = null, screenOptions = null) =>{
-        // alert('ddd')
-        Navigation.push(this.props.componentId, {
-          component: {
-            name: screenName, // Push the screen registered with the 'Settings' key
-            options: { // Optional options object to configure the screen
-              bottomTabs: {
-                animate: false,
-                visible: false
-              },
-              ...screenOptions
-            },
-            passProps: screenProps
-          }
-        });
-      }, 1000, {leading: true,trailing: false})
+    goToScreenFunc =(screenName,screenProps = null, screenOptions = null) =>{
+        goToScreen(this.props.componentId, screenName, screenProps, screenOptions);
+      }
 
     refreshInfo = (newUserData) => {
-        // let newUserData = await this.user.refreshCustomData();
         this.userData = newUserData;
         
         this.setState({
@@ -92,20 +76,12 @@ export default class profile extends Component {
                 phone: this.userData.contactPhone
             },
             avatarFeatures : this.userData.avatarFeatures
-        })
-
-        // this.setState({
-        //     displayName,
-        //     contactInfo: {
-        //         email: contactEmail,
-        //         phone: contactPhone
-        //     }
-        // })
+        });
     }
 
     updateAvatarTemp = async() =>{
         let uri = await captureRef(this.viewShot.current, {format: 'png'})
-        console.log("another one: ",uri);
+        // console.log("another one: ",uri);
 
         this.setState({
             avatarTempImage: uri
@@ -120,7 +96,7 @@ export default class profile extends Component {
                     isVisible={this.state.contactModal}
                     closeFunction = {() => {this.setState({contactModal: false})}}
                     type='contactDetails'
-                    goToScreen = {() => {this.setState({contactModal: false},() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})})}}
+                    goToScreen = {() => {this.setState({contactModal: false},() => {this.goToScreenFunc('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})})}}
 
                     contactInfo={this.state.contactInfo}
                     modalTitle='Contact Details'
@@ -134,7 +110,7 @@ export default class profile extends Component {
               >
                 <View style={styles.top}>
                     <View>
-                        <TouchableOpacity useForeground={true} activeOpacity={0.8} onPress={()=>{goToScreen(this.props.componentId,'com.lysts.screen.customizeAvatar',{refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp},{
+                        <TouchableOpacity useForeground={true} activeOpacity={0.8} onPress={()=>{this.goToScreenFunc('com.lysts.screen.customizeAvatar',{refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp},{
                             topBar: {
                                 title: {
                                     text: 'Customize Avatar'
@@ -153,7 +129,7 @@ export default class profile extends Component {
                     </View>
                     <View><Text style={styles.name}>{this.state.displayName}</Text></View>
                     <View>
-                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp})}}>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => {this.goToScreenFunc('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo, onCloseFunc: this.updateAvatarTemp})}}>
                             <View style={styles.button}><Text style={styles.buttonText}>Edit Profile</Text></View>
                         </TouchableOpacity>
                     </View>
@@ -166,7 +142,7 @@ export default class profile extends Component {
                         <View style={styles.actionsWrapper} onLayout={(e) => {
                             this.setState({actionsWrapperHeight: e.nativeEvent.layout.height})
                         }}>
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'saved',avatarImage: this.state.avatarTempImage})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreenFunc('com.lysts.screen.save_archive',{show: 'saved',avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -205,7 +181,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.save_archive',{show: 'archive',avatarImage: this.state.avatarTempImage})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreenFunc('com.lysts.screen.save_archive',{show: 'archive',avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -252,7 +228,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreenFunc('com.lysts.screen.profileInfo', {refreshInfo: this.refreshInfo})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>
@@ -362,7 +338,7 @@ export default class profile extends Component {
 
                             <View style={styles.actionDivider}></View>
                             
-                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreen('com.lysts.screen.settings',{avatarImage: this.state.avatarTempImage, hasNetworkConnection: this.state.hasNetworkConnection})}}>
+                            <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreenFunc('com.lysts.screen.settings',{avatarImage: this.state.avatarTempImage, hasNetworkConnection: this.state.hasNetworkConnection})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
                                         <View style={styles.actionIconWrapper}>

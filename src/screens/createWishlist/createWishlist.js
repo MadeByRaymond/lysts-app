@@ -14,7 +14,7 @@ import NoConnectionAlert from '../../components/Alerts/noConnection/noConnection
 
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import {removeExcessWhiteSpace} from '../../includes/functions';
-import {Touchable, dWidth, dHeight} from '../../includes/variables';
+import {dWidth, dHeight} from '../../includes/variables';
 
 
 import {app as realmApp} from '../../../storage/realm';
@@ -73,54 +73,6 @@ class createWishlist extends Component {
                 subtitle: '',
             },
             savingInfo: false,
-
-
-
-            // wizard:{
-            //     currentStep: 0,
-            //     isLastStep: false,
-            //     infoButtonDisabledStatus: false,
-            //     itemButtonDisabledStatus: true,
-            // },
-            // wishlistInfo:{
-            //   name: {
-            //     value: 'Raymond’s Ultimate House Warming List',
-            //     focused: false
-            //   },
-            //   category:{
-            //     value: 'house_warming',
-            //     focused: false
-            //   },
-            //   description:{
-            //     value: '',
-            //     focused: false
-            //   }
-            // },
-            // listItems: [
-            //     'A Daisy Lamp',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey',
-            //     '4TB Western Digital External Hard Disk Drive',
-            //     'Leicester Football Jersey'
-            // ]
         };
     }
 
@@ -134,8 +86,8 @@ class createWishlist extends Component {
         );
 
         this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
-            console.log("Connection type", state.type);
-            console.log("Is connected?", state.isConnected);
+            // console.log("Connection type", state.type);
+            // console.log("Is connected?", state.isConnected);
             this.setState({hasNetworkConnection: state.isConnected});
             
         });
@@ -156,11 +108,6 @@ class createWishlist extends Component {
 
     onAddItem = () => {
         this.setState(state => {
-        //   if (state.listItems.includes("")){
-        //       if(state.listItems.){
-        //         let d = [].
-        //       }
-        //   }
           const listItems = state.listItems.includes("") ? state.listItems : state.listItems.concat('');
      
           return {
@@ -269,16 +216,7 @@ class createWishlist extends Component {
 
             this.wizard.current.next();
         } else if(this.state.wizard.currentStep === 2){
-            // this.createNewWishlist();
-            this.startSaving();
-            // this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `lystsapp://wishlink/${this.wishlistCode}`, {
-            //     id: 'temp_id',
-            //     name: this.state.wishlistInfo.name.value,
-            //     type: this.state.wishlistInfo.category.value,
-            //     code: `${this.wishlistCode}`,
-            //     saved: false,
-            // });
-            // Navigation.popToRoot(this.props.componentId);
+            this.setState({savingInfo: true})
         } else {
             this.wizard.current.next();
         }
@@ -287,7 +225,7 @@ class createWishlist extends Component {
     
      createNewWishlist = () => {
         try{
-          console.log(`Logged in with the user: ${this.user.id}`);
+        //   console.log(`Logged in with the user: ${this.user.id}`);
           let newWishlist;
           let listItems = this.state.listItems.map(item => ({
             item, 
@@ -305,7 +243,7 @@ class createWishlist extends Component {
               user: this.user,
               partitionValue: "public",
               error: (s, e) => {
-                  console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);
+                //   console.log(`An error occurred with sync session with details: \n${s} \n\nError Details: \n${e}`);
                   this.setState((prevState) => ({
                     wizard:{
                         ...prevState.wizard,
@@ -323,10 +261,8 @@ class createWishlist extends Component {
             },
           };
           
-          console.log("log step 2");
-        //   realm = await Realm.open(config);
+
           Realm.open(config).then((realm) => {
-            console.log("log step 3/5");
             this.realm = realm;
             let keepCheckingCode = true
             while(keepCheckingCode){
@@ -352,51 +288,10 @@ class createWishlist extends Component {
                     status: 'active',
                     listItems
                 });
-              });
-
-            //   console.log({ 
-            //     _id : new ObjectId(),
-            //     _partition : 'public',
-            //     name: this.state.wishlistInfo.name.value,
-            //     category: this.state.wishlistInfo.category.value,
-            //     code: `${this.wishlistCode}`,
-            //     dateCreated: new Date(),
-            //     dateModified: new Date(),
-            //     description: this.state.wishlistInfo.description.value,
-            //     owner: this.user.id,
-            //     status: 'active',
-            //     listItems
-            //   });
-
-            // let wishlistData = this.realm.objects("wishlist").filtered(`owner == '${this.user.id}'`).sorted("dateModified", false);
-            
-            // console.log(wishlistData);
-            // if (wishlistData.length < 1) { 
-            //   this.setState({
-            //     isLoading: false,
-            //     listData
-            //   })
-            // } 
-            // else {
-              
-            //   for (const val of wishlistData) {
-            //     listData.push({
-            //       id: val._id,
-            //       name: val.name,
-            //       type: val.category,
-            //       code: val.code,
-            //       saved: this.user.customData.savedLists.includes(val.code)
-            //     })
-            //   }
-            //   this.setState({
-            //     isLoading: false,
-            //     listData
-            //   })
-            // }
-        //   console.log(datas);
+            });
 
             this.props.setNewListAdded(true,this.state.wishlistInfo.name.value, `${this.wishlistCode}`, `https://lystsapp.com/wishlink/${this.wishlistCode}`, {
-                id: 'temp_id',
+                id: `temp_id_${Math.random()}`,
                 name: this.state.wishlistInfo.name.value,
                 type: this.state.wishlistInfo.category.value,
                 code: `${this.wishlistCode}`,
@@ -405,7 +300,7 @@ class createWishlist extends Component {
             Navigation.popToRoot(this.props.componentId);
             // Vibration.vibrate(350);
           }).catch((e) => {
-            console.log(e);
+            // console.log(e);
             this.setState({
                 savingInfo: false,
                 alertMessage:{
@@ -417,6 +312,7 @@ class createWishlist extends Component {
             })
           })
         } catch (error) {
+            // console.log(error);
             this.setState({
                 savingInfo: false,
                 alertMessage:{
@@ -431,8 +327,6 @@ class createWishlist extends Component {
         }
       }
 
-      startSaving = () => {this.setState({savingInfo: true})}
-
       randomString = (length, chars = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ') => {
         length = Math.floor(length);
         let firstChar = 'ADEJMNUVXY'
@@ -443,7 +337,6 @@ class createWishlist extends Component {
 
     
     resetAlert = () => {
-        
         this.timeoutAlert = setTimeout(()=>{
             this.setState({alertMessage: {show: false}})
             clearTimeout(this.timeoutAlert);

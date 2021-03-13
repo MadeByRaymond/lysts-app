@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, TouchableWithoutFeedback } from 'react-native'
 
-import {dWidth, dHeight} from '../../includes/variables'
+import {dWidth} from '../../includes/variables'
 
 export default function errorView(props) {
     let SVG = props.svg;

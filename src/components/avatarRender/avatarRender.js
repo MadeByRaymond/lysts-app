@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Image, StyleSheet } from 'react-native';
 
 import * as AvatarSVG from '../../SVG_Files/avatarSVG';
