@@ -67,21 +67,17 @@ Navigation.registerComponent('com.lysts.screen.settings', () => Settings);
 Navigation.registerComponent('com.lysts.screen.aboutSettings', () => AboutSettings);
 Navigation.registerComponent('com.lysts.screen.notificationSettings', () => NotificationSettings);
 Navigation.registerComponent('com.lysts.screen.securitySettings', () => SecuritySettings);
+
 // NON SCREEN COMPONENTS REGISTER
 Navigation.registerComponent('com.lysts.component.SavedButton', () => SavedButton);
 
-// HEADLESS JS COMPONENT REGISTER 
-// if(Platform.OS === 'android'){
-//   AppRegistry.registerHeadlessTask('BackgroundNotification', () => require('./BackgroundNotification'))
-// }
 
-// alert('ddd')
-// REQUIRED APP RESOURCES
-// require("./src/assets/images/home_bg.png");
-// Register background handler
+// FCM Register Background Handler
 message.setBackgroundMessageHandler(async remoteMessage => {
   console.log('Message handled in the background!', remoteMessage);
 });
+
+// FCM Notification Foreground Handler
 message.onMessage(async remoteMessage => {
   // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
   (remoteMessage.data.isNotification == "true" && remoteMessage.data.showInForeground == "true") 
@@ -106,54 +102,56 @@ message.onMessage(async remoteMessage => {
     // actions: ["Cancel"],
   }) : null
 });
-message.subscribeToTopic('general').then(() => console.log('Subscribed to topic!'));
-message.subscribeToTopic('app_updates').then(() => console.log('Subscribed to topic!'));
 
+// Subscribe To Notification FCM Topics 
+message.subscribeToTopic('general').then(() => {/*console.log('Subscribed to topic - General!')*/});
+message.subscribeToTopic('app_updates').then(() => {/*console.log('Subscribed to topic - App Updates!')*/});
+
+// Notification Open App From Background Handler 
 message.onNotificationOpenedApp(remoteMessage => {
-  console.log(
+  /*console.log(
     'Notification caused app to open from background state:',
     remoteMessage.notification,
-  );
-  remoteMessage.data.redirectURL ? Linking.openURL(remoteMessage.data.redirectURL) : null
-  // navigation.navigate(remoteMessage.data.type);
+  ); */
+  remoteMessage.data.redirectURL ? Linking.openURL(remoteMessage.data.redirectURL) : null;
 });
 
+// Notification Open App From Quit State Handler 
 // Check whether an initial notification is available
 message
   .getInitialNotification()
   .then(remoteMessage => {
     if (remoteMessage) {
-      console.log(
+      /*console.log(
         'Notification caused app to open from quit state:',
         remoteMessage.notification,
-      );
+      );*/
       remoteMessage.data.redirectURL ? Linking.openURL(remoteMessage.data.redirectURL) : null
       // setInitialRoute(remoteMessage.data.type); // e.g. "Settings"
     }
-    // setLoading(false);
   });
 
-
+// Handle In App Messaging 
 inAppMessaging().setMessagesDisplaySuppressed(false);
 
+
+// HANDLING DEEP LINKING 
+// Deep Linking Launching Quit App Handler 
 Linking.getInitialURL().then((url) => {
-  // console.log("Linking opened ==> ",url);
-  // console.log("Linking opened ==> ",url.slice(url.lastIndexOf('/')+1));
-  // console.log('wishlink ==> Loading...', url);
   if(url.toLowerCase().includes('/wishlink/')){
     let wishlist_code = url.substring(url.lastIndexOf('/wishlink/') + 10);
-    console.log('wishlink ==> ', wishlist_code);
+    
     if(wishlist_code.length == 6){
       global.launchWithCode = wishlist_code;
     }
   }
 }).catch((e)=>{});
 
+// Deep Linking Launching Background App Handler 
 Linking.addEventListener('url', ({url}) =>{
   if(url.toLowerCase().includes('/wishlink/')){
     let wishlist_code = url.substring(url.lastIndexOf('/wishlink/') + 10);
-    // console.log("Linking opened ==> ",wishlist_code);
-    // Navigation.
+    
     if(
       wishlist_code.length == 6
       && typeof global.activeComponentId !== 'undefined' 
@@ -165,6 +163,8 @@ Linking.addEventListener('url', ({url}) =>{
   }
 });
 
+
+// APP ROOTS 
 export const splashRoot = {
   root: {
     component: {
@@ -287,38 +287,6 @@ export const mainRoot = {
         }
       ]
     }
-
-
-
- 
-  //   component: {
-  //     name:'com.lysts.WelcomeScreen',
-  //     options : {
-  //     }
-  //   }
-
-    // stack: {
-    //   children: [
-    //     {
-    //       component: {
-    //         name: 'com.lysts.WelcomeScreen',
-    //         options: {
-    //           topBar: {
-    //             title: {
-    //               text: 'Find a Place'
-    //             },
-    //             leftButtons: {
-    //                // id: 'sideMenu',
-    //                // icon: hamburger
-    //              }
-    //           }
-    //         }
-    //       }
-    //     }  
-    //   ]
-    // }
-
-
   }
 }
 
@@ -367,36 +335,12 @@ Navigation.setDefaultOptions({
         duration: 400,
         startDelay: 0,
         interpolation: 'decelerate'
-      },
-    },
-    push:{
-      content:{
-        // y:{
-        //   from: 2000,
-        //   to: 0,
-        //   duration: 500
-        // }
       }
-    },
-    // pop:{
-    //   content:{
-    //     x:{
-    //       from: -2000,
-    //       to: 0,
-    //       duration: 500
-    //     }
-    //   }
-    // }
+    }
   },
   layout: {
     orientation: ['portrait']
   }
-});
-
-Navigation.events().registerAppLaunchedListener(async() => {
-  //  Navigation.setRoot(await isLoggedIn() ? mainRoot : loginRoot);
-  //  Navigation.setRoot(await getRoot());
-  Navigation.setRoot(splashRoot);
 });
 
 export const getRoot = async () =>{
@@ -422,3 +366,10 @@ export const getRoot = async () =>{
     return onBoardingRoot;
   }
 }
+
+
+Navigation.events().registerAppLaunchedListener(async() => {
+  //  Navigation.setRoot(await isLoggedIn() ? mainRoot : loginRoot);
+  //  Navigation.setRoot(await getRoot());
+  Navigation.setRoot(splashRoot);
+});
