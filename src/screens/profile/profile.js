@@ -406,8 +406,9 @@ export default class profile extends Component {
 
 Check out Lysts. I use it to create and share wishlists for special celebrations and events with my guests, friends and family.
 
-Get it now on android free. 
-                                `, 'Lysts for Android and IOS'
+Get it now on android free.
+https://www.lystsapp.com/ 
+                                `, 'Lysts for Android'
                             )}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
