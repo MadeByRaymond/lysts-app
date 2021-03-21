@@ -1,40 +1,48 @@
-import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import React, {useEffect} from 'react'
+import { StyleSheet, View, ImageBackground } from 'react-native'
 import LottieView from 'lottie-react-native'
 import {Navigation} from 'react-native-navigation';
 import {View as AnimatableView} from 'react-native-animatable'
+import RNBootSplash from "react-native-bootsplash";
 
 import {getRoot} from '../../../App';
 
-import CreditsSVG from '../../SVG_Files/UI_SVG/Credits/credits'
+import CreditsSVG from '../../SVG_Files/UI_SVG/Credits/credits';
+import {dWidth, dHeight} from '../../includes/variables'
 
-let loaderSource = require('../../lotti_animations/42790-crowdify-logo-animation.json');
+let loaderSource = require('../../lotti_animations/42790-logo-animation.json');
 
 export default function SplashScreen() {
+
+    useEffect(() => {
+        RNBootSplash.hide({fade: true});
+    }, [])
+
     return (
-        <View style={styles.container}>
-            <LottieView 
-                style={styles.lottieView}
-                source={loaderSource} 
-                autoPlay = {true}
-                loop={false}
-                autoSize= {true}
-                speed={1}
-                onAnimationFinish={()=>{
-                    // alert('pie');
-                    // console.log('pie')
-                    getRoot().then(root => {
-                        Navigation.setRoot(root)
-                    })
-                }}
-            />
-            
-            <View style={styles.credits}>
-                <AnimatableView  animation="fadeInUp" easing='ease-in-out' duration={1500} iterationDelay={0} iterationCount={1} useNativeDriver={true}>
-                    <CreditsSVG width={111} height={48} />
-                </AnimatableView>
+        
+        <ImageBackground source={{uri: 'splash_bg'}} style={styles.bgImage} resizeMethod='resize' resizeMode='cover'>
+            <View style={styles.container}>
+                <LottieView 
+                    style={styles.lottieView}
+                    source={loaderSource} 
+                    autoPlay = {true}
+                    loop={false}
+                    autoSize= {true}
+                    speed={1}
+                    onAnimationFinish={()=>{
+                        getRoot().then(root => {
+                            Navigation.setRoot(root)
+                        })
+                    }}
+                />
+                
+                <View style={styles.credits}>
+                    <AnimatableView  animation="fadeInUp" easing='ease-in-out' duration={1500} iterationDelay={0} iterationCount={1} useNativeDriver={true}>
+                        <CreditsSVG width={111} height={48} />
+                    </AnimatableView>
+                </View>
             </View>
-        </View>
+        </ImageBackground>
     )
 }
 
@@ -42,11 +50,19 @@ const styles = StyleSheet.create({
     container:{
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#fff'
+        // backgroundColor: '#fff'
+    },
+    bgImage: {
+      flex: 1,
+      width: dWidth,
+      height: dHeight,
+      resizeMode: "cover",
+      justifyContent: "center",
+      backgroundColor: '#fff'
     },
     lottieView:{
         width: '100%', 
-        height: 250, 
+        height: 100, 
         marginTop: 0, 
         alignSelf: 'center',
         backgroundColor:'transparent'
