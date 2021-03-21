@@ -45,7 +45,7 @@ export default function loader({lottieViewStyle = null}) {
                 // clearTimeout(attentionSeekerTimeout)
                 break;
             case 2:
-                setAttentionSeeker(<AnimatableTextTemplate text={'Okay! There may be a problem.\nTry reloading your app'} />)
+                setAttentionSeeker(<AnimatableTextTemplate text={'Okay! There may be a problem.\nTry relaunching your app'} />)
                 setSetTimeoutTracker(3)
                 break;
             default:

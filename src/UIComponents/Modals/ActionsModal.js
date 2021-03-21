@@ -83,11 +83,13 @@ const SoundsModal = (props) => {
                                     // Sound.setCategory
                                     notiSound = new Sound(item.sound, Sound.MAIN_BUNDLE, (error) => {
                                         if (error) {
-                                            console.log('failed to load the sound', error);
+                                            if(__DEV__){
+                                                console.log('failed to load the sound', error);
+                                            }
                                             return;
                                         }
                                         // loaded successfully
-                                        console.log('duration in seconds: ' + notiSound.getDuration() + 'number of channels: ' + notiSound.getNumberOfChannels());
+                                        // console.log('duration in seconds: ' + notiSound.getDuration() + 'number of channels: ' + notiSound.getNumberOfChannels());
                                         
                                         
                                         // Stop the sound and rewind to the beginning
@@ -98,7 +100,7 @@ const SoundsModal = (props) => {
                                             // Play the sound with an onEnd callback
                                             notiSound.play((success) => {
                                                 if (success) {
-                                                    console.log('successfully finished playing');
+                                                    // console.log('successfully finished playing');
                                                 } else {
                                                     console.log('playback failed due to audio decoding errors');
                                                 }

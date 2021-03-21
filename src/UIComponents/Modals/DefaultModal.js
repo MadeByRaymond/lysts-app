@@ -28,7 +28,7 @@ const DefaultModal = (props) => {
               <View>
                 <TouchableWithoutFeedback onPress={() => {
                     // console.log(this.animatableView)
-                    animatableView.current.bounceIn(300).then(endState => console.log(endState.finished ? 'bounce finished' : 'bounce cancelled'));
+                    animatableView.current.bounceIn(300).then(endState => {/*console.log(endState.finished ? 'bounce finished' : 'bounce cancelled')*/});
                     let clickSound = new Sound('click_s7.mp3', Sound.MAIN_BUNDLE, (error) => {
                       if (error) {
                           return;
@@ -43,9 +43,11 @@ const DefaultModal = (props) => {
                           // Play the sound with an onEnd callback
                           clickSound.play((success) => {
                               if (success) {
-                                  console.log('successfully finished playing');
+                                  // console.log('successfully finished playing');
                               } else {
+                                if(__DEV__){
                                   console.log('playback failed due to audio decoding errors');
+                                } 
                               }
                               clickSound.release();
                           });

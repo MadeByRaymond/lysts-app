@@ -128,7 +128,7 @@ toggleAnimation=(isLastPage)=>{
                 />
             </View>
             <View style={styles.paginationWrapper} onLayout={(e) => {
-                console.log("height: ",e.nativeEvent.layout.height);
+                // console.log("height: ",e.nativeEvent.layout.height);
                 this.setState({
                     paginationLayout:{
                         height:e.nativeEvent.layout.height,

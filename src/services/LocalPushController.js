@@ -1,6 +1,8 @@
 import { Platform } from "react-native";
 import PushNotification from "react-native-push-notification";
 
+import {defaultNotificationSound, defaultNotificationChannel} from '../includes/variables/index';
+
 export const configurePushNotification = () => {
   PushNotification.configure({
     onRegister: function(token){
@@ -22,13 +24,13 @@ export const configurePushNotification = () => {
 });
 }
 
-export const createChannel = (sound = 'default_notification_sound_long_expected_548.mp3') =>{
-  PushNotification.channelExists('lysts-app-channel', function (exists) {
+export const createChannel = (sound = defaultNotificationSound) =>{
+  PushNotification.channelExists(defaultNotificationChannel, function (exists) {
     /* console.log(`Channel exists ==> '${exists}'`); // true/false  */
     if(!exists){
       PushNotification.createChannel(
         {
-            channelId: 'lysts-app-channel', // (required)
+            channelId: defaultNotificationChannel, // (required)
             channelName: "Lysts Notifications", // (required)
             channelDescription: "A channel to categorize your Lysts App notifications", // (optional) default: undefined.
             importance: 4, // (optional) default: 4. Int value of the Android notification importance
@@ -41,14 +43,14 @@ export const createChannel = (sound = 'default_notification_sound_long_expected_
   });
 }
 
-export const recreateChannel = (sound = 'default_notification_sound_long_expected_548.mp3') =>{
+export const recreateChannel = (sound = defaultNotificationSound) =>{
   PushNotification.getChannels(function (channel_ids) {
     /*console.log('Here is a list of Channels ==> ', channel_ids); // ['channel_id_1']  */
   });
-  PushNotification.channelExists('lysts-app-channel', function (exists) {
+  PushNotification.channelExists(defaultNotificationChannel, function (exists) {
     /*console.log(`Channel exists ==> '${exists}'`); // true/false  */
     if(exists){
-      PushNotification.deleteChannel('lysts-app-channel');
+      PushNotification.deleteChannel(defaultNotificationChannel);
       /*console.log('Channel Deleted'); */
     }
 
@@ -56,7 +58,7 @@ export const recreateChannel = (sound = 'default_notification_sound_long_expecte
 
     PushNotification.createChannel(
       {
-          channelId: 'lysts-app-channel', // (required)
+          channelId: defaultNotificationChannel, // (required)
           channelName: "Lysts Notifications", // (required)
           channelDescription: "A channel to categorize your Lysts App notifications", // (optional) default: undefined.
           importance: 4, // (optional) default: 4. Int value of the Android notification importance
@@ -71,20 +73,21 @@ export const recreateChannel = (sound = 'default_notification_sound_long_expecte
 export const LocalNotification = () => {
     // console.log('sendig notify');
     PushNotification.localNotification({
-      channelId: 'lysts-app-channel',
+      channelId: defaultNotificationChannel,
       autoCancel: true,
       bigText: 'When you get a notification on your Lysts App, it looks something like this 🎁.',
-      subText: "8 messages from 3 chats",
-      title: 'Lysts',
+      subText: "Test Successful",
+      title: 'Lysts Notification',
       message: 'When you get a notification on your Lysts App...',
       smallIcon: "ic_launcher_transparent",
+      largeIconUrl: 'https://www.lystsapp.com/img/lysts-app-user-colour.png',
       // color: "blue",
       showWhen: true,
       when: new Date(),
       vibrate: true,
       vibration: 300,
       playSound: true,
-      soundName: 'default_notification_sound_long_expected_548.mp3',
+      soundName: defaultNotificationSound,
       actions: ["Cancel"],
     })
   }

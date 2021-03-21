@@ -13,7 +13,7 @@ export default function avatarRender({ avatarFeatures}) {
 
     let showAvatarTimeout = showAvatar ? null : setTimeout(() => {
       setShowAvatar(true)
-    }, 50); 
+    }, 100); 
 
 
     useEffect(() => {

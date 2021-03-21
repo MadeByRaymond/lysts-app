@@ -439,7 +439,7 @@ export default class wishlistDetails extends Component {
             alertMessage: {
                 show: true,
                 type: 'success',
-                title: 'Wishlist Archived!',
+                title: value ? 'Wishlist Archived!' : 'Removed From Archived',
                 subtitle: ''
             }
         }, ()=>{this.props.updateUI ? this.props.updateUI() : null;});

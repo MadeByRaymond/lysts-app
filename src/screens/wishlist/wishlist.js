@@ -106,7 +106,7 @@ export default class Wishlist extends Component {
             shareLink: shareLink
           },
           listData: [newListData, ...this.state.listData]
-      }, ()=>{console.log('New state==> ',this.state);})})
+      })})
     });
   }
 

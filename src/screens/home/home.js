@@ -17,13 +17,10 @@ let guestBg = {uri: 'guest_home_bg'};
 
 let prevComponentId;
 
-let user = realmApp.currentUser;
-let notLoggedInAndAnonymous = (user) ? ((!user.isLoggedIn || user.providerType == 'anon-user') ? true : false) : true
-
 let unsubscribeNetworkUpdate;
 
 let goToAddScreen = (componentId,setNewListAdded) =>{
-    goToScreen(componentId, 'com.lysts.screen.selectCategory',  {
+    goToScreen('WISHLIST_SCREEN', 'com.lysts.screen.selectCategory',  {
         setNewListAdded: ((showNewListModal, name, code, shareLink) => {
           setNewListAdded({
               newListAdded: showNewListModal,
@@ -60,9 +57,10 @@ let handelNewWishlistModal = (newListAdded,setNewListAdded) => {
 }
 
 export default function home(props) {
-    const [newListAdded, setNewListAdded] = useState({newListAdded:false})
-    const [wishlistCode, setWishlistCode] = useState('')
-    const [hasNetworkConnection, setHasNetworkConnection] = useState(true)
+    const [newListAdded, setNewListAdded] = useState({newListAdded:false});
+    const [wishlistCode, setWishlistCode] = useState('');
+    const [hasNetworkConnection, setHasNetworkConnection] = useState(true);
+    let notLoggedInAndAnonymous = (realmApp.currentUser) ? ((!realmApp.currentUser.isLoggedIn || realmApp.currentUser.providerType == 'anon-user') ? true : false) : true
 
     useEffect(() => {
         unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {

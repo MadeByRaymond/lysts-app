@@ -7,7 +7,7 @@ import ModalButtonView from '../../UIComponents/Buttons/ModalButton/modalButtonV
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
-import {removeExcessWhiteSpace, validateEmail} from '../../includes/functions';
+import {removeExcessWhiteSpace, removeExcessWhiteSpaceTextarea, validateEmail} from '../../includes/functions';
 import {dHeight} from '../../includes/variables';
 
 export default class reportWishlist extends Component {
@@ -59,7 +59,7 @@ export default class reportWishlist extends Component {
                 ...this.state.reportInfo,
                 [parentKey] : {
                     ...this.state.reportInfo[parentKey],
-                    [childKey]: typeof childValue == 'string' ? removeExcessWhiteSpace(childValue) : childValue
+                    [childKey]: typeof childValue == 'string' ? parentKey == 'message' ? removeExcessWhiteSpaceTextarea(childValue) : removeExcessWhiteSpace(childValue) : childValue
                 }
             }
         })

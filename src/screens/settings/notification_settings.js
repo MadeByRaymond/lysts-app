@@ -5,7 +5,7 @@ import NetInfo from "@react-native-community/netinfo";
 
 import {message} from '../../services/FCMService';
 
-import {dWidth} from '../../includes/variables';
+import {dWidth, defaultNotificationSound} from '../../includes/variables';
 import {saveUserData_MongoCRUD} from '../../includes/functions';
 
 import {app as realmApp} from '../../../storage/realm';
@@ -29,7 +29,7 @@ export default class settings extends Component {
     this.notificationSounds = [
       {
         id: 'SID-0',
-        sound: 'default_notification_sound_long_expected_548.mp3',
+        sound: defaultNotificationSound,
         title: 'Default'
       },
       {
@@ -56,7 +56,7 @@ export default class settings extends Component {
       notificationModal: false,
       notificationSound: {
         id: 'SID-0',
-        sound: 'default_notification_sound_long_expected_548.mp3',
+        sound: defaultNotificationSound,
         title: 'Default'
       },
       hasNetworkConnection: true,
@@ -231,7 +231,7 @@ export default class settings extends Component {
                 <View style={styles.settingsWrapper}>  
                   <TouchableOpacity activeOpacity={0.8} onPress={()=>{ 
                     NativeModules.OpenSettings.openNotificationSettings(data => {
-                      console.log('call back data', data);
+                      // console.log('call back data', data);
                     });
                   }}>
                     <View style={styles.settingRow}>

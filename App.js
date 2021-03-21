@@ -361,7 +361,7 @@ export const getRoot = async () =>{
     await AsyncStorage.setItem('lystsApp:appStorage:lastOpenedDate', `${new Date()}`);
     return navRoot;
   } catch(e) {
-    console.log(e);
+    // console.log(e);
     await AsyncStorage.setItem('lystsApp:appStorage:lastOpenedDate', `${new Date()}`);
     return onBoardingRoot;
   }

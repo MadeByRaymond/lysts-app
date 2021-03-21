@@ -135,11 +135,11 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
             style={[styles.alertShadow, {shadowColor: primaryColor}]}
           >
             <View style={[styles.background, {backgroundColor: primaryColor}]}>
-              <View>
+              <View style={styles.textWrapper}>
                 <View><Text style={styles.title}>{title}</Text></View>
                 {(typeof subtitle == 'string' && subtitle.trim() !== '') ? <View><Text style={styles.subtitle}>{subtitle}</Text></View> : null}
               </View>
-              <View>
+              <View style={styles.svgIconWrapper}>
                 {SVGIcon}
               </View>
             </View>
@@ -168,12 +168,13 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'transparent',
     width: dWidth -25,
-    height:55,
-    overflow: 'hidden'
+    height: 55,
+    // overflow: 'hidden'
   },
   background:{
     backgroundColor: '#272C2F',
-    height:55,
+    borderRadius: 4,
+    minHeight: 55,
     width: dWidth - 25,
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -193,5 +194,12 @@ const styles = StyleSheet.create({
     fontFamily:'Poppins-Regular',
     letterSpacing: 0.3,
     marginTop: 0
+  },
+
+  textWrapper:{
+    width: dWidth - 25 - 60
+  },
+  svgIconWrapper:{
+    marginLeft: 4
   }
 })

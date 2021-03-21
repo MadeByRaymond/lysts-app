@@ -199,7 +199,7 @@ export default class customizeAvatar extends Component {
             }
         )
         .catch((error) => {
-            console.log(error);
+            // console.log(error);
             this.setState({
                 showSaveButton: true,
                 savingData: false,

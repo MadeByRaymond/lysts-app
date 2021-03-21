@@ -88,6 +88,7 @@ export default class profileInfo extends Component {
                 this.setState({
                     buttonDisabledStatus: true,
                     savingData: false,
+                    closeButtonText : 'Close',
                     profileInfo:{
                         name: {
                             value: customUserData.fullName,
@@ -250,7 +251,6 @@ export default class profileInfo extends Component {
                     Keyboard.dismiss();
                     this.setState(prevState => ({
                         buttonDisabledStatus: false,
-                        closeButtonText : 'Close',
                         savingData: true,
                         profileInfo: {
                             ...prevState.profileInfo,
