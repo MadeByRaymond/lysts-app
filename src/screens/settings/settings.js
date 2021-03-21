@@ -111,8 +111,8 @@ export default class settings extends Component {
     )
 
     logoutHandler = () => {
-      signOutAuth(
-        () => {
+      signOutAuth().catch(
+        (e) => {
           this.setState({
             loggingOut: false,
             alertMessage:{

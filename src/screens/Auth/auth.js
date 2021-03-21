@@ -69,7 +69,7 @@ export class Auth extends Component {
     render() {
         this.state.alertMessage.show ? this.resetAlert() : null;
         return (
-            <ImageBackground source={require("../../assets/images/signin_bg.png")} style={styles.bgImage}>
+            <ImageBackground source={{uri: 'signin_bg'}} style={styles.bgImage} resizeMethod='resize' resizeMode='cover'>
                 <View style={styles.container}>
                     
                     {/* <Text> Login in..... </Text> */}
@@ -106,17 +106,17 @@ export class Auth extends Component {
                                     isLoading:true,
                                     loginWith: 'google'
                                 }, () => {
-                                    signInAuth("demo", true, ()=> {
+                                    signInAuth("google", true, ()=> {
                                         this.setState({isLoading:false,loginWith: ''});
-                                    }, ()=>{
+                                    }, (error, ignore = false)=>{
                                         this.setState({
                                             isLoading:false,
                                             loginWith: '',
                                             alertMessage:{
-                                                show: true,
+                                                show: !ignore,
                                                 type: 'error',
-                                                title: 'Couldn\'t Sign In',
-                                                subtitle: 'Try again or contact support if this continues',
+                                                title: error.message ? error.message.trim().toLowerCase() == 'user disabled' ? 'This Account Has Been Disabled' : error.message : 'Couldn\'t Sign In',
+                                                subtitle: error.message ? error.message.trim().toLowerCase() == 'user disabled' ? 'Kindly contact support to resolve this' : '' : 'Try again or contact support if this continues',
                                             }
                                         });
                                     })
@@ -162,15 +162,15 @@ export class Auth extends Component {
                                 }, () => {
                                     signInAuth("facebook", true, ()=> {
                                         this.setState({isLoading:false,loginWith: ''});
-                                    }, ()=>{
+                                    }, (error, ignore = false)=>{
                                         this.setState({
                                             isLoading:false,
                                             loginWith: '',
                                             alertMessage:{
-                                                show: true,
+                                                show: !ignore,
                                                 type: 'error',
-                                                title: 'Couldn\'t Sign In',
-                                                subtitle: 'Try again or contact support if this continues',
+                                                title: error.message ? error.message.trim().toLowerCase() == 'user disabled' ? 'This Account Has Been Disabled' : error.message : 'Couldn\'t Sign In',
+                                                subtitle: error.message ? error.message.trim().toLowerCase() == 'user disabled' ? 'Kindly contact support to resolve this' : '' : 'Try again or contact support if this continues',
                                             }
                                         });
                                     })
