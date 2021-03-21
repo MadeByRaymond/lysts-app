@@ -26,36 +26,6 @@ export const onBookmark = debounce(async (value, wishlistCode, savingInProgress,
             },
             () => {finalValue = value}
         )
-
-  
-        // const mongo = user.mongoClient(mongoClientCluster);
-        // const collection = mongo.db("lysts").collection("users");
-  
-        // const filter = {
-        //     userID: user.id, // Query for the user object of the logged in user
-        // };
-  
-        // const updateDoc = {
-        //     $set: { 
-        //       savedLists: newSavedList,
-        //       lastModified: new Date()
-        //     },
-        // };
-        // // console.log("ddd")
-        // const result = await collection.updateMany(filter, updateDoc);
-        // console.log(result);
-  
-        // const customUserData = await user.refreshCustomData();
-        // console.log(customUserData);
-
-        // finalValue = value
-
-        // updateUIFunction ? updateUIFunction() : null;
-        
-        // this.setState({
-        //   isSaved: value,
-        //   updateSettings: true
-        // }, () =>{this.props.updateUI ? this.props.updateUI() : null; alert("Updated Successfully!!")})
     } catch (error) {
         finalValue = !value;
         saveWishlistError ? saveWishlistError(error) : null;
@@ -71,7 +41,7 @@ export const saveUserData_MongoCRUD = async(filters={}, updateSet = {}, callback
         const collection = mongo.db("lysts").collection("users");
 
         const filter = {
-            userID: this.user.id, // Query for the user object of the logged in user
+            userID: realmApp.currentUser.id, // Query for the user object of the logged in user
             ...filters
         };
 
@@ -83,7 +53,7 @@ export const saveUserData_MongoCRUD = async(filters={}, updateSet = {}, callback
         };
         const result = await collection.updateMany(filter, updateDoc);
 
-        const customUserData = await this.user.refreshCustomData();
+        const customUserData = await realmApp.currentUser.refreshCustomData();
 
         callbackFunc ? await callbackFunc(customUserData) : null;
 

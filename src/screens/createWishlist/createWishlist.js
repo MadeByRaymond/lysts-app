@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Realm from 'realm';
-import { Text, StyleSheet, View, BackHandler} from 'react-native'
+import { Text, StyleSheet, View, BackHandler, Vibration} from 'react-native'
 import Wizard from 'react-native-wizard';
 import {Navigation} from 'react-native-navigation';
 import NetInfo from "@react-native-community/netinfo";
@@ -13,7 +13,7 @@ import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccess
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
-import {removeExcessWhiteSpace} from '../../includes/functions';
+import {removeExcessWhiteSpace, removeExcessWhiteSpaceTextarea} from '../../includes/functions';
 import {dWidth, dHeight} from '../../includes/variables';
 
 
@@ -181,7 +181,7 @@ class createWishlist extends Component {
                 ...this.state.wishlistInfo,
                 [parentKey] : {
                     ...this.state.wishlistInfo[parentKey],
-                    [childKey]: typeof childValue == 'string' ? removeExcessWhiteSpace(childValue) : childValue
+                    [childKey]: typeof childValue == 'string' ? parentKey == 'description' ? removeExcessWhiteSpaceTextarea(childValue) : removeExcessWhiteSpace(childValue) : childValue
                 }
             },
             wizard: {
@@ -298,7 +298,7 @@ class createWishlist extends Component {
                 saved: false,
             });
             Navigation.popToRoot(this.props.componentId);
-            // Vibration.vibrate(350);
+            Vibration.vibrate(350);
           }).catch((e) => {
             // console.log(e);
             this.setState({

@@ -20,6 +20,22 @@ export function capitalizeFirstLetters(val) {
 export function removeExcessWhiteSpace (value){
   return value !== value.trim() ? (value.trim() + ' ') : value;
 }
+;
+export function removeExcessWhiteSpaceTextarea (value = ''){
+  let returnValue = value;
+  if(value !== value.trim()){
+    if(value.endsWith('\n ')){
+      returnValue = value.substring(0, value.length - 1)
+    }else if(value.endsWith('  ')){
+      returnValue = value.substring(0, value.length - 1)
+    }else if(value == (value.trim() + '\n\n')){
+      returnValue = value.trim() + '\n';
+    }else if(value == (value.trim() + ' \n\n')){
+      returnValue = value.trim() + ' \n';
+    }
+  }
+  return returnValue;
+}
 
 export function getCategoryDisplay(val) {
     return capitalizeFirstLetters(val.replace('_', ' ').replace('0', '\''))
@@ -50,13 +66,13 @@ export const onShare = debounce(async (dialogTitle, message, title) => {
     //     // dismissed
     //   }
     } catch (error) {
-      alert('Error sharing message' + error.message);
+      // alert('Error sharing message' + error.message);
+      if(__DEV__){console.log('Error sharing message', error.message)}
     }
   }, 1000, {leading: true,trailing: false});
 
 
 export const goToViewWishlistScreen = debounce((componentId, code, saveStatus = false, updateUIFunction = null) =>{
-    // alert('ddd')
     Navigation.push(componentId, {
       component: {
         name: 'com.lysts.screen.wishlistDetails', // Push the screen registered with the 'Settings' key
