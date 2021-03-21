@@ -67,7 +67,7 @@ public class OpenSettingsModule extends ReactContextBaseJavaModule {
     try {
       currentActivity.startActivity(
         new Intent(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
-          .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, "com.lysts")
+          .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, "com.madebyraymond.lysts")
           .putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, "lysts-app-channel")
       );
       cb.invoke(true);
