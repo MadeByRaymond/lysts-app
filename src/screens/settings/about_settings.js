@@ -31,7 +31,7 @@ export default function about_settings(props) {
     <View style={styles.container}>
         <View style={styles.titleWrapper}><Text style={styles.title}>Helpful information</Text></View>
         <View style={styles.settingsWrapper}>
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/app-updates")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/app_updates")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 53 53" fill="none">
@@ -57,7 +57,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/privacy-policy")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/privacy_policy")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={32} viewBox="0 0 40 53" fill="none">
@@ -87,7 +87,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/tnc")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/terms_of_service")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 58 51" fill="none">
