@@ -58,6 +58,7 @@ export const signInAuth = async (type, redirectAfterLogin = true, callbackFunc =
                             "appUpdates":true
                         }
                     },
+                    "status": "active",
                     "lastModified": new Date(),
                     "lastModifiedLog": `User Created`,
                     "dateCreated": new Date()

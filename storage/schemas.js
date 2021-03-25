@@ -45,6 +45,7 @@ class UserSchemas {
       lastModifiedLog: 'string?',
       savedLists: 'string[]',
       settings: 'user_settings',
+      status: 'string?',
       userID: 'string?',
     },
     primaryKey: '_id',
