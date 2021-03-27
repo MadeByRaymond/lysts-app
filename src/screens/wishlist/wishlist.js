@@ -2,11 +2,13 @@ import React, {Component} from 'react';
 import Realm from 'realm';
 import { View, Text, StyleSheet } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
-import {message} from '../../services/FCMService';
+import AsyncStorage from '@react-native-community/async-storage';
 
+import {message} from '../../services/FCMService';
 import {app as realmApp} from '../../../storage/realm';
 import {WishlistSchemas} from '../../../storage/schemas';
 
+import {InfoModal} from '../../UIComponents/Modals/ActionsModal';
 import FabView from '../../UIComponents/Buttons/FabButton/fabButton';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 import ListView from '../../components/wishlistList/wishlistList';
@@ -40,6 +42,11 @@ export default class Wishlist extends Component {
       wishlistName: '',
       wishListCode: ''
     },
+    infoModal:{
+      show: false,
+      text: '',
+      buttons: []
+    },
     listData: [
       // {
       //   id: '1233',
@@ -51,7 +58,8 @@ export default class Wishlist extends Component {
     alertMessage:{show:false, type:'',title:'',subtitle:''}
   }
 
-  componentDidMount(){
+  async componentDidMount(){
+
     this.unsubscribeNetworkUpdate = NetInfo.addEventListener(state => {
       // console.log("Connection type", state.type);
       // console.log("Is connected?", state.isConnected);
@@ -63,6 +71,40 @@ export default class Wishlist extends Component {
 
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
+
+    try {
+      if (typeof global.lastOpenedDate == 'string' && global.lastOpenedDate.trim() !== '') {
+        let sessionTimeoutLimit = await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutLimit')
+
+        // GET Time Since Last Launch - Check if its greater than sessionTimeoutLimit
+        let hours = Math.abs(Math.floor(((new Date().getTime()) - (new Date(global.lastOpenedDate).getTime())) / (60*60*1000)));
+        (hours > sessionTimeoutLimit) ? this.setState({
+          infoModal:{
+            show: true,
+            text: 'blash blah blah',
+            buttons: [{
+              text: 'Okkk',
+              func: () => {
+                this.setState(prevState => ({
+                  infoModal:{
+                    ...prevState.infoModal,
+                    buttons: [{
+                      text: 'please wait...',
+                      func: ()=>{}
+                    }]
+                  }
+                }))
+              }
+            }]
+          }
+        }) : loginRoot;
+      }
+    } catch (error) {
+      if (_DEV_) {
+        console.log('Error Checking Session Timeout ==> ', error);
+      }
+    }
+    
     
     if (typeof global.launchWithCode == 'string' && global.launchWithCode.trim().length == 6) {
       goToViewWishlistScreen(
@@ -285,6 +327,10 @@ export default class Wishlist extends Component {
 
     return (
       <View style={styles.container}>
+        {this.state.infoModal.show ? <InfoModal
+          buttons={this.state.infoModal.buttons}
+          text = {this.state.infoModal.text}
+        /> : null}
         {this.state.newListAdded ? this.handelModal() : null}
         <View style={[styles.container, hasData ? styles.grayBG : styles.whiteBg]}>
           <View style={styles.top}>

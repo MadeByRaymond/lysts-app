@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg"
 import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-community/async-storage';
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
@@ -13,6 +14,8 @@ export default class settings extends Component {
   unsubscribeNetworkUpdate;
   state={
     hasNetworkConnection: true,
+    sessionTimeoutLimit: 'infinite'
+
   }
 
   componentDidMount(){
@@ -21,6 +24,15 @@ export default class settings extends Component {
       // console.log("Is connected?", state.isConnected);
       this.setState({hasNetworkConnection: state.isConnected});
     });
+
+    AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutLimit').then((sessionTimeoutLimit) =>{
+      if (typeof sessionTimeoutLimit == 'undefined' || sessionTimeoutLimit == null || sessionTimeoutLimit.trim() == '' ) {
+        throw 'Saved Session Timeout Limit Invalid'
+      }
+      this.setState({sessionTimeoutLimit});
+    }).catch(async(e) => {
+      await AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit)
+    })
 
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
@@ -31,6 +43,11 @@ export default class settings extends Component {
 
     this.unsubscribeNetworkUpdate();
   }
+
+  saveSessionLimit = () => {
+    await AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit);
+  }
+
     render() {
         return (
             <View style={styles.container}>

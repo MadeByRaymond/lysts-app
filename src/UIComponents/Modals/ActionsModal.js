@@ -132,7 +132,44 @@ const SoundsModal = (props) => {
     )
 }
 
-export {ActionsModal, SoundsModal}
+const InfoModal = (props) => {
+    return (
+        <Modal 
+            isVisible={props.modalState} 
+            backdropOpacity={0.6} 
+            useNativeDriver={true}
+            // statusBarTranslucent={true} 
+            style={styles.actionModalViewWrapper}
+            // onSwipeComplete={() => props.closeFunction()}
+            animationIn= "zoomIn"
+            animationOut="zoomOut"
+            // animationOutTiming={500}
+            hideModalContentWhileAnimating={true}
+            swipeDirection={["down", "left", "up", "right"]}
+        >
+            <View style={styles.actionModalView}>
+                <View><Text>{props.text}</Text></View>
+                <View>
+                    {props.buttons.map((item, i) => {
+                        return(
+                            <TouchableIOSHighlight
+                                key={i}
+                                onPress={() => {
+                                    item.func();
+                                }} 
+                                underlayColor="#EDEDED"
+                            >
+                                <View>{item.text}</View> 
+                            </TouchableIOSHighlight>
+                        )
+                    })}
+                </View>    
+            </View>
+        </Modal>
+    )
+}
+
+export {ActionsModal, SoundsModal,InfoModal}
 
 const styles = StyleSheet.create({
     actionModalViewWrapper:{

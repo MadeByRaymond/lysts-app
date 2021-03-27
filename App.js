@@ -1,13 +1,12 @@
 import { Linking } from 'react-native';
 import { Navigation } from "react-native-navigation";
 import PushNotification from "react-native-push-notification";
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {message, inAppMessaging} from './src/services/FCMService';
 import {app as realmApp} from './storage/realm';
 
 import {goToViewWishlistScreen} from './src/includes/functions'
-
-import AsyncStorage from '@react-native-community/async-storage';
 
 // DEV IMPORTS
 if(__DEV__) {
@@ -348,6 +347,7 @@ export const getRoot = async () =>{
     let navRoot;
     if((realmApp.currentUser !== null) && (typeof realmApp.currentUser !== 'undefined') && (realmApp.currentUser.isLoggedIn && realmApp.currentUser.providerType != 'anon-user')){
       navRoot = mainRoot;
+      global.lastOpenedDate = await AsyncStorage.getItem('lystsApp:appStorage:lastOpenedDate');
     }else{
       // console.log('diff, ');
       let lastOpenedDate = await AsyncStorage.getItem('lystsApp:appStorage:lastOpenedDate');
