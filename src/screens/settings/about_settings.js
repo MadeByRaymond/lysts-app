@@ -9,8 +9,15 @@ import {goToScreen} from '../../includes/functions'
 let unsubscribeNetworkUpdate;
 let prevComponentId;
 
-const goToWebView = (uri) => {
-  goToScreen(this.props.componentId,'com.lysts.screen.webView', {uri});
+const goToWebView = (compID, uri, title) => {
+  goToScreen(compID,'com.lysts.screen.webView', {uri}, {topBar: {
+    title: {
+        text: title
+    },
+    visible: true,
+    drawBehind: false,
+    animate: true,
+  }});
 }
 
 export default function about_settings(props) {
@@ -36,7 +43,7 @@ export default function about_settings(props) {
     <View style={styles.container}>
         <View style={styles.titleWrapper}><Text style={styles.title}>Helpful information</Text></View>
         <View style={styles.settingsWrapper}>
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{goToWebView("https://lystsapp.com/app_updates")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{goToWebView(props.componentId, "https://lystsapp.com/app_updates?hide_header=true&hide_footer=true", "App Updates")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 53 53" fill="none">
@@ -62,7 +69,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/privacy_policy")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{goToWebView(props.componentId, "https://lystsapp.com/privacy_policy?hide_header=true&hide_footer=true", "Data / Privacy Policy")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={32} viewBox="0 0 40 53" fill="none">
@@ -92,7 +99,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/terms_of_service")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{goToWebView(props.componentId, "https://lystsapp.com/terms_of_service?hide_header=true&hide_footer=true", "Terms of Service")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 58 51" fill="none">
@@ -118,7 +125,7 @@ export default function about_settings(props) {
             </View>
           </TouchableOpacity>
           
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("mailto:contact@lystsapp.com?subject=&body=&cc=<lystsapp@gmail.com>")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("mailto:contact@lystsapp.com?subject=&body=")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 58 56" fill="none">
