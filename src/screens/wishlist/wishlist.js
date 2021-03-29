@@ -72,6 +72,9 @@ export default class Wishlist extends Component {
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
 
+    var isSessionTimeout = ((await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutReached')) == 'true');
+    // ALSO SEE HOW IT WORKS WHEN WE OPEN A NEW TAB BEFORE THE MODAL SHOWS 
+
     try {
       if (typeof global.lastOpenedDate == 'string' && global.lastOpenedDate.trim() !== '') {
         let sessionTimeoutLimit = await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutLimit')

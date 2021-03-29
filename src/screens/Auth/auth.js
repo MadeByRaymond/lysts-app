@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Text, View, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import Svg, { Rect, Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {goToViewWishlistScreen} from '../../includes/functions';
 
@@ -39,6 +40,8 @@ export class Auth extends Component {
 
         prevComponentId = global.activeComponentId;
         global.activeComponentId = this.props.componentId;
+
+        AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutReached','false');
 
         signInAuth('anonymous', false, (parsedRes) =>{
             if(parsedRes.error){
