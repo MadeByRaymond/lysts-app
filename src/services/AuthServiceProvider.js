@@ -92,6 +92,7 @@ export const signOutAuth = async () =>{
         if(__DEV__){console.log("Session Terminated")}
         await logoutOfGoogle();
         await logoutOfFacebook();
+        global.lastOpenedDate = '';
         Navigation.setRoot(loginRoot);
     } catch (error) {
         // console.log(error);

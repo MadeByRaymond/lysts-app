@@ -145,22 +145,29 @@ const InfoModal = (props) => {
             animationOut="zoomOut"
             // animationOutTiming={500}
             hideModalContentWhileAnimating={true}
-            swipeDirection={["down", "left", "up", "right"]}
+            swipeDirection={["left","right"]}
         >
             <View style={styles.actionModalView}>
-                <View><Text>{props.text}</Text></View>
-                <View>
+                <View style={styles.actionInfoWrapper}>
+                    <View><Text style={styles.actionInfoText}>{props.text}</Text></View>
+                    {(props.subText && props.subText.trim() !== '') ? <View><Text style={[styles.actionInfoSubText]}>{props.subText}</Text></View> : null}
+                </View>
+                <View style={styles.infoButtonsWrapper}>
                     {props.buttons.map((item, i) => {
                         return(
-                            <TouchableIOSHighlight
+                            <View style={{width: `${100 / props.buttons.length}%`}}>
+                                <TouchableIOSHighlight
                                 key={i}
                                 onPress={() => {
                                     item.func();
                                 }} 
                                 underlayColor="#EDEDED"
+                                
                             >
-                                <View>{item.text}</View> 
+                                <View style={styles.actionItem}><Text style={[styles.actionItemText, {textAlign: 'center'}]}>{item.text}</Text></View> 
                             </TouchableIOSHighlight>
+                            </View>
+                            
                         )
                     })}
                 </View>    
@@ -195,6 +202,30 @@ const styles = StyleSheet.create({
     },
     actionItemActive:{
         backgroundColor:'#F9C9B6'
+    },
+
+    actionInfoWrapper:{
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+        borderBottomColor: '#F3F5F6',
+        borderBottomWidth: 1,
+        borderStyle: 'solid',
+        width: 300,
+    },
+    actionInfoText:{
+        fontSize: 15.5,
+        fontFamily: 'Poppins-Regular'
+    },
+    actionInfoSubText:{
+        fontFamily: 'Poppins-Regular',
+        fontSize: 14,
+        fontStyle:'italic', 
+        marginTop: 10, 
+    },
+    infoButtonsWrapper:{
+        flexDirection:'row',
+        justifyContent: 'space-evenly',
+        width: 300,
     },
 
     // saveButton:{

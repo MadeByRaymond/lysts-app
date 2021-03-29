@@ -39,3 +39,37 @@ export const avatarCustomizer = {
     jewelry : ['#000000','#F4D150','#224762','#B1CC33','#FAD08C','#FFFDF3'],
     bgColor : ['#FFEDEF','#F9E59D','#E0DDFF','#E9F6EF','#EFEFEF'],
 }
+
+export const sessionTimeoutLimits = [
+    // These are all calculated in Hours 
+    {
+        label: 'Infinite',
+        value: 'infinite',
+        key: 'infinite',
+        comment: 'Lasts Forever until user signs out'
+    },
+    {
+        label: 'Few Hours',
+        value: '12',
+        key: '12',
+        comment: 'Lasts 12 hours'
+    },
+    {
+        label: 'Few Days',
+        value: '126',
+        key: '126',
+        comment: 'Lasts 5.25 days'
+    },
+    {
+        label: 'Few Weeks',
+        value: '504',
+        key: '504',
+        comment: 'Lasts 3 weeks'
+    },
+    {
+        label: 'Few Months',
+        value: '2190',
+        key: '2190',
+        comment: 'Lasts 3 months'
+    },
+]

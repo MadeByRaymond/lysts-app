@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
-import Svg, { Circle, Path } from "react-native-svg"
+import { Text, StyleSheet, View } from 'react-native';
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
+import SelectPicker from 'react-native-picker-select';
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 
 import { dWidth } from '../../includes/variables';
+import {sessionTimeoutLimits} from '../../includes/datasets';
 
 let prevComponentId;
 
@@ -31,6 +32,9 @@ export default class settings extends Component {
       }
       this.setState({sessionTimeoutLimit});
     }).catch(async(e) => {
+      if (__DEV__) {
+        console.log('Error Loading Session Timeout ==> ', e);
+      }
       await AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit)
     })
 
@@ -45,85 +49,48 @@ export default class settings extends Component {
   }
 
   saveSessionLimit = () => {
-    await AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit);
+    AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit);
   }
 
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.titleWrapper}><Text style={styles.title}>Switch login method</Text></View>
+                <View style={styles.titleWrapper}><Text style={styles.title}>Session Timeout Limit</Text></View>
                 <View style={styles.settingsWrapper}>
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
-                    <View style={styles.settingRow}>
-                      <View style={styles.settingSVGWrapper}>
-                        <Svg width={35} height={30} viewBox="0 0 52 52" fill="none">
-                          <Path
-                            d="M11.524 31.424l-1.81 6.758-6.615.14A25.884 25.884 0 010 26c0-4.311 1.049-8.377 2.907-11.957h.002l5.89 1.08 2.58 5.854A15.456 15.456 0 0010.543 26c0 1.909.346 3.737.98 5.424z"
-                            fill="#FBBB00"
-                          />
-                          <Path
-                            d="M51.546 21.143c.299 1.573.455 3.197.455 4.857 0 1.862-.196 3.677-.569 5.429a25.994 25.994 0 01-9.154 14.847l-.002-.002-7.418-.378-1.05-6.554a15.496 15.496 0 006.667-7.913H26.572V21.143h24.974z"
-                            fill="#518EF8"
-                          />
-                          <Path
-                            d="M42.276 46.274l.001.002A25.89 25.89 0 0126 52C16.1 52 7.49 46.466 3.1 38.321l8.425-6.897C13.72 37.284 19.373 41.456 26 41.456c2.849 0 5.517-.77 7.807-2.115l8.469 6.933z"
-                            fill="#28B446"
-                          />
-                          <Path
-                            d="M42.597 5.986l-8.423 6.895A15.369 15.369 0 0026 10.544c-6.777 0-12.536 4.363-14.621 10.433l-8.47-6.934h-.002C7.235 5.7 15.952 0 26.001 0a25.89 25.89 0 0116.596 5.986z"
-                            fill="#F14336"
-                          />
-                        </Svg>
-                      </View>
-                      <View style={styles.checkSettingsWrapper}>
-                        <View style={[styles.settingTextWrapper, {maxWidth: (dWidth - 35 - 25 - 25 - 10 - 40)}]}><Text style={styles.settingText}>Login with Google</Text></View>
-                        <View>
-                          <Svg width={24} height={24} viewBox="0 0 70 70" fill="none" >
-                            <Circle cx={35.158} cy={35.36} r={34.56} fill="#E4E7EA" />
-                            <Path
-                                d="M17.158 35.36l11.52 11.52 24.48-23.04"
-                                stroke="#fff"
-                                strokeWidth={5.76}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                          </Svg>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
-                    <View style={styles.settingRow}>
-                      <View style={styles.settingSVGWrapper}>
-                        <Svg width={35} height={30} viewBox="0 0 52 52" fill="none">
-                          <Path
-                            d="M45.5 0h-39A6.507 6.507 0 000 6.5v39C0 49.085 2.915 52 6.5 52h39c3.585 0 6.5-2.915 6.5-6.5v-39C52 2.915 49.085 0 45.5 0z"
-                            fill="#1976D2"
-                          />
-                          <Path
-                            d="M43.875 26H35.75v-6.5c0-1.794 1.456-1.625 3.25-1.625h3.25V9.75h-6.5A9.75 9.75 0 0026 19.5V26h-6.5v8.125H26V52h9.75V34.125h4.875L43.875 26z"
-                            fill="#FAFAFA"
-                          />
-                        </Svg>
-                      </View>
-                      <View style={styles.checkSettingsWrapper}>
-                        <View style={[styles.settingTextWrapper, {maxWidth: (dWidth - 35 - 25 - 25 - 10 - 40)}]}><Text style={styles.settingText}>Login with Facebook</Text></View>
-                        <View>
-                          <Svg width={24} height={24} viewBox="0 0 70 70" fill="none" >
-                            <Circle cx={35.158} cy={35.36} r={34.56} fill="#28A664" />
-                            <Path
-                                d="M17.158 35.36l11.52 11.52 24.48-23.04"
-                                stroke="#fff"
-                                strokeWidth={5.76}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                          </Svg>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                  <SelectPicker 
+                    value = {this.state.sessionTimeoutLimit}
+                    onValueChange={(val) => {
+                      this.setState({
+                        sessionTimeoutLimit:val
+                      },()=>{
+                        AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutLimit', this.state.sessionTimeoutLimit)
+                      })
+                    }}
+                    items={sessionTimeoutLimits}
+                    placeholder={{}}
+                    useNativeAndroidPickerStyle = {true}
+                    style={{
+                        inputAndroid:{
+                          fontSize: 16.5,
+                          fontFamily: 'Poppins-Regular',
+                          color: '#515D70',
+                          height: 50,
+                        },
+                        headlessAndroidContainer:{
+                            backgroundColor: "#fff",
+                            paddingHorizontal: 18,
+                        },
+                        inputAndroidContainer:{
+                          fontSize: 16.5,
+                          fontFamily: 'Poppins-Regular',
+                          color: '#515D70',
+                          height: 50,
+                          backgroundColor: "#fff",
+                          paddingHorizontal: 18,
+                        }
+
+                    }}
+                  />
                 </View>
                 {this.state.hasNetworkConnection ? null : <NoConnectionAlert />}
             </View>

@@ -5,6 +5,7 @@ import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from '@react-native-community/async-storage';
 
 import {message} from '../../services/FCMService';
+import {signOutAuth} from '../../services/AuthServiceProvider';
 import {app as realmApp} from '../../../storage/realm';
 import {WishlistSchemas} from '../../../storage/schemas';
 
@@ -45,6 +46,7 @@ export default class Wishlist extends Component {
     infoModal:{
       show: false,
       text: '',
+      subText:'',
       buttons: []
     },
     listData: [
@@ -72,38 +74,48 @@ export default class Wishlist extends Component {
     prevComponentId = global.activeComponentId;
     global.activeComponentId = this.props.componentId;
 
-    var isSessionTimeout = ((await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutReached')) == 'true');
     // ALSO SEE HOW IT WORKS WHEN WE OPEN A NEW TAB BEFORE THE MODAL SHOWS 
 
     try {
-      if (typeof global.lastOpenedDate == 'string' && global.lastOpenedDate.trim() !== '') {
-        let sessionTimeoutLimit = await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutLimit')
-
-        // GET Time Since Last Launch - Check if its greater than sessionTimeoutLimit
-        let hours = Math.abs(Math.floor(((new Date().getTime()) - (new Date(global.lastOpenedDate).getTime())) / (60*60*1000)));
-        (hours > sessionTimeoutLimit) ? this.setState({
+      let setTimeoutModalState = async() => {
+        await AsyncStorage.setItem('lystsApp:appStorage:sessionTimeoutReached', 'true');
+        this.setState({
           infoModal:{
             show: true,
-            text: 'blash blah blah',
+            text: 'Your session has expired, log in and keep sharing your Lysts.',
+            subText: 'P.S: You can always increase your timeout time in the app settings',
             buttons: [{
-              text: 'Okkk',
+              text: 'Continue',
               func: () => {
                 this.setState(prevState => ({
                   infoModal:{
                     ...prevState.infoModal,
                     buttons: [{
-                      text: 'please wait...',
+                      text: 'Please wait...',
                       func: ()=>{}
                     }]
                   }
                 }))
+                this.logoutHandler();
               }
             }]
           }
-        }) : loginRoot;
+        });
+      }
+      var isSessionTimeout = ((await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutReached')) == 'true');
+      if(isSessionTimeout){
+        setTimeoutModalState();
+      }else{
+        let sessionTimeoutLimit = await AsyncStorage.getItem('lystsApp:appStorage:sessionTimeoutLimit')
+        if (sessionTimeoutLimit && sessionTimeoutLimit.trim().toLowerCase() !== 'infinite' && typeof global.lastOpenedDate == 'string' && global.lastOpenedDate.trim() !== '') {
+
+          // GET Time Since Last Launch - Check if its greater than sessionTimeoutLimit
+          let hours = Math.abs(Math.floor(((new Date().getTime()) - (new Date(global.lastOpenedDate).getTime())) / (60*60*1000)));
+          (hours >= parseInt(sessionTimeoutLimit)) ? setTimeoutModalState() : null;
+        }
       }
     } catch (error) {
-      if (_DEV_) {
+      if (__DEV__) {
         console.log('Error Checking Session Timeout ==> ', error);
       }
     }
@@ -305,6 +317,40 @@ export default class Wishlist extends Component {
       }, 4500)
   }
 
+  logoutHandler = () => {
+    signOutAuth().catch(
+      (e) => {
+        this.setState(prevState => ({
+          infoModal:{
+            ...prevState.infoModal,
+            buttons: [{
+              text: 'Continue',
+              func: () => {
+                this.setState(prevState => ({
+                  infoModal:{
+                    ...prevState.infoModal,
+                    buttons: [{
+                      text: 'Please wait...',
+                      func: ()=>{}
+                    }]
+                  }
+                }))
+
+                this.logoutHandler();
+              }
+            }]
+          },
+          alertMessage:{
+            show: true,
+            type: 'error',
+            title: 'We\'re Sorry',
+            subtitle: 'Seems like an error occurred. Try again.',
+          }
+        }))
+      }
+    );
+  }
+
   render() {
     let listData = this.state.listData;
     let hasData = (listData.length == 0 || listData == null) ? false : true;
@@ -331,8 +377,10 @@ export default class Wishlist extends Component {
     return (
       <View style={styles.container}>
         {this.state.infoModal.show ? <InfoModal
+          modalState = {this.state.infoModal.show}
           buttons={this.state.infoModal.buttons}
           text = {this.state.infoModal.text}
+          subText = {this.state.infoModal.subText}
         /> : null}
         {this.state.newListAdded ? this.handelModal() : null}
         <View style={[styles.container, hasData ? styles.grayBG : styles.whiteBg]}>
