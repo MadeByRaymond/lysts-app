@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native'
 
-import * as Input from '../../../UIComponents/Inputs/index';
+import * as Input from '../../../UIComponents/Inputs';
 import {getCategoryDisplay} from '../../../includes/functions';
 
 import {categories} from '../../../includes/datasets';

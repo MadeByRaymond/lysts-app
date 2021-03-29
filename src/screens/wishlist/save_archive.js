@@ -173,9 +173,11 @@ export default class save_archive extends Component {
             }else{
               filter = filter + ` || code == '${val}'`
             }
-          })
+          });
 
-          wishlistData = this.realm.objects("wishlist").filtered(`status == 'active' && (${filter})`).sorted("dateCreated", true);
+          // let wishlistFilters = filter.trim() == "" ? "" : `&& (${filter})`;
+
+          wishlistData = savedWishlists.length < 1 ? [] : this.realm.objects("wishlist").filtered(`status == 'active' && (${filter})`).sorted("dateCreated", true);
 
           if(wishlistData.length > 0){
             wishlistData.forEach((val,i) => {
@@ -256,13 +258,14 @@ export default class save_archive extends Component {
         
 
         if(this.realm != null && !this.realm.isClosed){
-          await this.getWishlistsFromRealm();
+          // await this.getWishlistsFromRealm();
         }else{
           this.realm = await Realm.open(config);
           await this.getWishlistsFromRealm();
         }
         
       } catch (error) {
+        console.log(error);
         this.setState({
           isLoading: false, 
           silentReload: false,
