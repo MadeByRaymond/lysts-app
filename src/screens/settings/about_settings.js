@@ -4,9 +4,14 @@ import Svg, { Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
 
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+import {goToScreen} from '../../includes/functions'
 
 let unsubscribeNetworkUpdate;
 let prevComponentId;
+
+const goToWebView = (uri) => {
+  goToScreen(this.props.componentId,'com.lysts.screen.webView', {uri});
+}
 
 export default function about_settings(props) {
   const [hasNetworkConnection, setNetworkConnection] = useState(true);
@@ -31,7 +36,7 @@ export default function about_settings(props) {
     <View style={styles.container}>
         <View style={styles.titleWrapper}><Text style={styles.title}>Helpful information</Text></View>
         <View style={styles.settingsWrapper}>
-          <TouchableOpacity activeOpacity={0.8} onPress={()=>{Linking.openURL("https://lystsapp.com/app_updates")}}>
+          <TouchableOpacity activeOpacity={0.8} onPress={()=>{goToWebView("https://lystsapp.com/app_updates")}}>
             <View style={styles.settingRow}>
               <View style={styles.settingSVGWrapper}>
                 <Svg width={35} height={30} viewBox="0 0 53 53" fill="none">

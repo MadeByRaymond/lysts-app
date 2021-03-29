@@ -36,6 +36,7 @@ import Settings from  "./src/screens/settings/settings";
 import AboutSettings from  "./src/screens/settings/about_settings";
 import NotificationSettings from  "./src/screens/settings/notification_settings";
 import SecuritySettings from  "./src/screens/settings/security_settings";
+import WebView from  "./src/screens/webView/webView";
 
 // APP COMPONENTS IMPORTS
 import SavedButton from "./src/components/saveWishlistButton/saveButton";
@@ -66,6 +67,7 @@ Navigation.registerComponent('com.lysts.screen.settings', () => Settings);
 Navigation.registerComponent('com.lysts.screen.aboutSettings', () => AboutSettings);
 Navigation.registerComponent('com.lysts.screen.notificationSettings', () => NotificationSettings);
 Navigation.registerComponent('com.lysts.screen.securitySettings', () => SecuritySettings);
+Navigation.registerComponent('com.lysts.screen.webView', () => WebView);
 
 // NON SCREEN COMPONENTS REGISTER
 Navigation.registerComponent('com.lysts.component.SavedButton', () => SavedButton);

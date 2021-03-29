@@ -43,6 +43,7 @@
     "react-native-sound": "^0.11.0",
     "react-native-svg": "^12.1.0",
     "react-native-view-shot": "^3.1.2",
+    "react-native-webview": "^11.3.2",
     "react-native-wizard": "^2.1.0",
     "realm": "^10.0.1"
   },
