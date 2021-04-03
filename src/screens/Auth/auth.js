@@ -280,6 +280,7 @@ const styles = StyleSheet.create({
           backgroundColor: 'transparent',
           paddingVertical: 14,
           width: (dWidth - 60),
+          maxWidth: 480,
           borderRadius: 1000
           // marginHorizontal: 30
       },

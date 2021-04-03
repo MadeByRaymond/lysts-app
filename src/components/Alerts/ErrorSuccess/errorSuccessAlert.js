@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     borderRadius: 4,
     backgroundColor: 'transparent',
-    width: dWidth -25,
+    width: (dWidth > 530) ? 500 : (dWidth -25),
     height: 55,
     // overflow: 'hidden'
   },
@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     minHeight: 55,
     width: dWidth - 25,
+    maxWidth: 500,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -197,7 +198,7 @@ const styles = StyleSheet.create({
   },
 
   textWrapper:{
-    width: dWidth - 25 - 60
+    width: (dWidth > 530) ? (500 - 25 - 60) : (dWidth - 25 - 60)
   },
   svgIconWrapper:{
     marginLeft: 4
