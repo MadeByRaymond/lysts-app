@@ -280,11 +280,11 @@ export default class settings extends Component {
                       </View>
                     </TouchableOpacity>
                     
-                    <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
+                    {/* <TouchableOpacity activeOpacity={0.8} onPress={()=>{}}>
                       <View style={styles.settingRow}>
                         <View style={styles.settingTextWrapper}><Text style={[styles.settingText,{color:'#EF4C4E'}]}>Delete my account</Text></View>
                       </View>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </ScrollView>
                 {this.state.alertMessage.show ? <ErrorSuccessAlert 

@@ -3,10 +3,10 @@
     <string name="default_notification_channel_id">lysts-app-channel</string>
     
     <!-- STAGING VALUES  -->
-    <string name="facebook_app_id">199695245174373</string>
-    <string name="fb_login_protocol_scheme">fb199695245174373</string>
+    <!-- <string name="facebook_app_id">199695245174373</string>
+    <string name="fb_login_protocol_scheme">fb199695245174373</string> -->
 
     <!-- PRODUCTION VALUES  -->
-    <!-- <string name="facebook_app_id">1314494128907350</string>
-    <string name="fb_login_protocol_scheme">fb1314494128907350</string> -->
+    <string name="facebook_app_id">1314494128907350</string>
+    <string name="fb_login_protocol_scheme">fb1314494128907350</string>
 </resources>
