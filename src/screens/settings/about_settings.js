@@ -195,23 +195,5 @@ const styles = StyleSheet.create({
         color: '#515D70',
         fontSize: 16.5,
         fontFamily: 'Poppins-Regular'
-    },
-    divider:{
-        backgroundColor: '#E4E7EA',
-        height: 2,
-        opacity: 0.5,
-        marginTop: 12,
-        marginBottom: 30
-    },
-
-    credits:{
-        alignItems:'center',
-        position: 'absolute',
-        bottom: 30,
-        left: '50%',
-        transform: [{
-            translateX: -(111/2)
-        }]
-        
     }
 })

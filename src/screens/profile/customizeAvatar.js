@@ -2,15 +2,18 @@ import React, { Component } from 'react'
 import { Text, StyleSheet, View, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
+import { BigHead } from 'react-native-bigheads'
+import SelectPicker from 'react-native-picker-select';
+import Modal from 'react-native-modal';
+import LinearGradient from 'react-native-linear-gradient';
+import Shadow from 'react-native-drop-shadow';
 
-import { dWidth, dHeight, Touchable } from '../../includes/variables';
-import { avatarCustomizer } from '../../includes/datasets';
-import { saveUserData_MongoCRUD } from '../../includes/functions';
+import { dWidth, dHeight } from '../../includes/variables';
+import { avatarCustomizer, avatarCustomizerColors } from '../../includes/datasets';
+import { saveUserData_MongoCRUD, capitalizeFirstLetters, spaceCamelCase } from '../../includes/functions';
 import ButtonView from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
-
-import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
 import {app as realmApp} from '../../../storage/realm';
 
@@ -21,38 +24,35 @@ export default class customizeAvatar extends Component {
     userData = realmApp.currentUser.customData;
     unsubscribeNetworkUpdate;
 
-    AvatarSVGKeys = {
-        Male: Object.keys(AvatarSVG['Male']),
-        Female: Object.keys(AvatarSVG['Female'])
-    }
-
 
     state = {
-       accordionActive : false,
+       accordionActive : true,
        scrollPosition: 0,
 
        showSaveButton: false,
        savingData: false,
 
-        avatarFeatures: {
-            avatarId: this.userData.avatarFeatures.avatarId,
-            skinTone: this.userData.avatarFeatures.skinTone,
-            hairColor: this.userData.avatarFeatures.hairColor,
-            shirtColor: this.userData.avatarFeatures.shirtColor,
-            shirtCollarColor: this.userData.avatarFeatures.shirtCollarColor,
-            eyeGlass: this.userData.avatarFeatures.eyeGlass,
-            jewelry: this.userData.avatarFeatures.jewelry,
-            bgColor: this.userData.avatarFeatures.bgColor
-        },
+        avatarFeatures: this.userData.avatarFeatures,
 
         avatarFeaturesTitles: {
-            skinTone: 'Skin Tone',
-            hairColor: 'Hair / Turban Color',
-            shirtColor: 'Shirt Color',
-            shirtCollarColor: 'Shirt Collar Color',
-            eyeGlass: 'Eye Glass ',
-            jewelry: 'Ear Ring / Jewelry',
-            bgColor: 'Background Color'
+            accessory : 'Face Accessory',
+            bgColor : 'Background Color',
+            bgShape : 'Background Shape',
+            body : 'Body Type',
+            clothing : 'Clothing',
+            clothingColor : 'Clothing Color',
+            eyebrows : 'Eye Brows',
+            eyes : 'Eyes',
+            facialHair : 'Facial Hair',
+            graphic : 'Shirt Graphics',
+            hair : 'Hair Type',
+            hairColor : 'Hair Color',
+            hat : 'Hats & Caps',
+            hatColor : 'Hat Color',
+            lashes : 'Lashes',
+            lipColor : 'Lips Color',
+            mouth : 'Mouth',
+            skinTone : 'Skin Tone',
         },
 
         alertMessage:{
@@ -60,6 +60,11 @@ export default class customizeAvatar extends Component {
             type: '',
             title: '',
             subtitle: '',
+        },
+
+        colorModal:{
+            visible: false,
+            feature: 'bgColor'
         },
         
         hasNetworkConnection: true,
@@ -82,99 +87,73 @@ export default class customizeAvatar extends Component {
         this.props.onCloseFunc ? this.props.onCloseFunc() : null;
     }
 
-    renderColorPicker = (feature, arrayObject = [''], selectedValue= '', isDisabled) => {
-        // let TouchableView = isDisabled ? View :TouchableOpacity
-        return arrayObject.map((item, i) =>{
-            return (
-                <TouchableOpacity  key={i} activeOpacity={0.8} onPress={()=>{this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, [feature]:item }}))}}>
-                <View style={[styles.colorPicker, {
-                    backgroundColor: item, 
-                    borderColor: ((item.toLowerCase() == '#FFFDF3'.toLowerCase()) || (item.toLowerCase() ==  '#FFFFFF'.toLowerCase())) ? '#B8BDC4' : item
-                }]}>
-                {item == selectedValue ? (<Svg
-                    width={20}
-                    height={20}
-                    viewBox="0 0 33 33"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    style={styles.checkMark}
-                >
-                    <Circle cx={16.44} cy={16.44} r={16.44} fill="#28A664" />
-                    <Path
-                        d="M7.877 16.44l5.48 5.48 11.645-10.96"
-                        stroke="#fff"
-                        strokeWidth={2.74}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    />
-                </Svg>) : null}
-            </View>
-            </TouchableOpacity>)
-        })
-    }
-
-    renderColorPickerWrapper = (feature, hasSwitch = false) => {
-        let disabled = (this.state.avatarFeatures[feature] == 'none') ? true : false
+    renderAvatarFeatureOptions = (avatarFeature, type = "options")=>{
+        let featureValue = this.state.avatarFeatures[avatarFeature];
+        let selectOptions = avatarCustomizer[avatarFeature].map((value, i) => ({
+            label: spaceCamelCase(capitalizeFirstLetters((type == "binal") ? (value ? 'Shown' : 'Hidden') : value)),
+            value: value,
+            key: i
+        }))
         return (
             <View>
-                <View style={styles.sectionTitleWrapper}>
-                    <View><Text style={[styles.sectionTitle, (this.state.avatarFeatures[feature] == 'none') ? {opacity: 0.6} : null]}>{this.state.avatarFeaturesTitles[feature]}</Text></View>
-                    {hasSwitch ? 
-                        (<View>
-                            <Switch 
-                                trackColor={{ false: "#767577", true: "#DCBCA8" }}
-                                thumbColor={(this.state.avatarFeatures[feature] == 'none') ? "#f4f3f4" : "#C06A46" }
-                                ios_backgroundColor="#3e3e3e"
-                                onValueChange={(val) => {this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, [feature]: val ? avatarCustomizer[feature][0] : 'none'}}))}}
-                                value={(this.state.avatarFeatures[feature] == 'none') ? false : true}
-                            />
-                        </View>) 
-                    : null}
-                </View>
-                <View style={[styles.colorPickerWrapper, (this.state.avatarFeatures[feature] == 'none') ? {opacity: 0.6} : null]}>
-                    {this.renderColorPicker(feature, avatarCustomizer[feature], this.state.avatarFeatures[feature], disabled)}
-                </View>
-            </View>
-        )
-    }
-
-    renderAvatar = (avatarType = 'Male') => {
-        return this.AvatarSVGKeys[avatarType].map((item,i) =>{ 
-        // let AvatarSVGItem = this.AvatarSVGItems[item];
-        let AvatarSVGItem = {uri : item.toLowerCase() };
-        // console.log(item);
-          return (
-            <View style={styles.selectAvatarSVG} key={i}>
-                <TouchableOpacity onPress={()=>{this.setState(prevState => ({showSaveButton: true, avatarFeatures: {...prevState.avatarFeatures, avatarId:item }}))}}>
-                    <View style={{position: 'relative', borderRadius:1000, backgroundColor: '#FFEDEF'}}>
-                      {item == this.state.avatarFeatures.avatarId ? (<Svg
-                        width={20}
-                        height={20}
-                        viewBox="0 0 33 33"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                        style={styles.checkMark}
-                      >
-                        <Circle cx={16.44} cy={16.44} r={16.44} fill="#28A664" />
-                        <Path
-                            d="M7.877 16.44l5.48 5.48 11.645-10.96"
-                            stroke="#fff"
-                            strokeWidth={2.74}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </Svg>) : null}
-                    
-                        {/* <AvatarSVGItem width={65} height={65} avatarFeatures={{
-                            skinTone: this.state.avatarFeatures.skinTone,
-                            bgColor: this.state.avatarFeatures.bgColor
-                        }} /> */}
-                        <Image style={{width: 65, height: 65}} resizeMethod='resize' source={AvatarSVGItem} resizeMode='contain' />
+                <TouchableOpacity onPress={() => {
+                    if(type == 'colors'){
+                        this.setState({
+                            colorModal:{
+                                visible: true,
+                                feature: avatarFeature
+                            }
+                        })
+                    }
+                }}>
+                  <View style={{position: 'relative'}}>
+                    <View style={styles.featureOptionWrapper}>
+                        <View><Text style={styles.featureTitle}>{this.state.avatarFeaturesTitles[avatarFeature]}</Text></View>
+                        {
+                            (type == "options") 
+                            ? <View><Text style={styles.featureValue}>{spaceCamelCase(capitalizeFirstLetters(featureValue))}</Text></View>
+                            : (type == "binal") 
+                            ? <View><Text style={styles.featureValue}>{featureValue ? 'Shown' : 'Hidden'}</Text></View>
+                            : <View>
+                                <LinearGradient colors={[
+                                    avatarCustomizerColors[avatarFeature][featureValue].base,
+                                    avatarCustomizerColors[avatarFeature][featureValue].shadow
+                                ]} style={{height: 27, width:27, borderRadius:1000}} />
+                            </View>
+                        }
                     </View>
+                    {type == 'colors' ? null : <View style={{position:'absolute', top: 0, bottom: 0, left: 0, right: 0}}>
+                        <SelectPicker 
+                            value = {featureValue}
+                            onValueChange={(val) => {
+                                this.setState(prevState => ({
+                                    showSaveButton: true,
+                                    avatarFeatures:{
+                                        ...prevState.avatarFeatures,
+                                        [avatarFeature]:val
+                                    }
+                                }))
+                            }}
+                            items={selectOptions}
+                            placeholder={{}}
+                            useNativeAndroidPickerStyle = {false}
+                            style={{
+                                inputAndroid:{
+                                    fontSize: 16.5,
+                                    fontFamily: 'Poppins-Regular',
+                                    color: 'transparent',
+                                },
+                                inputAndroidContainer:{
+                                    backgroundColor: "transparent"
+                                },
+                            }}
+                        />
+                        
+                    </View>}
+                  </View>
                 </TouchableOpacity>
             </View>
-          )
-        })
+        )
     }
 
     onSaveAvatar= ()=>{
@@ -227,7 +206,6 @@ export default class customizeAvatar extends Component {
     }
 
     render() {
-        let AvatarPreviewSVG = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
         this.state.savingData ? this.onSaveAvatar() : null;
         this.state.alertMessage.show ? this.resetAlert() : null;
         return (
@@ -249,6 +227,68 @@ export default class customizeAvatar extends Component {
                 /> )
                 : null}
 
+                {this.state.colorModal.visible ? (<Modal
+                    isVisible={(this.state.hasNetworkConnection && this.state.colorModal.visible)}
+                    // coverScreen={false}
+                    animationIn="slideInUp"
+                    animationInTiming={500}
+                    hideModalContentWhileAnimating={true}
+                    onBackButtonPress={() => this.setState({colorModal: {visible: false}})}
+                    onBackdropPress={() => this.setState({colorModal: {visible: false}})}
+                    onSwipeComplete={() => this.setState({colorModal: {visible: false}})}
+                    swipeDirection={['down', 'up']}
+                    backdropColor= "#000000"
+                    backdropOpacity={0.03}
+                    style={{alignItems: 'center'}}
+                >
+                  <Shadow style={styles.colorSelectorViewShadow}>
+                    <View style={styles.colorSelectorView}>
+                        <View style={styles.colorPickerWrapper}>
+                            {avatarCustomizer[this.state.colorModal.feature].map((item, i) => (
+                                <TouchableOpacity onPress={() => {
+                                    this.setState(prevState => ({
+                                        colorModal: {visible: false},
+                                        showSaveButton: true,
+                                        avatarFeatures:{
+                                            ...prevState.avatarFeatures,
+                                            [this.state.colorModal.feature]:item
+                                        }
+                                    }))
+                                }} key={i}>
+                                    <LinearGradient 
+                                        colors={[
+                                            avatarCustomizerColors[this.state.colorModal.feature][item].base,
+                                            avatarCustomizerColors[this.state.colorModal.feature][item].shadow
+                                        ]}
+                                        
+                                        style={styles.colorPicker}
+                                    >
+                                        {item == this.state.avatarFeatures[this.state.colorModal.feature] ? (<Svg
+                                            width={20}
+                                            height={20}
+                                            viewBox="0 0 33 33"
+                                            fill="none"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            style={styles.checkMark}
+                                        >
+                                            <Circle cx={16.44} cy={16.44} r={16.44} fill="#28A664" />
+                                            <Path
+                                                d="M7.877 16.44l5.48 5.48 11.645-10.96"
+                                                stroke="#fff"
+                                                strokeWidth={2.74}
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </Svg>) : null}
+                                    </LinearGradient>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+                    </View>
+                  </Shadow>
+                </Modal> )
+                : null}
+
               <ScrollView 
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
@@ -264,67 +304,66 @@ export default class customizeAvatar extends Component {
 
                 <View style={[styles.avatarPreviewWrapper,this.state.scrollPosition > 30 ? {elevation: 2, backgroundColor: '#FFFEFC'} : null]}>
                     <View style={styles.avatarPreview}>
-                        <AvatarPreviewSVG width={180} height={180} avatarFeatures={this.state.avatarFeatures} />
+                        <BigHead
+                            accessory={this.state.avatarFeatures.accessory}
+                            bgColor={this.state.avatarFeatures.bgColor}
+                            bgShape={this.state.avatarFeatures.bgShape}
+                            body={this.state.avatarFeatures.body}
+                            clothing={this.state.avatarFeatures.clothing}
+                            clothingColor={this.state.avatarFeatures.clothingColor}
+                            eyebrows={this.state.avatarFeatures.eyebrows}
+                            eyes={this.state.avatarFeatures.eyes}
+                            facialHair={this.state.avatarFeatures.facialHair}
+                            graphic={this.state.avatarFeatures.graphic}
+                            hair={this.state.avatarFeatures.hair}
+                            hairColor={this.state.avatarFeatures.hairColor}
+                            hat={this.state.avatarFeatures.hat}
+                            hatColor={this.state.avatarFeatures.hatColor}
+                            lashes={this.state.avatarFeatures.lashes}
+                            lipColor={this.state.avatarFeatures.lipColor}
+                            mouth={this.state.avatarFeatures.mouth}
+                            showBackground={this.state.avatarFeatures.showBackground}
+                            size={230}
+                            skinTone={this.state.avatarFeatures.skinTone}
+                        />
                     </View>
                     <View><Text style={styles.avatarPreviewText}>Preview</Text></View>
                 </View>
 
                 <View style={styles.customizerWrapper}>
 
-                    <Touchable activeOpacity={0.6} onPress={()=> this.setState(prevState => ({accordionActive: !prevState.accordionActive}))}>
-                        <View style={styles.accordionWrapper}>
-                            <View><Text style={[styles.sectionTitle,styles.accordionTitle]}>Select Avatar</Text></View>
-                            <View>
-                                <Svg
-                                    width={39}
-                                    height={8}
-                                    viewBox={"0 0 39 20"}
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    style={this.state.accordionActive ? null : {transform:[{ rotate: "-90deg" }]}}
-                                >
-                                    <Path
-                                        d="M2 2l17.5 15.5L36.667 2"
-                                        stroke="#44577C"
-                                        strokeWidth={4}
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                    />
-                                </Svg>
-                            </View>
-                        </View>
-                    </Touchable>
+                    <View>
+                        {/* {this.renderColorPickerWrapper('skinTone')} */}
+                        <View><Text style={styles.sectionTitle}>Skin Tone</Text></View>
+                        {this.renderAvatarFeatureOptions('skinTone', 'colors')}
 
-                    { this.state.accordionActive ? 
-                    (<View style={[styles.selectAvatarContainer,this.state.accordionActive ? null : {opacity: 0, height: 0}]}>
-                        <View><Text style={styles.sectionTitle}>Male</Text></View>
-                        <View style={styles.selectAvatarSVGWrapper}>
-                            {this.renderAvatar('Male')}
-                        </View>
-                        
-                        <View><Text style={styles.sectionTitle}>Female</Text></View>
-                        <View style={styles.selectAvatarSVGWrapper}>
-                            {this.renderAvatar('Female')}
-                        </View>
-                    </View>)
-                        :
-                    (<View>
-                        {this.renderColorPickerWrapper('skinTone')}
+                        <View><Text style={styles.sectionTitle}>Body</Text></View>
+                        {this.renderAvatarFeatureOptions('body', 'options')}
+                        {this.renderAvatarFeatureOptions('clothing', 'options')}
+                        {this.renderAvatarFeatureOptions('clothingColor', 'colors')}
+                        {this.renderAvatarFeatureOptions('graphic', 'options')}
 
-                        {this.renderColorPickerWrapper('hairColor', true)}
+                        <View><Text style={styles.sectionTitle}>Hair</Text></View>
+                        {this.renderAvatarFeatureOptions('hair', 'options')}
+                        {this.renderAvatarFeatureOptions('facialHair', 'options')}
+                        {this.renderAvatarFeatureOptions('hairColor', 'colors')}
 
-                        {this.renderColorPickerWrapper('shirtColor')}
+                        <View><Text style={styles.sectionTitle}>Face</Text></View>
+                        {this.renderAvatarFeatureOptions('eyes', 'options')}
+                        {this.renderAvatarFeatureOptions('eyebrows', 'options')}
+                        {this.renderAvatarFeatureOptions('lashes', 'binal')}
+                        {this.renderAvatarFeatureOptions('mouth', 'options')}
+                        {this.renderAvatarFeatureOptions('lipColor', 'colors')}
 
-                        {this.renderColorPickerWrapper('shirtCollarColor')}
+                        <View><Text style={styles.sectionTitle}>Accessories</Text></View>
+                        {this.renderAvatarFeatureOptions('accessory', 'options')}
+                        {this.renderAvatarFeatureOptions('hat', 'options')}
+                        {this.renderAvatarFeatureOptions('hatColor', 'colors')}
 
-                        {this.renderColorPickerWrapper('eyeGlass', true)}
-
-                        {this.renderColorPickerWrapper('jewelry', true)}
-
-                        {this.renderColorPickerWrapper('bgColor')}
-                    </View>)
-}
-                    
+                            <View><Text style={styles.sectionTitle}>Accessories</Text></View>
+                            {this.renderAvatarFeatureOptions('bgShape', 'options')}
+                        {this.renderAvatarFeatureOptions('bgColor', 'colors')}
+                    </View>                    
 
                 </View>
 
@@ -342,27 +381,64 @@ const styles = StyleSheet.create({
     scrollContainerStyle:{
         paddingBottom: 150
     },
-
-    sectionTitleWrapper:{
-        flexDirection:'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
-    },
+    
     sectionTitle:{
-        fontFamily: 'Poppins-Regular',
-        fontSize: 17,
+        fontFamily: 'Poppins-Bold',
+        fontSize: 18,
         color: '#515D70',
         paddingTop: 15,
-        paddingBottom: 3
+        paddingBottom: 0
+    },
+
+    featureOptionWrapper:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignContent: 'center',
+        paddingVertical: 7
+    },
+    featureTitle:{
+        fontFamily: 'Poppins-Medium',
+        fontSize: 16,
+        color: '#515D70',
+    },
+    featureValue:{
+        fontFamily: 'Poppins-Regular',
+        fontSize: 14.5,
+        color: '#515D70',
+    },
+
+    colorSelectorView:{
+        backgroundColor: '#fff',
+        width: '100%',
+        // maxWidth:500,
+        marginHorizontal: 'auto',
+        paddingHorizontal: 20,
+        paddingVertical: 20,
+        borderRadius: 25,
+        // elevation: 3,
+        
+    },
+    colorSelectorViewShadow:{
+        shadowOffset: {width: 0, height: 0},
+        shadowOpacity: 0.19,
+        shadowColor: "#000000",
+        shadowRadius: 10,
+        borderRadius: 15,
+        backgroundColor: 'transparent',
+        width:'100%',
+        maxWidth:500,
+        overflow: 'hidden',
+        position: 'absolute',
+        bottom: 20
     },
 
 
     avatarPreviewWrapper:{
         width: '100%',
         alignItems: 'center',
-        paddingTop: 15,
+        paddingTop: 0,
         paddingBottom: 10,
-        marginTop: 35,
+        marginTop: 0,
         marginBottom: 10,
         width: dWidth,
         backgroundColor : '#FFFFFF'
@@ -383,37 +459,11 @@ const styles = StyleSheet.create({
     },
 
 
-    accordionWrapper:{
-        flexDirection:'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 5,
-        marginHorizontal: -5,
-        marginBottom: -8
-    },
-    accordionTitle:{
-        color:'#000000',
-        paddingBottom: 10,
-    },
-
-    selectAvatarContainer:{
-        marginTop: -10,
-        marginBottom: 15
-    },
-    selectAvatarSVGWrapper:{
-        flexDirection: 'row',
-        flexWrap: 'wrap'
-    },
-    selectAvatarSVG:{
-        marginHorizontal: 4,
-        marginVertical: 4,
-    },
-
-
     colorPickerWrapper:{
         flexDirection: 'row',
+        // justifyContent: 'space-between',
         flexWrap: 'wrap',
-        marginBottom: 15
+        // marginBottom: 15
     },
     colorPicker:{
         width: 50,
@@ -422,8 +472,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 4,
         marginVertical: 4,
         backgroundColor: '#ffffff',
-        borderColor: '#000000',
-        borderWidth: 1,
         position: 'relative'
     },
 

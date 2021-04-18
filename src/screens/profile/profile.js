@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import Svg, { Circle, Path } from "react-native-svg";
-import { Shadow } from 'react-native-neomorph-shadows';
+import Shadow from 'react-native-drop-shadow';
 import ViewShot, {captureRef} from "react-native-view-shot";
 import NetInfo from "@react-native-community/netinfo";
 
@@ -11,8 +11,7 @@ import {dWidth} from '../../includes/variables';
 import {onShare, goToScreen} from '../../includes/functions';
 import ContactsModal from '../../UIComponents/Modals/DefaultModal';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
-
-import * as AvatarSVG from '../../SVG_Files/avatarSVG';
+import AvatarRender from '../../components/avatarRender/avatarRender';
 
 let prevComponentId;
 
@@ -23,7 +22,6 @@ export default class profile extends Component {
     unsubscribeNetworkUpdate;
     viewShot = React.createRef();
     state = {
-        actionsWrapperHeight: 410,
         contactModal: false,
         displayName: (
             (typeof this.userData.displayName == 'undefined' || this.userData.displayName == null || this.userData.displayName.trim() == "") 
@@ -89,7 +87,6 @@ export default class profile extends Component {
     }
 
     render() {
-        let AvatarSVGView = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
         return (
             <View style={styles.container}>
                 <ContactsModal 
@@ -122,7 +119,7 @@ export default class profile extends Component {
                         })}}>
                             <ViewShot ref={this.viewShot} options={{ format: "png" }}>
                                 <View style={styles.avatar}>
-                                    <AvatarSVGView width={100} height={100} avatarFeatures={this.state.avatarFeatures} />
+                                    <AvatarRender size={100} avatarFeatures={this.state.avatarFeatures} />
                                 </View>
                             </ViewShot>
                         </TouchableOpacity>
@@ -135,13 +132,8 @@ export default class profile extends Component {
                     </View>
                 </View>
                 <View style={styles.bottom}>
-                    <Shadow
-                        useArt
-                        style={[styles.actionsWrapperShadow, {height:this.state.actionsWrapperHeight}]}
-                    >
-                        <View style={styles.actionsWrapper} onLayout={(e) => {
-                            this.setState({actionsWrapperHeight: e.nativeEvent.layout.height})
-                        }}>
+                    <Shadow style={styles.actionsWrapperShadow}>
+                        <View style={styles.actionsWrapper}>
                             <TouchableOpacity activeOpacity={0.8} onPress={() => {this.goToScreenFunc('com.lysts.screen.save_archive',{show: 'saved',avatarImage: this.state.avatarTempImage})}}>
                                 <View style={styles.action}>
                                     <View style={styles.actionWrapper}>
@@ -488,7 +480,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: 'transparent',
         width: dWidth - 50,
-        height:410,
+        // height:410,
         overflow: 'hidden'
     },
     actionsWrapper:{

@@ -1,37 +1,32 @@
 import React, {useState, useEffect} from 'react';
 import {View, Image, StyleSheet } from 'react-native';
+import { BigHead } from 'react-native-bigheads'
 
-import * as AvatarSVG from '../../SVG_Files/avatarSVG';
-
-export default function avatarRender({ avatarFeatures}) {
-    const [showAvatar, setShowAvatar] = useState(false)  
-
-    let AvatarSVGView = avatarFeatures.avatarId.toLowerCase().includes('f') 
-                            ? AvatarSVG.Female[avatarFeatures.avatarId] 
-                            : AvatarSVG.Male[avatarFeatures.avatarId];
-
-
-    let showAvatarTimeout = showAvatar ? null : setTimeout(() => {
-      setShowAvatar(true)
-    }, 100); 
-
-
-    useEffect(() => {
-      return () => {
-        clearTimeout(showAvatarTimeout)
-      };
-    }, []);
+export default function avatarRender({ avatarFeatures, size}) {
     return (
     <View>
-        <View style={[styles.image,{display: showAvatar ? 'flex' : 'none'}]}>
-          <AvatarSVGView width={60} height={60} avatarFeatures={avatarFeatures} />
-        </View>
-        <Image
-            style={[styles.image,{display: showAvatar ? 'none' : 'flex'}]}
-            blurRadius={80}
-            resizeMode='cover'
-            source={{uri: 'f001'}}
-        />
+      <BigHead
+          accessory={avatarFeatures.accessory}
+          bgColor={avatarFeatures.bgColor}
+          bgShape={avatarFeatures.bgShape}
+          body={avatarFeatures.body}
+          clothing={avatarFeatures.clothing}
+          clothingColor={avatarFeatures.clothingColor}
+          eyebrows={avatarFeatures.eyebrows}
+          eyes={avatarFeatures.eyes}
+          facialHair={avatarFeatures.facialHair}
+          graphic={avatarFeatures.graphic}
+          hair={avatarFeatures.hair}
+          hairColor={avatarFeatures.hairColor}
+          hat={avatarFeatures.hat}
+          hatColor={avatarFeatures.hatColor}
+          lashes={avatarFeatures.lashes}
+          lipColor={avatarFeatures.lipColor}
+          mouth={avatarFeatures.mouth}
+          showBackground={avatarFeatures.showBackground}
+          size={size}
+          skinTone={avatarFeatures.skinTone}
+      />
     </View>
   )
 }

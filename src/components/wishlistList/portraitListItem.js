@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Shadow } from 'react-native-neomorph-shadows';
+import Shadow from 'react-native-drop-shadow';
 
 import {getCategoryDisplay, onBookmark} from '../../includes/functions';
 
@@ -14,10 +14,7 @@ import {dWidth} from '../../includes/variables';
     // let cardsPerRow = dWidth > 575 ? 3 : 2
     let cardWidth = ((dWidth /cardsPerRow ) - 30);
     return (
-        <Shadow
-            useArt 
-            style={[styles.cardBoxShadow, {width: cardWidth, height: ((cardWidth*68)/148)+125.5}]}
-        >
+        <Shadow style={styles.cardBoxShadow}>
             <TouchableOpacity activeOpacity={0.8} onPress={() => action(data.code, data.saved)}>
                 <View style={[styles.cardBox, {width: cardWidth}]}>
                     <View style={styles.top}>
@@ -50,8 +47,7 @@ const styles = StyleSheet.create({
         shadowOffset: {width: 0, height: 1},
         shadowOpacity: 0.05,
         shadowColor: "#000000",
-        shadowRadius: 10,
-        borderRadius: 10,
+        shadowRadius: 7,
         backgroundColor: 'transparent',
         // height:560, 
         // overflow: 'hidden' ,

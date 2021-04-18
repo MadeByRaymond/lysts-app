@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react'
 import { StyleSheet, Text, View, Vibration } from 'react-native'
 import Svg, { Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
-import { Shadow } from 'react-native-neomorph-shadows';
+import Shadow from 'react-native-drop-shadow';
 import Sound from 'react-native-sound';
 
 import {dWidth} from '../../../includes/variables'
@@ -130,10 +130,7 @@ export default function errorSuccessAlert({title, subtitle, type = ('success' ||
     }
     return (
         <Animatable.View animation={animationState} duration={500} useNativeDriver={true} style={[styles.wrapper, wrapperContainerStyle]}>
-          <Shadow
-            useArt
-            style={[styles.alertShadow, {shadowColor: primaryColor}]}
-          >
+          <Shadow style={[styles.alertShadow, {shadowColor: primaryColor}]}>
             <View style={[styles.background, {backgroundColor: primaryColor}]}>
               <View style={styles.textWrapper}>
                 <View><Text style={styles.title}>{title}</Text></View>
@@ -165,10 +162,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     shadowColor: "#272C2F",
     shadowRadius: 8,
-    borderRadius: 4,
     backgroundColor: 'transparent',
-    width: (dWidth > 530) ? 500 : (dWidth -25),
-    height: 55,
+    // width: (dWidth > 530) ? 500 : (dWidth -25),
+    // height: 55,
     // overflow: 'hidden'
   },
   background:{

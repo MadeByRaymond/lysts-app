@@ -27,7 +27,6 @@ const profileNavHeader = ({theme = 'theme1' ,avatarImage, onPressFunc}) => {
                 <View style={styles.profileWrapper}>
                 <View style={styles.profileAvatarWrapper}>
                     <Image source={{uri: avatarImage}} resizeMethod='scale' resizeMode='cover' style={styles.profileAvatar} />
-                    {/* <AvatarSVGView width={60} height={60} avatarFeatures={realmApp.currentUser.customData.avatarFeatures} /> */}
                 </View>
                 <View style={styles.profileTextWrapper}><Text style={styles.profileText}>Profile</Text></View>
                 </View>
