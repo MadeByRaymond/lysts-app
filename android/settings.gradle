@@ -23,8 +23,6 @@ include ':@react-native-community_blur'
 project(':@react-native-community_blur').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/blur/android')
 include ':react-native-linear-gradient'
 project(':react-native-linear-gradient').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-linear-gradient/android')
-include ':@react-native-community_art'
-project(':@react-native-community_art').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/art/android')
 include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-navigation'
