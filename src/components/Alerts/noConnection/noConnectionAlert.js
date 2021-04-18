@@ -2,7 +2,7 @@ import React, {useEffect} from 'react'
 import { StyleSheet, Text, View, Vibration } from 'react-native'
 import Svg, { Path } from "react-native-svg"
 import * as Animatable from 'react-native-animatable';
-import { Shadow } from 'react-native-neomorph-shadows';
+import Shadow from 'react-native-drop-shadow';
 
 import {dWidth} from '../../../includes/variables';
 
@@ -12,10 +12,7 @@ export default function noConnectionAlert(props) {
     }, []);
     return (
         <Animatable.View animation="fadeInUp" duration={500} useNativeDriver={true} style={[styles.wrapper, props.wrapperContainerStyle ? props.wrapperContainerStyle : null]}>
-          <Shadow
-            useArt
-            style={styles.alertShadow}
-          >
+          <Shadow style={styles.alertShadow}>
             <View style={styles.background}>
               <View><Text style={styles.text}>No Network Connection</Text></View>
               <View>
@@ -59,10 +56,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.75,
     shadowColor: "#C06A46",
     shadowRadius: 8,
-    borderRadius: 4,
     backgroundColor: 'transparent',
-    width: (dWidth > 530) ? 500 : (dWidth -25),
-    height:55,
     overflow: 'hidden',
     alignItems: 'center'
   },
@@ -71,6 +65,7 @@ const styles = StyleSheet.create({
     height:55,
     width: dWidth - 25,
     maxWidth: 500,
+    borderRadius: 4,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

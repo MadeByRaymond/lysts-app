@@ -17,6 +17,10 @@ export function capitalizeFirstLetters(val) {
     return val.join(" ");
 }
 
+export function spaceCamelCase(val) {
+    return val.replace( /([A-Z])/g, " $1" );;
+}
+
 export function removeExcessWhiteSpace (value){
   return value !== value.trim() ? (value.trim() + ' ') : value;
 }

@@ -5,6 +5,7 @@ import { Navigation } from "react-native-navigation";
 import Svg, { Circle, Path } from "react-native-svg";
 import NetInfo from "@react-native-community/netinfo";
 import debounce from 'lodash.debounce';
+import Clipboard from "@react-native-community/clipboard";
 
 import {ActionsModal} from '../../UIComponents/Modals/ActionsModal';
 import DefaultModal from '../../UIComponents/Modals/DefaultModal';
@@ -13,14 +14,13 @@ import ErrorView from '../../components/Errors/errorView';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
 import AvatarRender from '../../components/avatarRender/avatarRender';
-import Clipboard from "@react-native-community/clipboard";
 
 import * as ImageSVG from '../../SVG_Files/viewWishlistSVG';
 import Loader from '../../components/Loader/loader';
 import {Bottom as FadeBottom} from '../../UIComponents/GradientFade/gradientFade';
 import {getCategoryDisplay, onShare, onBookmark as onBookmarkFunc, onReport as onReportFunc} from '../../includes/functions';
 import {dWidth, dHeight, mongoClientCluster} from '../../includes/variables';
-import {categories} from '../../includes/datasets';
+import {categories, avatarCustomizer} from '../../includes/datasets';
 
 import {app as realmApp} from '../../../storage/realm';
 import * as Schemas from '../../../storage/schemas';
@@ -64,8 +64,26 @@ export default class wishlistDetails extends Component {
                 // }
             ]
         },
-        avatarFeatures:{
-            avatarId: 'M001'
+        avatarFeatures: {
+            accessory : `${avatarCustomizer.accessory[0]}`,
+            bgColor : `${avatarCustomizer.bgColor[0]}`,
+            bgShape : `${avatarCustomizer.bgShape[0]}`,
+            body : `${avatarCustomizer.body[0]}`,
+            clothing : 'shirt',
+            clothingColor : `${avatarCustomizer.clothingColor[0]}`,
+            eyebrows : `${avatarCustomizer.eyebrows[0]}`,
+            eyes : `${avatarCustomizer.eyes[0]}`,
+            facialHair : 'none',
+            graphic : 'none',
+            hair : 'none',
+            hairColor : `${avatarCustomizer.hairColor[0]}`,
+            hat : 'none',
+            hatColor : `${avatarCustomizer.hatColor[0]}`,
+            lashes : false,
+            lipColor : 'red',
+            mouth : `${avatarCustomizer.mouth[0]}`,
+            showBackground : true,
+            skinTone : `${avatarCustomizer.skinTone[0]}`,
         },
         noData: {value:true, message: 'Loading...', svgComponent: wishlistNotExist},
         actionsModal : false,
@@ -745,7 +763,7 @@ export default class wishlistDetails extends Component {
                             </View>
                             <View>
                                 <View style={styles.imageAvatar}>
-                                    <AvatarRender avatarFeatures={this.state.avatarFeatures} />
+                                    <AvatarRender avatarFeatures={this.state.avatarFeatures} size={60} />
                                 </View>
                             </View>
                         </View>

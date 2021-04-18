@@ -383,15 +383,4 @@ const styles = StyleSheet.create({
       paddingTop: 3
     },
     notificationSoundPlayIcon:{ marginLeft:5},
-
-    credits:{
-        alignItems:'center',
-        position: 'absolute',
-        bottom: 30,
-        left: '50%',
-        transform: [{
-            translateX: -(111/2)
-        }]
-        
-    }
 })

@@ -7,12 +7,11 @@ import Button from '../../UIComponents/Buttons/ButtonWithShadow/floatingButton';
 import InfoForm from '../../components/Forms/profileForms/profileInfoForm';
 import ErrorSuccessAlert from '../../components/Alerts/ErrorSuccess/errorSuccessAlert';
 import NoConnectionAlert from '../../components/Alerts/noConnection/noConnectionAlert';
+import AvatarRender from '../../components/avatarRender/avatarRender';
 
 import {removeExcessWhiteSpace, validateEmail, goToScreen, saveUserData_MongoCRUD} from '../../includes/functions';
 
 import {app as realmApp} from '../../../storage/realm';
-
-import * as AvatarSVG from '../../SVG_Files/avatarSVG';
 
 let prevComponentId;
 
@@ -199,7 +198,6 @@ export default class profileInfo extends Component {
     render() {
         this.state.savingData ? this.saveData() : null;
         this.state.alertMessage.show ? this.resetAlert() : null;
-        let AvatarSVGView = this.state.avatarFeatures.avatarId.toLowerCase().includes('f') ? AvatarSVG.Female[this.state.avatarFeatures.avatarId] : AvatarSVG.Male[this.state.avatarFeatures.avatarId];
         return (
             <View style={styles.container}>
                 {this.state.alertMessage.show ? (<ErrorSuccessAlert 
@@ -230,7 +228,7 @@ export default class profileInfo extends Component {
                             <View>
                                 <View style={styles.avatarWrapper}>
                                     <View style={styles.avatar}>
-                                        <AvatarSVGView width={150} height={150} avatarFeatures={this.state.avatarFeatures} />
+                                        <AvatarRender size={150} avatarFeatures={this.state.avatarFeatures} />
                                     </View>
                                 </View>
                                 <View><Text style={styles.changeAvatarText}>Customize avatar</Text></View>

@@ -121,44 +121,9 @@ const styles = StyleSheet.create({
       paddingHorizontal: 25,
       paddingVertical: 20
     },
-    settingRow:{
-        flexDirection:'row',
-        alignItems: 'center',
-        marginBottom: 20
-    },
-    settingSVGWrapper:{
-        marginRight: 10
-    },
-    settingTextWrapper:{
-        paddingTop: 2
-    },
     settingText:{
         color: '#515D70',
         fontSize: 16.5,
         fontFamily: 'Poppins-Regular'
     },
-    checkSettingsWrapper:{
-      flexDirection:'row',
-      justifyContent:'space-between',
-      alignItems:'center',
-      width: (dWidth - 35 - 25 - 25 - 10)
-    },
-    divider:{
-        backgroundColor: '#E4E7EA',
-        height: 2,
-        opacity: 0.5,
-        marginTop: 12,
-        marginBottom: 30
-    },
-
-    credits:{
-        alignItems:'center',
-        position: 'absolute',
-        bottom: 30,
-        left: '50%',
-        transform: [{
-            translateX: -(111/2)
-        }]
-        
-    }
 })

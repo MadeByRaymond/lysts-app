@@ -36,6 +36,7 @@ import Settings from  "./src/screens/settings/settings";
 import AboutSettings from  "./src/screens/settings/about_settings";
 import NotificationSettings from  "./src/screens/settings/notification_settings";
 import SecuritySettings from  "./src/screens/settings/security_settings";
+import DonationsSupport from  "./src/screens/settings/support_donations";
 import WebView from  "./src/screens/webView/webView";
 
 // APP COMPONENTS IMPORTS
@@ -67,6 +68,7 @@ Navigation.registerComponent('com.lysts.screen.settings', () => Settings);
 Navigation.registerComponent('com.lysts.screen.aboutSettings', () => AboutSettings);
 Navigation.registerComponent('com.lysts.screen.notificationSettings', () => NotificationSettings);
 Navigation.registerComponent('com.lysts.screen.securitySettings', () => SecuritySettings);
+Navigation.registerComponent('com.lysts.screen.supportDonations', () => DonationsSupport);
 Navigation.registerComponent('com.lysts.screen.webView', () => WebView);
 
 // NON SCREEN COMPONENTS REGISTER
