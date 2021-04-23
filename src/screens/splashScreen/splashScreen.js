@@ -4,6 +4,7 @@ import LottieView from 'lottie-react-native'
 import {Navigation} from 'react-native-navigation';
 import {View as AnimatableView} from 'react-native-animatable'
 import RNBootSplash from "react-native-bootsplash";
+import SpInAppUpdates, { IAUUpdateKind } from 'sp-react-native-in-app-updates';
 
 import {getRoot} from '../../../App';
 
@@ -11,6 +12,29 @@ import CreditsSVG from '../../SVG_Files/UI_SVG/Credits/credits';
 import {dWidth, dHeight} from '../../includes/variables'
 
 let loaderSource = require('../../lotti_animations/42790-logo-animation.json');
+
+let animationFinishedFunc = () => {
+    const inAppUpdates = new SpInAppUpdates(
+        false // isDebug (boolean)
+      );
+
+    inAppUpdates.checkNeedsUpdate({ curVersion: '1.1.0' }).then((result) => {
+        if (result.shouldUpdate) {
+            inAppUpdates.startUpdate({
+                updateType : IAUUpdateKind.IMMEDIATE
+            });
+        }else{
+            getRoot().then(root => {
+                Navigation.setRoot(root)
+            })
+        }
+    }).catch((e) =>{
+        getRoot().then(root => {
+            Navigation.setRoot(root)
+        })
+    });
+}
+
 
 export default function SplashScreen() {
 
@@ -30,9 +54,7 @@ export default function SplashScreen() {
                     autoSize= {true}
                     speed={1}
                     onAnimationFinish={()=>{
-                        getRoot().then(root => {
-                            Navigation.setRoot(root)
-                        })
+                        animationFinishedFunc();
                     }}
                 />
                 

@@ -45,7 +45,8 @@
     "react-native-view-shot": "^3.1.2",
     "react-native-webview": "^11.3.2",
     "react-native-wizard": "^2.1.0",
-    "realm": "^10.0.1"
+    "realm": "^10.0.1",
+    "sp-react-native-in-app-updates": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

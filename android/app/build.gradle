@@ -133,8 +133,8 @@ android {
         applicationId "com.madebyraymond.lysts"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 101
-        versionName "1.1"
+        versionCode 10100
+        versionName "1.1.0"
         multiDexEnabled true
     }
     splits {
