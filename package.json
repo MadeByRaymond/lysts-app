@@ -11,7 +11,8 @@
     "test": "jest",
     "lint": "eslint .",
     "clean-android": "cd android && gradlew clean && cd ..",
-    "clean-assemble-android": "cd android && gradlew clean assembleDebug && cd .."
+    "clean-assemble-android": "cd android && gradlew clean assembleDebug && cd ..",
+    "bundle-release": "cd android && gradlew bundleRelease"
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.11.0",
